@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main role="main">
+
+  <div class="container">
+      {% if triggers_list %}
+      <ul>
+          {% for trigger in triggers_list %}<li>{{ trigger.description }} - {{ trigger.rss_url }} - {{ trigger.joplin_folder }}</li>{% endfor %}
+      </ul>
+      {% else %}
+      <em>None</em>
+      {% endif %}
+      <div class="service-form">
+          <h4>New Trigger</h4>
+          <form method="POST" action='{{ url_for('add_trigger') }}'>
+            {{ form['description'] }}
+            <div class="form-group">
+                <label for="form-triggerschema-joplin-folder">
+                    Joplin Folder
+                </label>
+                <input type="text" class="form-control " id="form-triggerschema-joplin-folder" name="joplin_folder" required >
+            </div>
+            <div class="form-group">
+                <label for="form-triggerschema-rss-url">
+                    RSS URL
+                </label>
+                <input type="text" class="form-control " id="form-triggerschema-rss-url" name="rss_url" required >
+            </div>
+            <div class="form-group">
+                <label for="form-triggerschema-description">
+                    Description
+                </label>
+                <input type="text" class="form-control " id="form-triggerschema-description" name="description" required >
+            </div>
+            <div class="submit-controls">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+      </div>
+
+  </div> <!-- /container -->
+
+</main>
+{% endblock %}
