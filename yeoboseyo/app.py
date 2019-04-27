@@ -39,26 +39,38 @@ async def homepage(request):
     """
     triggers = await Trigger.objects.all()
     template = "index.html"
-    form = forms.Form(TriggerSchema)
-    context = {"request": request, "form": form, "triggers_list": triggers}
-    return templates.TemplateResponse(template, context)
+    if request.method == 'GET':
+        # trigger_id provided, form to edit this one
+        if 'trigger_id' in request.path_params:
+            trigger_id = int(request.path_params['trigger_id'])
+            trigger = await Trigger.objects.get(id=trigger_id)
+            form = forms.Form(TriggerSchema, values=trigger)
+        # empty form
+        else:
+            form = forms.Form(TriggerSchema)
 
+        context = {"request": request, "form": form, "triggers_list": triggers}
+        return templates.TemplateResponse(template, context)
+    # POST
+    else:
+        data = await request.form()
+        trigger, errors = TriggerSchema.validate_or_error(data)
 
-async def add_trigger(request):
-    data = await request.form()
-    trigger, errors = TriggerSchema.validate_or_error(data)
-    print(trigger, errors)
-    if errors:
-        triggers = await Trigger.objects.all()
-        form = forms.Form(TriggerSchema, values=data, errors=errors)
-        context = {"request": request, "form": form, "triggers": triggers}
-        return templates.TemplateResponse("index.html", context)
-    # Execute
-    await Trigger.objects.create(rss_url=trigger.rss_url,
-                                 joplin_folder=trigger.joplin_folder,
-                                 description=trigger.description)
+        if errors:
+            form = forms.Form(TriggerSchema, values=data, errors=errors)
+            context = {"request": request, "form": form, "triggers_list": triggers}
+            return templates.TemplateResponse(template, context)
 
-    return RedirectResponse(request.url_for("homepage"))
+        if 'trigger_id' in request.path_params:
+            await Trigger.objects.save(rss_url=trigger.rss_url,
+                                       joplin_folder=trigger.joplin_folder,
+                                       description=trigger.description)
+        else:
+            await Trigger.objects.create(rss_url=trigger.rss_url,
+                                         joplin_folder=trigger.joplin_folder,
+                                         description=trigger.description)
+        return RedirectResponse(request.url_for("homepage"))
+
 
 # HTTP Requests
 # Error Pages
@@ -74,8 +86,8 @@ async def not_found(request, exc):
 app = Starlette(
     debug=True,
     routes=[
-        Route('/', homepage, methods=['GET'], name='homepage'),
-        Route('/', add_trigger, methods=['POST'], name='add_trigger'),
+        Route('/', homepage, methods=['GET', 'POST'], name='homepage'),
+        Route('/id/{trigger_id}', homepage, methods=['GET'], name='homepage'),
         Mount('/static', StaticFiles(directory='static'), name='static')
     ],
 )

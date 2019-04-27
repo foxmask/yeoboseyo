@@ -3,42 +3,28 @@
 {% block content %}
 <main role="main">
 
-  <div class="container">
-      {% if triggers_list %}
-      <ul>
-          {% for trigger in triggers_list %}<li>{{ trigger.description }} - {{ trigger.rss_url }} - {{ trigger.joplin_folder }}</li>{% endfor %}
-      </ul>
-      {% else %}
-      <em>None</em>
-      {% endif %}
-      <div class="service-form">
-          <h4>New Trigger</h4>
-          <form method="POST" action='{{ url_for('add_trigger') }}'>
-            {{ form['description'] }}
+    <div class="container">
+        <h4>Trigger</h4>
+        <form method="POST" action='{{ url_for('homepage') }}'>
             <div class="form-group">
-                <label for="form-triggerschema-joplin-folder">
-                    Joplin Folder
-                </label>
-                <input type="text" class="form-control " id="form-triggerschema-joplin-folder" name="joplin_folder" required >
+            {{ form }}
             </div>
-            <div class="form-group">
-                <label for="form-triggerschema-rss-url">
-                    RSS URL
-                </label>
-                <input type="text" class="form-control " id="form-triggerschema-rss-url" name="rss_url" required >
-            </div>
-            <div class="form-group">
-                <label for="form-triggerschema-description">
-                    Description
-                </label>
-                <input type="text" class="form-control " id="form-triggerschema-description" name="description" required >
-            </div>
-            <div class="submit-controls">
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-          </form>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
       </div>
-
+      <hr/>
+      <table class="table table-striped table-hover">
+          <thead>
+            <tr><th scope="col">ID</th><th scope="col">Description</th><th scope="col">RSS URL</th><th scope="col">Joplin Folder</th></tr>
+          </thead>
+          {% if triggers_list %}
+          <tbody>
+            {% for trigger in triggers_list %}
+            <tr><td>{{ trigger.id }}</td><td>{{ trigger.description }}</td><td>{{ trigger.rss_url }} </td><td>{{ trigger.joplin_folder }}</td></tr>
+            {% endfor %}
+          </tbody>
+          {% endif %}
+      </table>
   </div> <!-- /container -->
 
 </main>

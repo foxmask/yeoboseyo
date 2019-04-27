@@ -14,12 +14,13 @@ config = Config('.env')
 DATABASE_URL = config('DATABASE_URL')
 database = databases.Database(DATABASE_URL, force_rollback=True)
 
+
 class Trigger(orm.Model):
     __tablename__ = "trigger"
     __database__ = database
     __metadata__ = metadata
 
-    id  = orm.Integer(primary_key=True)
+    id = orm.Integer(primary_key=True)
     rss_url = orm.String(max_length=255)
     joplin_folder = orm.String(max_length=80)
     description = orm.String(max_length=200)
@@ -30,6 +31,7 @@ class Trigger(orm.Model):
     date_result = orm.DateTime(allow_null=True)
     provider_failed = orm.Integer(allow_null=True)
     consumer_failed = orm.Integer(allow_null=True)
+
 
 # Bootstrap
 if __name__ == '__main__':
