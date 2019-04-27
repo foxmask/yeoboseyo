@@ -42,7 +42,7 @@ async def homepage(request):
     if request.method == 'GET':
         # trigger_id provided, form to edit this one
         if 'trigger_id' in request.path_params:
-            trigger_id = int(request.path_params['trigger_id'])
+            trigger_id = request.path_params['trigger_id']
             trigger = await Trigger.objects.get(id=trigger_id)
             form = forms.Form(TriggerSchema, values=trigger)
         # empty form
@@ -62,14 +62,29 @@ async def homepage(request):
             return templates.TemplateResponse(template, context)
 
         if 'trigger_id' in request.path_params:
-            await Trigger.objects.save(rss_url=trigger.rss_url,
-                                       joplin_folder=trigger.joplin_folder,
-                                       description=trigger.description)
+            trigger_id = int(request.path_params['trigger_id'])
+            trigger = await Trigger.objects.get(id=trigger_id)
+            await trigger.update(rss_url=trigger.rss_url,
+                                 joplin_folder=trigger.joplin_folder,
+                                 description=trigger.description)
         else:
             await Trigger.objects.create(rss_url=trigger.rss_url,
                                          joplin_folder=trigger.joplin_folder,
                                          description=trigger.description)
         return RedirectResponse(request.url_for("homepage"))
+
+
+async def delete(request):
+    """
+    get the list of triggers
+    :param request:
+    :return:
+    """
+    if 'trigger_id' in request.path_params:
+        trigger_id = int(request.path_params['trigger_id'])
+        trigger = await Trigger.objects.get(id=trigger_id)
+        await trigger.delete()
+    return RedirectResponse(request.url_for("homepage"))
 
 
 # HTTP Requests
@@ -87,7 +102,8 @@ app = Starlette(
     debug=True,
     routes=[
         Route('/', homepage, methods=['GET', 'POST'], name='homepage'),
-        Route('/id/{trigger_id}', homepage, methods=['GET'], name='homepage'),
+        Route('/id/{trigger_id:int}', homepage, methods=['GET'], name='homepage'),
+        Route('/delete/{trigger_id:int}', delete, methods=['GET'], name='delete'),
         Mount('/static', StaticFiles(directory='static'), name='static')
     ],
 )

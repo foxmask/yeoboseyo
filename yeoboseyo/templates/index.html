@@ -1,31 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
-<main role="main">
+<div class="col-xs-5 col-md-5 col-lg-5">
+    <form method="POST" action='{{ url_for('homepage') }}'>
+        {{ form }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+<div class="col-xs-7 col-md-7 col-lg-7">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr><th scope="col">Description</th>
+                <th scope="col">RSS URL</th>
+                <th scope="col">Joplin Folder</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        {% if triggers_list %}
+        <tbody>
+        {% for trigger in triggers_list %}
+            <tr><td><a href="{{ url_for('homepage', trigger_id=trigger.id)}}" title="Edit this trigger">{{ trigger.description }}</a></td>
+                <td><a href="{{ trigger.rss_url }}" title="go to this URL">{{ trigger.rss_url }}</a> </td>
+                <td>{{ trigger.joplin_folder }}</td>
+                <td>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#trigger{{ trigger.id }}">Delete</button>
+                    <div class="modal fade" id="trigger{{ trigger.id }}" tabindex="-1" role="dialog" aria-labelledby="trigger{{ trigger.id}}Label" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Deletion : {{ trigger.description }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <p>are your sure you want to delete this trigger ? {{ trigger.description }}</p>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <a href="{{ url_for('delete', trigger_id=trigger.id)}}" class="btn btn-danger" role="button">Delete it</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        {% endif %}
+    </table>
+</div>
 
-    <div class="container">
-        <h4>Trigger</h4>
-        <form method="POST" action='{{ url_for('homepage') }}'>
-            <div class="form-group">
-            {{ form }}
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-      </div>
-      <hr/>
-      <table class="table table-striped table-hover">
-          <thead>
-            <tr><th scope="col">ID</th><th scope="col">Description</th><th scope="col">RSS URL</th><th scope="col">Joplin Folder</th></tr>
-          </thead>
-          {% if triggers_list %}
-          <tbody>
-            {% for trigger in triggers_list %}
-            <tr><td>{{ trigger.id }}</td><td>{{ trigger.description }}</td><td>{{ trigger.rss_url }} </td><td>{{ trigger.joplin_folder }}</td></tr>
-            {% endfor %}
-          </tbody>
-          {% endif %}
-      </table>
-  </div> <!-- /container -->
 
-</main>
 {% endblock %}
