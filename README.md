@@ -20,10 +20,31 @@ source bin/activate
 pip install -r requirements.txt
 ```
 
+## Database
+
 create the database (to execute only once)
 ```bash
 python models.py
 ```
+
+## Settings
+```bash
+mv env.sample .env
+```
+set the correct values for oyour environments
+```ini
+DATABASE_URL=sqlite:///db.sqlite3
+TIME_ZONE=Europe/Paris
+JOPLIN_URL=http://127.0.0.1
+JOPLIN_PORT=41184
+JOPLIN_TOKEN=
+FORMAT_FROM=markdown_github
+FORMAT_TO=html
+BYPASS_BOZO=False
+LOG_LEVEL=logging.INFO
+```
+
+## Running
 
 start the application
 ```bash
