@@ -8,7 +8,6 @@ import orm
 from starlette.config import Config
 import sqlalchemy
 
-
 metadata = sqlalchemy.MetaData()
 config = Config('.env')
 DATABASE_URL = config('DATABASE_URL')

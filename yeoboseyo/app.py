@@ -2,33 +2,23 @@
 """
    여보세요 App
 """
-import databases
-# yeoboseyo
-from forms import TriggerSchema
-from models import Trigger
-
 # starlette
 from starlette.applications import Starlette
-from starlette.config import Config
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
-
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
-
-import sqlalchemy
 # schema validation
 import typesystem
+# uvicorn
 import uvicorn
+# yeoboseyo
+from yeoboseyo.forms import TriggerSchema
+from yeoboseyo.models import Trigger
 
 forms = typesystem.Jinja2Forms(package="bootstrap4")
 templates = Jinja2Templates(directory="templates")
 statics = StaticFiles(directory="static")
-
-metadata = sqlalchemy.MetaData()
-config = Config('.env')
-DATABASE_URL = config('DATABASE_URL')
-database = databases.Database(DATABASE_URL, force_rollback=True)
 
 
 async def homepage(request):
@@ -47,9 +37,11 @@ async def homepage(request):
             form = forms.Form(TriggerSchema, values=trigger)
         # empty form
         else:
+            trigger_id = 0
             form = forms.Form(TriggerSchema)
-
-        context = {"request": request, "form": form, "triggers_list": triggers}
+        for trigger in triggers:
+            print(trigger)
+        context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
         return templates.TemplateResponse(template, context)
     # POST
     else:
@@ -62,11 +54,13 @@ async def homepage(request):
             return templates.TemplateResponse(template, context)
 
         if 'trigger_id' in request.path_params:
-            trigger_id = int(request.path_params['trigger_id'])
-            trigger = await Trigger.objects.get(id=trigger_id)
-            await trigger.update(rss_url=trigger.rss_url,
-                                 joplin_folder=trigger.joplin_folder,
-                                 description=trigger.description)
+            trigger_id = request.path_params['trigger_id']
+            trigger_to_update = await Trigger.objects.get(id=trigger_id)
+            print(trigger.rss_url, trigger.joplin_folder, trigger.description)
+            await trigger_to_update.update(rss_url=trigger.rss_url,
+                                           joplin_folder=trigger.joplin_folder,
+                                           status=bool(trigger.status),
+                                           description=trigger.description)
         else:
             await Trigger.objects.create(rss_url=trigger.rss_url,
                                          joplin_folder=trigger.joplin_folder,
@@ -102,7 +96,7 @@ app = Starlette(
     debug=True,
     routes=[
         Route('/', homepage, methods=['GET', 'POST'], name='homepage'),
-        Route('/id/{trigger_id:int}', homepage, methods=['GET'], name='homepage'),
+        Route('/id/{trigger_id:int}', homepage, methods=['POST', 'GET'], name='homepage'),
         Route('/delete/{trigger_id:int}', delete, methods=['GET'], name='delete'),
         Mount('/static', StaticFiles(directory='static'), name='static')
     ],

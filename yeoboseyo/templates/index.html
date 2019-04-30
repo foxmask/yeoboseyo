@@ -2,7 +2,11 @@
 
 {% block content %}
 <div class="col-xs-5 col-md-5 col-lg-5">
+    {% if trigger_id > 0 %}
+    <form method="POST" action='{{ url_for('homepage', trigger_id=trigger_id) }}'>
+    {% else %}
     <form method="POST" action='{{ url_for('homepage') }}'>
+    {% endif %}
         {{ form }}
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
@@ -13,6 +17,9 @@
             <tr><th scope="col">Description</th>
                 <th scope="col">RSS URL</th>
                 <th scope="col">Joplin Folder</th>
+                <th scope="col">Triggered</th>
+                <th scope="col">Created</th>
+                <th scope="col">Status</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -22,6 +29,9 @@
             <tr><td><a href="{{ url_for('homepage', trigger_id=trigger.id)}}" title="Edit this trigger">{{ trigger.description }}</a></td>
                 <td><a href="{{ trigger.rss_url }}" title="go to this URL">{{ trigger.rss_url }}</a> </td>
                 <td>{{ trigger.joplin_folder }}</td>
+                <td>{{ trigger.date_triggered  }}</td>
+                <td>{{ trigger.date_created}}</td>
+                <td>{{ trigger.status }}</td>
                 <td>
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#trigger{{ trigger.id }}">Delete</button>
                     <div class="modal fade" id="trigger{{ trigger.id }}" tabindex="-1" role="dialog" aria-labelledby="trigger{{ trigger.id}}Label" aria-hidden="true">
