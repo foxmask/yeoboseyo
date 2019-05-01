@@ -5,6 +5,11 @@ from yeoboseyo.models import Trigger
 
 
 async def switch(trigger_id):
+    """
+
+    :param trigger_id:  the id of the trigger to switch on/off
+    :return:
+    """
     trigger = await Trigger.objects.get(id=trigger_id)
     status = not trigger.status
     await trigger.update(status=status)
@@ -13,7 +18,7 @@ async def switch(trigger_id):
 
 if __name__ == '__main__':
     print('여보세요 ! Switch')
-    parser = argparse.ArgumentParser(description='Switch status of one triggers.')
+    parser = argparse.ArgumentParser(description='Switch status of one trigger')
     parser.add_argument('trigger_id',
                         metavar='N',
                         type=int,

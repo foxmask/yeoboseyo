@@ -7,7 +7,10 @@ This `hello` can be any data you want to get and send from any internet service 
 Services covered:
 
 - Joplin markdown editor
-- RSS Feeds
+- RSS Feedsc
+
+So today, you can read RSS Feeds and this will create note in Joplin automatically in the folder you set in the settings
+
 
 ## Installation
 
@@ -63,4 +66,24 @@ python run.py
 Trigger FoxMasK blog
  Entries created 1 / Read 1
 
+```
+
+```bash
+python report.py
+```
+get the list of your feeds to check which one provided articles or not
+```bash
+여보세요 ! Report
+
+ID    Name                           Triggered              Notebook                       Status
+    1 FoxMasK blog                   2019-04-30 22:01       internet                       0     
+```
+
+```bash
+python switch.py 1
+```
+get the list of your feeds to check which one provided articles or not
+```bash
+여보세요 ! Switch
+Successfully switched Trigger 'FoxMasK blog' to True
 ```
