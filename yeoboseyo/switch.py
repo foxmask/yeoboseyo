@@ -3,6 +3,10 @@ import argparse
 import asyncio
 from yeoboseyo.models import Trigger
 
+"""
+this script allow to enable/disable a given trigger 
+"""
+
 
 async def switch(trigger_id):
     """

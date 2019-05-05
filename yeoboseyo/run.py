@@ -17,7 +17,6 @@ from yeoboseyo.models import Trigger
 from yeoboseyo import JoplinService
 from yeoboseyo import RssService
 
-# create logger
 config = Config('.env')
 
 
@@ -52,6 +51,16 @@ def get_published(entry):
 
 
 async def go():
+    """
+    this function:
+    - check if joplinwebclipper is available
+    - get the triggers where the status is On
+    - get the RSS Feed of that trigger
+    - compare the date of the feed item with the last triggered date of that trigger
+    - if item date > triggered date ; create a Joplin Note in the choosen folder
+    - then reports how many data have been created
+    :return:
+    """
     res = await asks.get('{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT')))
     if res.text == 'JoplinClipperServer':
         triggers = await Trigger.objects.all()

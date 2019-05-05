@@ -39,8 +39,6 @@ async def homepage(request):
         else:
             trigger_id = 0
             form = forms.Form(TriggerSchema)
-        for trigger in triggers:
-            print(trigger)
         context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
         return templates.TemplateResponse(template, context)
     # POST
@@ -56,7 +54,6 @@ async def homepage(request):
         if 'trigger_id' in request.path_params:
             trigger_id = request.path_params['trigger_id']
             trigger_to_update = await Trigger.objects.get(id=trigger_id)
-            print(trigger.rss_url, trigger.joplin_folder, trigger.description)
             await trigger_to_update.update(rss_url=trigger.rss_url,
                                            joplin_folder=trigger.joplin_folder,
                                            status=bool(trigger.status),
@@ -80,18 +77,6 @@ async def delete(request):
         await trigger.delete()
     return RedirectResponse(request.url_for("homepage"))
 
-
-# HTTP Requests
-# Error Pages
-async def not_found(request, exc):
-    """
-    Return an HTTP 404 page.
-    """
-    template = "404.html"
-    context = {"request": request}
-    return templates.TemplateResponse(template, context, status_code=404)
-
-
 app = Starlette(
     debug=True,
     routes=[
@@ -101,6 +86,27 @@ app = Starlette(
         Mount('/static', StaticFiles(directory='static'), name='static')
     ],
 )
+
+# HTTP Requests
+# Error Pages
+@app.exception_handler(404)
+async def not_found(request, exc):
+    """
+    Return an HTTP 404 page.
+    """
+    template = "404.html"
+    context = {"request": request}
+    return templates.TemplateResponse(template, context, status_code=404)
+
+
+@app.exception_handler(500)
+async def server_error(request, exc):
+    """
+    Return an HTTP 500 page.
+    """
+    template = "500.html"
+    context = {"request": request}
+    return templates.TemplateResponse(template, context, status_code=500)
 
 # Bootstrap
 if __name__ == '__main__':

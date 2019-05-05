@@ -7,9 +7,9 @@ This `hello` can be any data you want to get and send from any internet service 
 Services covered:
 
 - Joplin markdown editor
-- RSS Feedsc
+- RSS Feeds
 
-So today, you can read RSS Feeds and this will create note in Joplin automatically in the folder you set in the settings
+So today, you can read RSS Feeds and this will create notes in Joplin automatically in the folder you define in the settings
 
 
 ## Installation
@@ -34,16 +34,16 @@ python models.py
 ```bash
 mv env.sample .env
 ```
-set the correct values for oyour environments
+set the correct values for your own environment
 ```ini
 DATABASE_URL=sqlite:///db.sqlite3
 TIME_ZONE=Europe/Paris
 JOPLIN_URL=http://127.0.0.1
 JOPLIN_PORT=41184
-JOPLIN_TOKEN=
+JOPLIN_TOKEN=  # put the token you can find in the webclipper page of joplin editor
 FORMAT_FROM=markdown_github
 FORMAT_TO=html
-BYPASS_BOZO=False
+BYPASS_BOZO=False   # if you don't want to get the malformed RSS Feeds set it to False
 LOG_LEVEL=logging.INFO
 ```
 
@@ -68,22 +68,19 @@ Trigger FoxMasK blog
 
 ```
 
-```bash
-python report.py
-```
 get the list of your feeds to check which one provided articles or not
 ```bash
-여보세요 ! Report
+python report.py
 
+여보세요 ! Report
 ID    Name                           Triggered              Notebook                       Status
     1 FoxMasK blog                   2019-04-30 22:01       internet                       0     
 ```
 
+switch the status of trigger to on/off
 ```bash
 python switch.py 1
-```
-get the list of your feeds to check which one provided articles or not
-```bash
+
 여보세요 ! Switch
 Successfully switched Trigger 'FoxMasK blog' to True
 ```

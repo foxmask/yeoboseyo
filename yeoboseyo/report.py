@@ -2,6 +2,10 @@
 import asyncio
 from yeoboseyo.models import Trigger
 
+"""
+this script will display a list of all the details of the triggers
+"""
+
 
 async def report():
     triggers = await Trigger.objects.all()
