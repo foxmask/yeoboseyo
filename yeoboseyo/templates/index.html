@@ -3,9 +3,9 @@
 {% block content %}
 <div class="col-xs-5 col-md-5 col-lg-5">
     {% if trigger_id > 0 %}
-    <form method="POST" action='{{ url_for('homepage', trigger_id=trigger_id) }}'>
+    <form method="POST" action="{{ url_for('homepage', trigger_id=trigger_id) }}">
     {% else %}
-    <form method="POST" action='{{ url_for('homepage') }}'>
+    <form method="POST" action="{{ url_for('homepage') }}">
     {% endif %}
         {{ form }}
         <button type="submit" class="btn btn-primary">Submit</button>

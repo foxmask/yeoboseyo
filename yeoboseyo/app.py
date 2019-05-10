@@ -4,10 +4,12 @@
 """
 # starlette
 from starlette.applications import Starlette
+from starlette.endpoints import HTTPEndpoint
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
+
 # schema validation
 import typesystem
 # uvicorn
@@ -21,15 +23,9 @@ templates = Jinja2Templates(directory="templates")
 statics = StaticFiles(directory="static")
 
 
-async def homepage(request):
-    """
-    get the list of triggers
-    :param request:
-    :return:
-    """
-    triggers = await Trigger.objects.all()
-    template = "index.html"
-    if request.method == 'GET':
+class Homepage(HTTPEndpoint):
+
+    async def get(self, request):
         # trigger_id provided, form to edit this one
         if 'trigger_id' in request.path_params:
             trigger_id = request.path_params['trigger_id']
@@ -39,17 +35,21 @@ async def homepage(request):
         else:
             trigger_id = 0
             form = forms.Form(TriggerSchema)
+
+        triggers = await Trigger.objects.all()
         context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
-        return templates.TemplateResponse(template, context)
-    # POST
-    else:
+        return templates.TemplateResponse("index.html", context)
+
+    async def post(self, request):
+        triggers = await Trigger.objects.all()
+
         data = await request.form()
         trigger, errors = TriggerSchema.validate_or_error(data)
 
         if errors:
             form = forms.Form(TriggerSchema, values=data, errors=errors)
             context = {"request": request, "form": form, "triggers_list": triggers}
-            return templates.TemplateResponse(template, context)
+            return templates.TemplateResponse("index.hml", context)
 
         if 'trigger_id' in request.path_params:
             trigger_id = request.path_params['trigger_id']
@@ -77,15 +77,17 @@ async def delete(request):
         await trigger.delete()
     return RedirectResponse(request.url_for("homepage"))
 
+
 app = Starlette(
     debug=True,
     routes=[
-        Route('/', homepage, methods=['GET', 'POST'], name='homepage'),
-        Route('/id/{trigger_id:int}', homepage, methods=['POST', 'GET'], name='homepage'),
+        Route('/', endpoint=Homepage, methods=['GET', 'POST'], name='homepage'),
+        Route('/id/{trigger_id:int}', endpoint=Homepage, methods=['POST', 'GET'], name='homepage'),
         Route('/delete/{trigger_id:int}', delete, methods=['GET'], name='delete'),
         Mount('/static', StaticFiles(directory='static'), name='static')
     ],
 )
+
 
 # HTTP Requests
 # Error Pages
