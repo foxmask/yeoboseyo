@@ -4,6 +4,7 @@ asks==2.3.2
 feedparser==5.2.1
 jinja2==2.10.1
 joplin-api==1.2.3
+Mastodon.py==1.4.3
 orm==0.1.4
 pypandoc==1.4
 python-multipart==0.0.5

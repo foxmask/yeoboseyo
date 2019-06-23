@@ -8,9 +8,10 @@ Services covered:
 
 - Joplin markdown editor
 - RSS Feeds
+- Mastodon
 
 So today, you can read RSS Feeds and this will create notes in Joplin automatically in the folder you define in the settings
-
+Or also post "toot" to your mastodon account
 
 ## Installation
 
@@ -45,6 +46,10 @@ FORMAT_FROM=markdown_github
 FORMAT_TO=html
 BYPASS_BOZO=False   # if you don't want to get the malformed RSS Feeds set it to False
 LOG_LEVEL=logging.INFO
+MASTODON_USERNAME=  # your mastodon username
+MASTODON_PASSWORD=  # your mastodon password
+MASTODON_INSTANCE=https://mastodon.social  # you mastodon instance
+
 ```
 
 ## Running
@@ -73,8 +78,8 @@ get the list of your feeds to check which one provided articles or not
 python report.py
 
 여보세요 ! Report
-ID    Name                           Triggered              Notebook                       Status
-    1 FoxMasK blog                   2019-04-30 22:01       internet                       0     
+ID    Name                           Triggered              Notebook                       Mastodon Status
+    1 FoxMasK blog                   2019-04-30 22:01       internet                              1      1     
 ```
 
 switch the status of trigger to on/off

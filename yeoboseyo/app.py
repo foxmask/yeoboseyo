@@ -2,6 +2,9 @@
 """
    여보세요 App
 """
+import os
+import sys
+
 # starlette
 from starlette.applications import Starlette
 from starlette.endpoints import HTTPEndpoint
@@ -15,6 +18,9 @@ import typesystem
 # uvicorn
 import uvicorn
 # yeoboseyo
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
+sys.path.append(PARENT_FOLDER)
 from yeoboseyo.forms import TriggerSchema
 from yeoboseyo.models import Trigger
 
@@ -56,11 +62,13 @@ class Homepage(HTTPEndpoint):
             trigger_to_update = await Trigger.objects.get(id=trigger_id)
             await trigger_to_update.update(rss_url=trigger.rss_url,
                                            joplin_folder=trigger.joplin_folder,
-                                           status=bool(trigger.status),
+                                           mastodon=trigger.mastodon,
+                                           status=trigger.status,
                                            description=trigger.description)
         else:
             await Trigger.objects.create(rss_url=trigger.rss_url,
                                          joplin_folder=trigger.joplin_folder,
+                                         mastodon=trigger.mastodon,
                                          description=trigger.description)
         return RedirectResponse(request.url_for("homepage"))
 

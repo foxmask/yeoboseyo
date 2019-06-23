@@ -20,6 +20,7 @@
                 <th scope="col">Triggered</th>
                 <th scope="col">Created</th>
                 <th scope="col">Status</th>
+                <th scope="col">Publish on Mastodon ?</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -31,6 +32,7 @@
                 <td>{{ trigger.joplin_folder }}</td>
                 <td>{{ trigger.date_triggered  }}</td>
                 <td>{{ trigger.date_created}}</td>
+                <td>{{ trigger.mastodon }}</td>
                 <td>{{ trigger.status }}</td>
                 <td>
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#trigger{{ trigger.id }}">Delete</button>

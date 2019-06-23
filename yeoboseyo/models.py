@@ -22,6 +22,7 @@ class Trigger(orm.Model):
     id = orm.Integer(primary_key=True)
     rss_url = orm.String(max_length=255)
     joplin_folder = orm.String(max_length=80)
+    mastodon = orm.Boolean(default=False)
     description = orm.String(max_length=200)
     date_created = orm.DateTime(default=datetime.datetime.now)
     date_triggered = orm.DateTime(allow_null=True)
@@ -35,5 +36,7 @@ class Trigger(orm.Model):
 # Bootstrap
 if __name__ == '__main__':
     # Create the database
+    print("database creation")
     engine = sqlalchemy.create_engine(DATABASE_URL)
     metadata.create_all(engine)
+    print("done!")

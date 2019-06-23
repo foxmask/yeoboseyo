@@ -13,8 +13,16 @@ import arrow
 # starlette
 from starlette.config import Config
 # yeoboseyo
+import os
+import sys
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
+sys.path.append(PARENT_FOLDER)
+
 from yeoboseyo.models import Trigger
 from yeoboseyo import JoplinService
+from yeoboseyo import MastodonService
 from yeoboseyo import RssService
 
 config = Config('.env')
@@ -61,41 +69,51 @@ async def go():
     - then reports how many data have been created
     :return:
     """
-    res = await asks.get('{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT')))
-    if res.text == 'JoplinClipperServer':
-        triggers = await Trigger.objects.all()
-        for trigger in triggers:
-            if trigger.status:
-                print("Trigger {}".format(trigger.description))
-                # RSS PART
-                rss = RssService()
-                # retrieve the data
-                feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
-                now = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
-                date_triggered = arrow.get(trigger.date_triggered).format('YYYY-MM-DDTHH:mm:ssZZ')
-                read_entries = 0
-                created_entries = 0
-                for entry in feeds.entries:
-                    # entry.*_parsed may be None when the date in a RSS Feed is invalid
-                    # so will have the "now" date as default
-                    published = get_published(entry)
-                    if published:
-                        published = arrow.get(published).format('YYYY-MM-DDTHH:mm:ssZZ')
-                    # last triggered execution
-                    if date_triggered is not None and published is not None and now >= published >= date_triggered:
-                        read_entries += 1
-                        # JOPLIN PART
-                        joplin = JoplinService()
-                        res = await joplin.save_data(trigger, entry)
+    triggers = await Trigger.objects.all()
+    for trigger in triggers:
+        if trigger.status:
+            print("Trigger {}".format(trigger.description))
+            # RSS PART
+            rss = RssService()
+            # retrieve the data
+            feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
+            now = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
+            date_triggered = arrow.get(trigger.date_triggered).format('YYYY-MM-DDTHH:mm:ssZZ')
+            read_entries = 0
+            created_entries = 0
+            for entry in feeds.entries:
+                # entry.*_parsed may be None when the date in a RSS Feed is invalid
+                # so will have the "now" date as default
+                published = get_published(entry)
+                if published:
+                    published = arrow.get(published).format('YYYY-MM-DDTHH:mm:ssZZ')
+                # last triggered execution
+                if date_triggered is not None and published is not None and now >= published >= date_triggered:
+                    read_entries += 1
+                    # JOPLIN PART
+                    if trigger.joplin_folder:
+                        res = await asks.get('{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT')))
+                        if res.text == 'JoplinClipperServer':
+                            joplin = JoplinService()
+                            res = await joplin.save_data(trigger, entry)
+                            if res:
+                                created_entries += 1
+                                await _update_date(trigger.id)
+                            else:
+                                print("Note not created in joplin, Something went wrong ")
+                    # MASTODON PART
+                    if trigger.mastodon:
+                        masto = MastodonService()
+                        res = await masto.save_data(trigger, entry)
                         if res:
                             created_entries += 1
                             await _update_date(trigger.id)
                         else:
-                            print("Note not created in joplin, Something went wrong ")
-                if read_entries:
-                    print(" Entries created {} / Read {}".format(created_entries, read_entries))
-                else:
-                    print("no feeds read")
+                            print("Toot not created, Something went wrong ")
+            if read_entries:
+                print(" Entries created {} / Read {}".format(created_entries, read_entries))
+            else:
+                print("no feeds read")
     else:
         print('Check "Tools > Webclipper options"  if the service is enable')
 
