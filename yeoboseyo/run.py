@@ -101,6 +101,8 @@ async def go():
                                 await _update_date(trigger.id)
                             else:
                                 print("Note not created in joplin, Something went wrong ")
+                        else:
+                            print('Check "Tools > Webclipper options"  if the service is enable')
                     # MASTODON PART
                     if trigger.mastodon:
                         masto = MastodonService()
@@ -114,8 +116,6 @@ async def go():
                 print(" Entries created {} / Read {}".format(created_entries, read_entries))
             else:
                 print("no feeds read")
-    else:
-        print('Check "Tools > Webclipper options"  if the service is enable')
 
 
 # Bootstrap

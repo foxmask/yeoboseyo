@@ -10,8 +10,9 @@ Services covered:
 - RSS Feeds
 - Mastodon
 
-So today, you can read RSS Feeds and this will create notes in Joplin automatically in the folder you define in the settings
-Or also post "toot" to your mastodon account
+So today, you can read RSS Feeds and this will:
+* create notes in Joplin automatically in the folder you defined in the form
+* post "toot" to your mastodon account
 
 ## Installation
 

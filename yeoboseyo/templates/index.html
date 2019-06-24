@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="col-xs-5 col-md-5 col-lg-5">
+<div class="col-xs-4 col-md-4 col-lg-4">
     {% if trigger_id > 0 %}
     <form method="POST" action="{{ url_for('homepage', trigger_id=trigger_id) }}">
     {% else %}
@@ -11,7 +11,7 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
-<div class="col-xs-7 col-md-7 col-lg-7">
+<div class="col-xs-8 col-md-8 col-lg-8">
     <table class="table table-striped table-hover">
         <thead>
             <tr><th scope="col">Description</th>
@@ -20,7 +20,7 @@
                 <th scope="col">Triggered</th>
                 <th scope="col">Created</th>
                 <th scope="col">Status</th>
-                <th scope="col">Publish on Mastodon ?</th>
+                <th scope="col">Mastodon ?</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -32,8 +32,8 @@
                 <td>{{ trigger.joplin_folder }}</td>
                 <td>{{ trigger.date_triggered  }}</td>
                 <td>{{ trigger.date_created}}</td>
-                <td>{{ trigger.mastodon }}</td>
                 <td>{{ trigger.status }}</td>
+                <td>{{ trigger.mastodon }}</td>
                 <td>
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#trigger{{ trigger.id }}">Delete</button>
                     <div class="modal fade" id="trigger{{ trigger.id }}" tabindex="-1" role="dialog" aria-labelledby="trigger{{ trigger.id}}Label" aria-hidden="true">

@@ -1,6 +1,13 @@
 # coding: utf-8
 import argparse
 import asyncio
+import os
+import sys
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
+sys.path.append(PARENT_FOLDER)
+
 from yeoboseyo.models import Trigger
 
 """
