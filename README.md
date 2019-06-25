@@ -59,8 +59,9 @@ once your settings are ready run the following commands once
 ```bash
 python mastodon_create_app.py
 ```
-to create an app named 'Yeoboseyo' with the username/pass you provided in the .env setting file 
-this command will create a file named `yeoboseyo_clientcred.secret` containing the token allowing us to publish stuff automatically ²
+this will create an app named 'Yeoboseyo' with the username/pass you provided in the `.env` setting file .
+
+this command will also create a file named `yeoboseyo_clientcred.secret` containing the token allowing us to publish stuff automatically.
 
 ## Running the Web application
 
@@ -73,13 +74,15 @@ INFO: Waiting for application startup.
 INFO: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
+
 ### Adding some Feeds to track
 
-on http://0.0.0.0:8000 fill the form to add new Feeds to track
+Go on http://0.0.0.0:8000 and fill the form to add new Feeds to track
 
-If you plan to publish RSS Feeds into a joplin note, fill the "Joplin folder" field (and don't forget to start your joplin desktop version of course), if not leave it empty.
-If you plan to publish RSS Feeds on your Mastodon account, check the checkbox "Publish on Mastodon?", if not, leave it unchecked
+* If you plan to publish RSS Feeds into a joplin note, fill the "Joplin folder" field (and don't forget to start your joplin desktop version of course), if not leave it empty.
+* If you plan to publish RSS Feeds on your Mastodon account, check the checkbox "Publish on Mastodon?", if not, leave it unchecked
 
+![doc/Yeoboseyo.png]
 
 ### Running the engine
 
@@ -92,7 +95,8 @@ Trigger FoxMasK blog
  Entries created 1 / Read 1
 
 ```
-
+![doc/Source_RSS.png]
+![doc/Mastodon.png]
 ## Monitoring, managing triggers
 
 # get the list
