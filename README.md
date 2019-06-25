@@ -82,7 +82,10 @@ Go on http://0.0.0.0:8000 and fill the form to add new Feeds to track
 * If you plan to publish RSS Feeds into a joplin note, fill the "Joplin folder" field (and don't forget to start your joplin desktop version of course), if not leave it empty.
 * If you plan to publish RSS Feeds on your Mastodon account, check the checkbox "Publish on Mastodon?", if not, leave it unchecked
 
-![Yeboseyo home page](doc/Yeoboseyo.png)
+
+Yeoboseyo home page
+
+![Yeoboseyo home page](doc/Yeoboseyo.png)
 
 ### Running the engine
 
@@ -96,7 +99,11 @@ Trigger FoxMasK blog
 
 ```
 
+RSS Source 
+
 ![RSS Source](doc/Source_RSS.png)
+
+Publication on Mastodon
 
 ![On Mastodon](doc/Mastodon.png)
 
