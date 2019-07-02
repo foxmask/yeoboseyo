@@ -9,10 +9,12 @@ Services covered:
 - Joplin markdown editor
 - RSS Feeds
 - Mastodon
+- Reddit
 
 So today, you can read RSS Feeds and this will:
 * create notes in Joplin automatically in the folder you defined in the form
 * post "toot" to your mastodon account
+* post stuff to the subreddit of your choice
 
 ## Installation
 
@@ -50,7 +52,11 @@ LOG_LEVEL=logging.INFO
 MASTODON_USERNAME=  # your mastodon username
 MASTODON_PASSWORD=  # your mastodon password
 MASTODON_INSTANCE=https://mastodon.social  # your mastodon instance
-
+REDDIT_CLIENT_ID=   # see below explanation
+REDDIT_CLIENT_SECRET= # see below explanation
+REDDIT_PASSWORD=   # put your reddit password
+REDDIT_USERAGENT=Yeoboseyo/1.0   # whatever :P
+REDDIT_USERNAME=  #put your reddit login
 ```
 
 ## Mastodon Service
@@ -62,6 +68,19 @@ python mastodon_create_app.py
 this will create an app named 'Yeoboseyo' with the username/pass you provided in the `.env` setting file .
 
 this command will also create a file named `yeoboseyo_clientcred.secret` containing the token allowing us to publish stuff automatically.
+
+## Reddit service
+
+you will need to declare an app from this page [https://www.reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)
+
+* enter th name of your app (eg "Yeoboseyo")
+* select 'script'
+* fill a description (eg "The bus for your internet services - an opensource alternative to IFTTT.com")
+* about url : http://localhost
+* redirect url : http://localhost/callback
+then press create ; once it's done
+in the frame you see the name "Yeoboseyo" under it "personal use script" and under it ; the precious REDDIT_CLIENT_ID, then the REDDIT_CLIENT_SECRET
+Use those info to fill the `.env` file 
 
 ## Running the Web application
 

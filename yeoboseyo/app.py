@@ -62,13 +62,16 @@ class Homepage(HTTPEndpoint):
             trigger_to_update = await Trigger.objects.get(id=trigger_id)
             await trigger_to_update.update(rss_url=trigger.rss_url,
                                            joplin_folder=trigger.joplin_folder,
+                                           subreddit=trigger.subreddit,
                                            mastodon=trigger.mastodon,
                                            status=trigger.status,
                                            description=trigger.description)
         else:
             await Trigger.objects.create(rss_url=trigger.rss_url,
                                          joplin_folder=trigger.joplin_folder,
+                                         subreddit=trigger.subreddit,
                                          mastodon=trigger.mastodon,
+                                         status=trigger.status,
                                          description=trigger.description)
         return RedirectResponse(request.url_for("homepage"))
 

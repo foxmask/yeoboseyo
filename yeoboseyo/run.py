@@ -21,9 +21,7 @@ PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
 
 from yeoboseyo.models import Trigger
-from yeoboseyo import JoplinService
-from yeoboseyo import MastodonService
-from yeoboseyo import RssService
+from yeoboseyo import JoplinService, MastodonService, RssService, RedditService
 
 config = Config('.env')
 
@@ -103,6 +101,16 @@ async def go():
                                 print("Note not created in joplin, Something went wrong ")
                         else:
                             print('Check "Tools > Webclipper options"  if the service is enable')
+                    # REDDIT
+                    if trigger.subreddit:
+                        reddit = RedditService()
+                        res = await reddit.save_data(trigger, entry)
+                        if res:
+                            created_entries += 1
+                            await _update_date(trigger.id)
+                        else:
+                            print("SubReddit post not created, Something went wrong ")
+
                     # MASTODON PART
                     if trigger.mastodon:
                         masto = MastodonService()
