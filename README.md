@@ -16,7 +16,7 @@ So today, you can read RSS Feeds and this will:
 * post "toot" to your mastodon account
 * post stuff to the subreddit of your choice
 
-## Installation
+## :package: Installation
 
 create a virtualenv
 
@@ -27,14 +27,14 @@ source bin/activate
 pip install -r requirements.txt
 ```
 
-## Database
+## :dvd: Database
 
 create the database (to execute only once)
 ```bash
 python models.py
 ```
 
-## Settings
+##  :wrench: Settings
 ```bash
 mv env.sample .env
 ```
@@ -59,7 +59,7 @@ REDDIT_USERAGENT=Yeoboseyo/1.0   # whatever :P
 REDDIT_USERNAME=  #put your reddit login
 ```
 
-## Mastodon Service
+##  :shell: Mastodon Service
 once your settings are ready run the following commands once
 
 ```bash
@@ -69,7 +69,7 @@ this will create an app named 'Yeoboseyo' with the username/pass you provided in
 
 this command will also create a file named `yeoboseyo_clientcred.secret` containing the token allowing us to publish stuff automatically.
 
-## Reddit service
+##  :shell: Reddit service
 
 you will need to declare an app from this page [https://www.reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)
 
@@ -82,7 +82,7 @@ then press create ; once it's done
 in the frame you see the name "Yeoboseyo" under it "personal use script" and under it ; the precious REDDIT_CLIENT_ID, then the REDDIT_CLIENT_SECRET
 Use those info to fill the `.env` file 
 
-## Running the Web application
+## :mega: Running the Web application
 
 start the application
 ```bash
@@ -94,7 +94,7 @@ INFO: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
 
-### Adding some Feeds to track
+### :eyes: Adding some Feeds to track
 
 Go on http://0.0.0.0:8000 and fill the form to add new Feeds to track
 
@@ -106,7 +106,7 @@ Yeoboseyo home page
 
 ![Yeoboseyo home page](doc/Yeoboseyo.png)
 
-### Running the engine
+###  :dizzy: Running the engine
 
 now that you fill settings, and form, launch the command and see how many feeds are comming
 ```bash
@@ -126,9 +126,9 @@ Publication on Mastodon
 
 ![On Mastodon](doc/Mastodon.png)
 
-## Monitoring, managing triggers
+## :mega: Monitoring, managing triggers
 
-# get the list
+### get the list
 get the list of your feeds to check which one provided articles or not
 ```bash
 python report.py
@@ -138,7 +138,7 @@ ID    Name                           Triggered              Notebook            
     1 FoxMasK blog                   2019-04-30 22:01       internet                              1      1     
 ```
 
-# swtich the status of a trigger
+### switch the status of a trigger
 switch the status of trigger to on/off
 ```bash
 python switch.py 1
