@@ -29,18 +29,13 @@ templates = Jinja2Templates(directory="templates")
 statics = StaticFiles(directory="static")
 
 
-class Homepage(HTTPEndpoint):
+class TriggerEndpoint(HTTPEndpoint):
 
     async def get(self, request):
         # trigger_id provided, form to edit this one
-        if 'trigger_id' in request.path_params:
-            trigger_id = request.path_params['trigger_id']
-            trigger = await Trigger.objects.get(id=trigger_id)
-            form = forms.Form(TriggerSchema, values=trigger)
-        # empty form
-        else:
-            trigger_id = 0
-            form = forms.Form(TriggerSchema)
+        trigger_id = request.path_params['trigger_id']
+        trigger = await Trigger.objects.get(id=trigger_id)
+        form = forms.Form(TriggerSchema, values=trigger)
 
         triggers = await Trigger.objects.all()
         context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
@@ -73,12 +68,26 @@ class Homepage(HTTPEndpoint):
                                          mastodon=trigger.mastodon,
                                          status=trigger.status,
                                          description=trigger.description)
+
         return RedirectResponse(request.url_for("homepage"))
+
+
+async def homepage(request):
+    """
+    get the list of triggers
+    :param request:
+    :return:
+    """
+    trigger_id = 0
+    form = forms.Form(TriggerSchema)
+    triggers = await Trigger.objects.all()
+    context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
+    return templates.TemplateResponse("index.html", context)
 
 
 async def delete(request):
     """
-    get the list of triggers
+    delete a trigger
     :param request:
     :return:
     """
@@ -92,8 +101,9 @@ async def delete(request):
 app = Starlette(
     debug=True,
     routes=[
-        Route('/', endpoint=Homepage, methods=['GET', 'POST'], name='homepage'),
-        Route('/id/{trigger_id:int}', endpoint=Homepage, methods=['POST', 'GET'], name='homepage'),
+        Route('/', homepage, methods=['GET', 'POST'], name='homepage'),
+        Route('/new', endpoint=TriggerEndpoint, methods=['POST'], name='new'),
+        Route('/edit/{trigger_id:int}', endpoint=TriggerEndpoint, methods=['POST', 'GET'], name='edit'),
         Route('/delete/{trigger_id:int}', delete, methods=['GET'], name='delete'),
         Mount('/static', StaticFiles(directory='static'), name='static')
     ],

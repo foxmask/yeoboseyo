@@ -3,8 +3,6 @@
 """
    여보세요
 """
-__version__ = "0.1.0"
-
 from yeoboseyo.services.service_rss import RssService
 from yeoboseyo.services.service_joplin import JoplinService
 from yeoboseyo.services.service_mastodon import MastodonService

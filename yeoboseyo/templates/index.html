@@ -3,9 +3,9 @@
 {% block content %}
 <div class="col-xs-4 col-md-4 col-lg-4">
     {% if trigger_id > 0 %}
-    <form method="POST" action="{{ url_for('homepage', trigger_id=trigger_id) }}">
+    <form method="POST" action="{{ url_for('edit', trigger_id=trigger_id) }}">
     {% else %}
-    <form method="POST" action="{{ url_for('homepage') }}">
+    <form method="POST" action="{{ url_for('new') }}">
     {% endif %}
         {{ form }}
         <button type="submit" class="btn btn-primary">Submit</button>
@@ -28,7 +28,7 @@
         {% if triggers_list %}
         <tbody>
         {% for trigger in triggers_list %}
-            <tr><td><a href="{{ url_for('homepage', trigger_id=trigger.id)}}" title="Edit this trigger">{{ trigger.description }}</a></td>
+            <tr><td><a href="{{ url_for('edit', trigger_id=trigger.id)}}" title="Edit this trigger">{{ trigger.description }}</a></td>
                 <td><a href="{{ trigger.rss_url }}" title="go to this URL">{{ trigger.rss_url }}</a> </td>
                 <td>{{ trigger.joplin_folder }}</td>
                 <td>{{ trigger.subreddit }}</td>
