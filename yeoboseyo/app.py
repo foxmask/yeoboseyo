@@ -36,7 +36,6 @@ class TriggerEndpoint(HTTPEndpoint):
         trigger_id = request.path_params['trigger_id']
         trigger = await Trigger.objects.get(id=trigger_id)
         form = forms.Form(TriggerSchema, values=trigger)
-
         triggers = await Trigger.objects.all()
         context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
         return templates.TemplateResponse("index.html", context)

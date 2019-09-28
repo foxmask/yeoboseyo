@@ -26,7 +26,7 @@ class Trigger(orm.Model):
     mastodon = orm.Boolean(default=False)
     description = orm.String(max_length=200)
     date_created = orm.DateTime(default=datetime.datetime.now)
-    date_triggered = orm.DateTime(allow_null=True)
+    date_triggered = orm.DateTime(default=datetime.datetime.now)
     status = orm.Boolean(default=False)
 
 

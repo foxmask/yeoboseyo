@@ -7,6 +7,9 @@
     {% else %}
     <form method="POST" action="{{ url_for('new') }}">
     {% endif %}
+        <div class="alert alert-info" role="alert">
+          the form is in 3 parts, the description, the source of the data (RSS URL), the services that will use it
+        </div>
         {{ form }}
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>

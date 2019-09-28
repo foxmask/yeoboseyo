@@ -10,3 +10,5 @@ from yeoboseyo.services.service_reddit import RedditService
 from yeoboseyo.services import set_content
 from yeoboseyo.forms import TriggerSchema
 from yeoboseyo.models import Trigger
+
+__version__ = '0.3.0'

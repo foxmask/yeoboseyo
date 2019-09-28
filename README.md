@@ -6,10 +6,10 @@ This `hello` can be any data you want to get and send from any internet service 
 
 Services covered:
 
-- Joplin markdown editor
+- [Joplin markdown editor](https://joplinapp.org)
 - RSS Feeds
-- Mastodon
-- Reddit
+- [Mastodon](https://mastodon.social)
+- [Reddit](https://reddit.com)
 
 So today, you can read RSS Feeds and this will:
 * create notes in Joplin automatically in the folder you defined in the form
@@ -98,7 +98,7 @@ INFO: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 
 Go on http://0.0.0.0:8000 and fill the form to add new Feeds to track
 
-* If you plan to publish RSS Feeds into a joplin note, fill the "Joplin folder" field (and don't forget to start your joplin desktop version of course), if not leave it empty.
+* If you plan to publish RSS Feeds into a joplin note, fill the "Joplin folder" field, if not leave it empty.
 * If you plan to publish RSS Feeds on your Mastodon account, check the checkbox "Publish on Mastodon?", if not, leave it unchecked
 
 

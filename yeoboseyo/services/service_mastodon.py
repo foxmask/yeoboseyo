@@ -44,7 +44,7 @@ class MastodonService:
         try:
             toot_api.toot(content)
             status = True
-        except Exception as inst:
+        except Exception:
             status = False
         return status
 
