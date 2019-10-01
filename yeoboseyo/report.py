@@ -15,7 +15,7 @@ this script will display a list of all the details of the triggers
 
 async def report():
     triggers = await Trigger.objects.all()
-    print("{:5} {:30} {:30} {:7} {:7} {:22}".format("ID", "Name",  "Notebook", "Mastodon", "Status", "Triggered",))
+    print("{:5} {:30} {:30} {:7} {:7} {:22}".format("ID", "Name", "Notebook", "Mastodon", "Status", "Triggered",))
     for trigger in triggers:
         date_triggered = trigger.date_triggered if trigger.date_triggered is not None else '***Not triggered yet**'
         joplin_folder = trigger.joplin_folder if trigger.joplin_folder is not None else '***Not used ***'

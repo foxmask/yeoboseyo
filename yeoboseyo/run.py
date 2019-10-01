@@ -86,7 +86,7 @@ async def go():
                 if published:
                     published = arrow.get(published).format('YYYY-MM-DDTHH:mm:ssZZ')
                 # last triggered execution
-                if date_triggered is not None and published is not None and now >= published >= date_triggered:
+                if published is not None and now >= published >= date_triggered:
                     read_entries += 1
                     # JOPLIN PART
                     if trigger.joplin_folder:

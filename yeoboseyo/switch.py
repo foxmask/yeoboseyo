@@ -11,7 +11,7 @@ sys.path.append(PARENT_FOLDER)
 from yeoboseyo.models import Trigger
 
 """
-this script allow to enable/disable a given trigger 
+this script allow to enable/disable a given trigger
 """
 
 

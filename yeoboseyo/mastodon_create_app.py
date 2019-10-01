@@ -19,7 +19,8 @@ from pathlib import Path
 
 my_file = Path("yeoboseyo_clientcred")
 if my_file.is_file():
-    print("credential already exists this script should be run only ONCE, if you really want to recrate it , drop it first")
+    print("credential already exists this script should be run only ONCE, "
+          "if you really want to recrate it , drop it first")
 else:
     # create app
     Mastodon.create_app(
