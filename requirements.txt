@@ -1,9 +1,9 @@
 aiofiles
 aiosqlite
 arrow
-asks
 bootstrap4
 feedparser
+httpx
 jinja2
 joplin-api
 orm
