@@ -8,8 +8,8 @@ import datetime
 import time
 import asyncio
 # external lib
-import asks
 import arrow
+import httpx
 # starlette
 from starlette.config import Config
 # yeoboseyo
@@ -90,17 +90,18 @@ async def go():
                     read_entries += 1
                     # JOPLIN PART
                     if trigger.joplin_folder:
-                        res = await asks.get('{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT')))
-                        if res.text == 'JoplinClipperServer':
-                            joplin = JoplinService()
-                            res = await joplin.save_data(trigger, entry)
-                            if res:
-                                created_entries += 1
-                                await _update_date(trigger.id)
+                        async with httpx.AsyncClient() as client:
+                            res = await client.get('{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT')))
+                            if res.text == 'JoplinClipperServer':
+                                joplin = JoplinService()
+                                res = await joplin.save_data(trigger, entry)
+                                if res:
+                                    created_entries += 1
+                                    await _update_date(trigger.id)
+                                else:
+                                    print("Note not created in joplin, Something went wrong ")
                             else:
-                                print("Note not created in joplin, Something went wrong ")
-                        else:
-                            print('Check "Tools > Webclipper options"  if the service is enable')
+                                print('Check "Tools > Webclipper options"  if the service is enable')
                     # REDDIT
                     if trigger.subreddit:
                         reddit = RedditService()
