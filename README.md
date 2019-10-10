@@ -80,7 +80,7 @@ you will need to declare an app from this page [https://www.reddit.com/prefs/app
 * redirect url : http://localhost/callback
 then press create ; once it's done
 in the frame you see the name "Yeoboseyo" under it "personal use script" and under it ; the precious REDDIT_CLIENT_ID, then the REDDIT_CLIENT_SECRET
-Use those info to fill the `.env` file 
+Use those info to fill the `.env` file
 
 ## :mega: Running the Web application
 
@@ -110,7 +110,20 @@ Yeoboseyo home page
 
 now that you fill settings, and form, launch the command and see how many feeds are comming
 ```bash
-python run.py
+여보세요 !
+usage: python run.py [-h] -a {report,go,switch} [-trigger_id TRIGGER_ID]
+
+Yeoboseyo
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -a {report,go,switch}
+                        choose -a report or -a go or -a swtch -trigger_id <id>
+  -trigger_id TRIGGER_ID
+                        trigger id to switch of status
+
+
+python run.py -a go
 
 여보세요 ! RUN and GO
 Trigger FoxMasK blog
@@ -118,7 +131,7 @@ Trigger FoxMasK blog
 
 ```
 
-RSS Source 
+RSS Source
 
 ![RSS Source](doc/Source_RSS.png)
 
@@ -131,26 +144,32 @@ Publication on Mastodon
 ### get the list
 get the list of your feeds to check which one provided articles or not
 ```bash
-python report.py
+python run.py report
 
 여보세요 ! Report
-ID    Name                           Triggered              Notebook                       Mastodon Status
-    1 FoxMasK blog                   2019-04-30 22:01       internet                              1      1     
+ID    Name                           Notebook                       Mastodon Status  Triggered
+    1 Joplin News                    News                                  0       0 2019-09-27 23:10:26
+    2 Un odieux connard              Connard                               0       1 2019-10-10 21:48:55
+    3 New Protonmail                 Protonmail                            0       1 2019-10-10 21:48:55
+1      0
 ```
 
 ### switch the status of a trigger
 switch the status of trigger to on/off
 ```bash
-python switch.py 1
+python run.py -a switch -trigger_id 1
 
 여보세요 ! Switch
 Successfully switched Trigger 'FoxMasK blog' to True
 ```
-and check it again to see the status moving 
+and check it again to see the status moving
 ```bash
-python report.py
+python run.py -a report
 
 여보세요 ! Report
-ID    Name                           Triggered              Notebook                       Mastodon Status
-    1 FoxMasK blog                   2019-04-30 22:01       internet                              1      0
+ID    Name                           Notebook                       Mastodon Status  Triggered
+    1 Joplin News                    News                                  0       1 2019-09-27 23:10:26
+    2 Un odieux connard              Connard                               0       1 2019-10-10 21:48:55
+    3 New Protonmail                 Protonmail                            0       1 2019-10-10 21:48:55
+1      0
 ```
