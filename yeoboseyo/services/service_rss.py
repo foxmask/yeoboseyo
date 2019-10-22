@@ -3,15 +3,18 @@
 from __future__ import unicode_literals
 from logging import getLogger
 # external lib
-import asks
+import httpx
 import feedparser
+
 # create logger
-logger = getLogger('yeoboseyo.yeoboseyo')
+logger = getLogger(__name__)
 
 __all__ = ['RssService']
 
 
 class RssService:
+
+    USER_AGENT = 'Yeoboseyo/1.0 +https://github.com/foxmask/yeoboseyo'
 
     async def get_data(self, **kwargs):
         """
@@ -21,15 +24,19 @@ class RssService:
         """
         if 'url_to_parse' not in kwargs:
             raise ValueError('you have to provide "url_to_parse" value')
-        url_to_parse = kwargs['url_to_parse']
+        url_to_parse = kwargs.get('url_to_parse', '')
+        if url_to_parse is False:
+            raise ValueError('you have to provide "url_to_parse" value')
         bypass_bozo = kwargs.get('bypass_bozo', "False")
-        data = await asks.get(url_to_parse)
-        data = feedparser.parse(data.text)
-        # if the feeds is not well formed, return no data at all
-        if bypass_bozo is False and data.bozo == 1:
-            data.entries = ''
-            log = f"{url_to_parse}: is not valid. You can tick the checkbox "
-            "'Bypass Feeds error ?' to force the process"
-            logger.info(log)
+        async with httpx.AsyncClient(http_versions=["HTTP/1.1"]) as client:
+            data = await client.get(url_to_parse)
+            logger.debug(url_to_parse)
+            data = feedparser.parse(data.text, agent=self.USER_AGENT)
+            # if the feeds is not well formed, return no data at all
+            if bypass_bozo is False and data.bozo == 1:
+                data.entries = ''
+                log = f"{url_to_parse}: is not valid. You can tick the checkbox "
+                "'Bypass Feeds error ?' to force the process"
+                logger.info(log)
 
         return data

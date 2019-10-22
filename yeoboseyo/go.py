@@ -6,7 +6,8 @@
 from __future__ import unicode_literals
 import datetime
 import time
-import asyncio
+from logging import getLogger
+import logging.config
 # external lib
 import arrow
 import httpx
@@ -21,9 +22,13 @@ PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
 
 from yeoboseyo.models import Trigger
-from yeoboseyo import JoplinService, MastodonService, RssService, RedditService
+from yeoboseyo import JoplinService, MastodonService, RssService, RedditService, MailService
 
 config = Config('.env')
+
+# create logger
+logging.config.fileConfig('logging.conf')
+logger = getLogger(__name__)
 
 
 async def _update_date(trigger_id):
@@ -70,7 +75,7 @@ async def go():
     triggers = await Trigger.objects.all()
     for trigger in triggers:
         if trigger.status:
-            print("Trigger {}".format(trigger.description))
+            logger.info("Trigger {}".format(trigger.description))
             # RSS PART
             rss = RssService()
             # retrieve the data
@@ -99,9 +104,9 @@ async def go():
                                     created_entries += 1
                                     await _update_date(trigger.id)
                                 else:
-                                    print("Note not created in joplin, Something went wrong ")
+                                    logger.critical("Note not created in joplin, Something went wrong ")
                             else:
-                                print('Check "Tools > Webclipper options"  if the service is enable')
+                                logger.warning('Check "Tools > Webclipper options"  if the service is enable')
                     # REDDIT
                     if trigger.subreddit:
                         reddit = RedditService()
@@ -110,7 +115,7 @@ async def go():
                             created_entries += 1
                             await _update_date(trigger.id)
                         else:
-                            print("SubReddit post not created, Something went wrong ")
+                            logger.warning("SubReddit post not created, Something went wrong ")
 
                     # MASTODON PART
                     if trigger.mastodon:
@@ -120,8 +125,19 @@ async def go():
                             created_entries += 1
                             await _update_date(trigger.id)
                         else:
-                            print("Toot not created, Something went wrong ")
+                            logger.warning("Toot not created, Something went wrong ")
+
+                    # MAIL PART
+                    if trigger.mail:
+                        mail = MailService()
+                        res = await mail.save_data(trigger, entry)
+                        if res:
+                            created_entries += 1
+                            await _update_date(trigger.id)
+                        else:
+                            logger.warning("Toot not created, Something went wrong ")
+
             if read_entries:
-                print(" Entries created {} / Read {}".format(created_entries, read_entries))
+                logger.info(" Entries created {} / Read {}".format(created_entries, read_entries))
             else:
-                print("no feeds read")
+                logger.info("no feeds read")

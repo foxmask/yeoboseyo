@@ -4,13 +4,11 @@ from __future__ import unicode_literals
 from logging import getLogger
 # external lib
 from mastodon import Mastodon as MastodonAPI
-
-
 # starlette
 from starlette.config import Config
 
 # create logger
-logger = getLogger('yeoboseyo.yeoboseyo')
+logger = getLogger(__name__)
 
 config = Config('.env')
 

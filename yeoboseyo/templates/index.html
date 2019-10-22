@@ -21,26 +21,43 @@
                 <th scope="col">RSS URL</th>
                 <th scope="col">Joplin Folder</th>
                 <th scope="col">SubReddit</th>
-                <th scope="col">Triggered</th>
-                <th scope="col">Created</th>
-                <th scope="col">Status</th>
-                <th scope="col">Mastodon ?</th>
+                <th scope="col">Masto?</th>
+                <th scope="col">E-Mail?</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
         {% if triggers_list %}
         <tbody>
         {% for trigger in triggers_list %}
-            <tr><td><a href="{{ url_for('edit', trigger_id=trigger.id)}}" title="Edit this trigger">{{ trigger.description }}</a></td>
-                <td><a href="{{ trigger.rss_url }}" title="go to this URL">{{ trigger.rss_url }}</a> </td>
-                <td>{{ trigger.joplin_folder }}</td>
-                <td>{{ trigger.subreddit }}</td>
-                <td>{{ trigger.date_triggered  }}</td>
-                <td>{{ trigger.date_created}}</td>
-                <td>{{ trigger.status }}</td>
-                <td>{{ trigger.mastodon }}</td>
+            <tr class="{% if trigger.status == False %}bg-light{% else %}bg-white{% endif %}">
                 <td>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#trigger{{ trigger.id }}">Delete</button>
+                  <p class="mb-0"><a href="{{ url_for('edit', trigger_id=trigger.id) }}" title="Edit this trigger">{{ trigger.description }}</a></p>
+                  <ul class="list-inline">
+                      <li class="list-inline-item"><small class="text-muted"><strong>triggered</strong> {{ trigger.date_triggered }}</small></li>
+                      <li class="list-inline-item"><small class="text-muted"><strong>created</strong> {{ trigger.date_created }} </small></li>
+                  </ul>
+                </td>
+                <td><a href="{{ trigger.rss_url }}" title="Go to this URL">{{ trigger.rss_url }}</a> </td>
+                <td>{{ trigger.joplin_folder }}</td>
+                <td>{% if trigger.reddit %}<a title="Go to this subreddit" href="https://www.reddit.com/r/{{ trigger.reddit }}">{{ trigger.reddit }}</a>{% else %}None is defined{% endif %}</td>
+                {% if trigger.mastodon == False %}
+                <td><a title="click to enable mastodon" href="{{ url_for('switch_masto', trigger_id=trigger.id) }}" class="btn btn-danger" role="button"><i class="far fa-lightbulb"></i></a></td>
+                {% else %}
+                <td><a title="click to disable mastodon" href="{{ url_for('switch_masto', trigger_id=trigger.id) }}" class="btn btn-info" role="button"><i class="fas fa-lightbulb"></i></a></a></td>
+                {% endif %}
+                {% if trigger.mail == False %}
+                <td><a title="click to enable mail" href="{{ url_for('switch_mail', trigger_id=trigger.id) }}" class="btn btn-danger" role="button"><i class="far fa-lightbulb"></i></a></td>
+                {% else %}
+                <td><a title="click to disable mail" href="{{ url_for('switch_mail', trigger_id=trigger.id) }}" class="btn btn-info" role="button"><i class="fas fa-lightbulb"></i></a></td>
+                {% endif %}
+                <td class="col-xs-2 col-md-2 col-lg-2">
+                {% if trigger.status == False %}
+                <a title="click to enable this trigger" href="{{ url_for('switch_status', trigger_id=trigger.id) }}" class="btn btn-danger" role="button"><i class="far fa-lightbulb"></i></a>
+                {% else %}
+                <a title="click to disable this trigger" href="{{ url_for('switch_status', trigger_id=trigger.id) }}" class="btn btn-info" role="button"><i class="fas fa-lightbulb"></i></a>
+                {% endif %}
+                    <a class="btn btn-info" role="button" href="{{ url_for('edit', trigger_id=trigger.id) }}" title="Edit this trigger"><i class="fa fa-pen"></i></a></button>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#trigger{{ trigger.id }}"><i class="fa fa-trash"></i></button>
                     <div class="modal fade" id="trigger{{ trigger.id }}" tabindex="-1" role="dialog" aria-labelledby="trigger{{ trigger.id}}Label" aria-hidden="true">
                       <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -51,7 +68,7 @@
                             </button>
                           </div>
                           <div class="modal-body">
-                            <p>are your sure you want to delete this trigger ? {{ trigger.description }}</p>
+                            <p>are your sure you want to delete this trigger ?</p>
                           </div>
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

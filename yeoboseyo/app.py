@@ -56,16 +56,18 @@ class TriggerEndpoint(HTTPEndpoint):
             trigger_to_update = await Trigger.objects.get(id=trigger_id)
             await trigger_to_update.update(rss_url=trigger.rss_url,
                                            joplin_folder=trigger.joplin_folder,
-                                           subreddit=trigger.subreddit,
+                                           reddit=trigger.reddit,
                                            mastodon=trigger.mastodon,
+                                           mail=trigger.mail,
                                            status=trigger.status,
                                            description=trigger.description)
         else:
             await Trigger.objects.create(rss_url=trigger.rss_url,
                                          joplin_folder=trigger.joplin_folder,
-                                         subreddit=trigger.subreddit,
+                                         reddit=trigger.reddit,
                                          mastodon=trigger.mastodon,
                                          status=trigger.status,
+                                         mail=trigger.mail,
                                          description=trigger.description)
 
         return RedirectResponse(request.url_for("homepage"))
@@ -82,6 +84,45 @@ async def homepage(request):
     triggers = await Trigger.objects.all()
     context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
     return templates.TemplateResponse("index.html", context)
+
+
+async def switch_status(request):
+    """
+    switch masto of that trigger
+    :param request:
+    :return:
+    """
+    if 'trigger_id' in request.path_params:
+        trigger_id = int(request.path_params['trigger_id'])
+        trigger = await Trigger.objects.get(id=trigger_id)
+        await trigger.update(status=not trigger.status)
+    return RedirectResponse(request.url_for("homepage"))
+
+
+async def switch_masto(request):
+    """
+    switch masto of that trigger
+    :param request:
+    :return:
+    """
+    if 'trigger_id' in request.path_params:
+        trigger_id = int(request.path_params['trigger_id'])
+        trigger = await Trigger.objects.get(id=trigger_id)
+        await trigger.update(mastodon=not trigger.mastodon)
+    return RedirectResponse(request.url_for("homepage"))
+
+
+async def switch_mail(request):
+    """
+    switch masto of that trigger
+    :param request:
+    :return:
+    """
+    if 'trigger_id' in request.path_params:
+        trigger_id = int(request.path_params['trigger_id'])
+        trigger = await Trigger.objects.get(id=trigger_id)
+        await trigger.update(mail=not trigger.mail)
+    return RedirectResponse(request.url_for("homepage"))
 
 
 async def delete(request):
@@ -104,6 +145,9 @@ app = Starlette(
         Route('/new', endpoint=TriggerEndpoint, methods=['POST'], name='new'),
         Route('/edit/{trigger_id:int}', endpoint=TriggerEndpoint, methods=['POST', 'GET'], name='edit'),
         Route('/delete/{trigger_id:int}', delete, methods=['GET'], name='delete'),
+        Route('/switch/masto/{trigger_id:int}', switch_masto, methods=['GET'], name='switch_masto'),
+        Route('/switch/mail/{trigger_id:int}', switch_mail, methods=['GET'], name='switch_mail'),
+        Route('/switch/status/{trigger_id:int}', switch_status, methods=['GET'], name='switch_status'),
         Mount('/static', StaticFiles(directory='static'), name='static')
     ],
 )

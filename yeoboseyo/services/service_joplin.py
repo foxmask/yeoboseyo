@@ -3,14 +3,15 @@
 from __future__ import unicode_literals
 from logging import getLogger
 # external lib
-import asks
+import httpx
 import pypandoc
 # starlette
 from starlette.config import Config
 # yeoboseyo
 from yeoboseyo.services import set_content
+
 # create logger
-logger = getLogger('yeoboseyo.yeoboseyo')
+logger = getLogger(__name__)
 
 config = Config('.env')
 
@@ -50,8 +51,9 @@ class JoplinService:
         get the list of all the folders of the joplin profile
         :return:
         """
-        res = await asks.get("{}:{}/folders".format(self.joplin_url, self.joplin_port))
-        return res.json()
+        async with httpx.AsyncClient() as client:
+            res = await client.get("{}:{}/folders".format(self.joplin_url, self.joplin_port))
+            return res.json()
 
     async def save_data(self, trigger, entry):
         """
@@ -81,7 +83,10 @@ class JoplinService:
                 'author': entry.author,
                 'source_url': entry.link}
         url = "{}:{}/notes".format(self.joplin_url, self.joplin_port)
-        res = await asks.post(url, json=data)
+        logger.debug(url)
+        logger.debug(data)
+        async with httpx.AsyncClient() as client:
+            res = await client.post(url, json=data)
         if res.status_code == 200:
             return True
         return False

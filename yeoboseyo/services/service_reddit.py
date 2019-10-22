@@ -8,7 +8,7 @@ from praw import Reddit
 from starlette.config import Config
 
 # create logger
-logger = getLogger('yeoboseyo.yeoboseyo')
+logger = getLogger(__name__)
 
 config = Config('.env')
 
