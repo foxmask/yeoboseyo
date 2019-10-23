@@ -1,28 +1,26 @@
 # coding: utf-8
 """
-   여보세요 Run
+   여보세요 Go
 """
 # std lib
 from __future__ import unicode_literals
 import datetime
-import time
 from logging import getLogger
 import logging.config
-# external lib
-import arrow
-import httpx
-# starlette
-from starlette.config import Config
-# yeoboseyo
 import os
 import sys
+import time
+# external lib
+import arrow
+from starlette.config import Config
+# yeoboseyo
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
 
 from yeoboseyo.models import Trigger
-from yeoboseyo import JoplinService, MastodonService, RssService, RedditService, MailService
+from yeoboseyo import JoplinService, RssService
 
 config = Config('.env')
 
@@ -61,6 +59,26 @@ def get_published(entry):
     return published
 
 
+async def service(the_service, trigger, entry, created_entries):
+    """
+    dynamic loading of service and submitting data to this one
+    :param the_service:
+    :param trigger:
+    :param entry:
+    :param created_entries:
+    :return:
+    """
+    service_name = the_service.split('Service')[0]  # name of the service
+    # load the module/class + create class instance of the service
+    klass = getattr(__import__('services.service_' + service_name.lower(), fromlist=[the_service]), the_service)
+    # save the data
+    if await klass().save_data(trigger, entry):
+        created_entries += 1
+    else:
+        logger.info("no %s created" % service_name)
+    return created_entries
+
+
 async def go():
     """
     this function:
@@ -78,6 +96,10 @@ async def go():
             logger.info("Trigger {}".format(trigger.description))
             # RSS PART
             rss = RssService()
+
+            if trigger.joplin_folder and await JoplinService().check_service() is False:
+                raise ConnectionError("Joplin service is not started")
+
             # retrieve the data
             feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
             now = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
@@ -93,55 +115,17 @@ async def go():
                 # last triggered execution
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1
-                    # JOPLIN PART
-                    if trigger.joplin_folder:
-                        async with httpx.AsyncClient() as client:
-                            res = await client.get('{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT')))
-                            if res.text == 'JoplinClipperServer':
-                                joplin = JoplinService()
-                                res = await joplin.save_data(trigger, entry)
-                                if res:
-                                    created_entries += 1
-                                    await _update_date(trigger.id)
-                                    logger.info("%s %s" % (trigger, entry.title))
-                                else:
-                                    logger.critical("Note not created in joplin, Something went wrong ")
-                            else:
-                                logger.warning('Check "Tools > Webclipper options"  if the service is enable')
-                    # REDDIT
-                    if trigger.reddit:
-                        reddit = RedditService()
-                        res = await reddit.save_data(trigger, entry)
-                        if res:
-                            created_entries += 1
-                            await _update_date(trigger.id)
-                            logger.info("%s %s" % (trigger, entry.title))
-                        else:
-                            logger.warning("SubReddit post not created, Something went wrong ")
 
-                    # MASTODON PART
-                    if trigger.mastodon:
-                        masto = MastodonService()
-                        res = await masto.save_data(trigger, entry)
-                        if res:
-                            created_entries += 1
-                            await _update_date(trigger.id)
-                            logger.info("%s %s" % (trigger, entry.title))
-                        else:
-                            logger.warning("Toot not created, Something went wrong ")
+                    created_entries = await service('JoplinService', trigger, entry, created_entries)
+                    created_entries = await service('MailService', trigger, entry, created_entries)
+                    created_entries = await service('MastodonService', trigger, entry, created_entries)
+                    created_entries = await service('RedditService', trigger, entry, created_entries)
 
-                    # MAIL PART
-                    if trigger.mail:
-                        mail = MailService()
-                        res = await mail.save_data(trigger, entry)
-                        if res:
-                            created_entries += 1
-                            await _update_date(trigger.id)
-                            logger.info("%s %s" % (trigger, entry.title))
-                        else:
-                            logger.warning("Toot not created, Something went wrong ")
+                    if created_entries > 0:
+                        await _update_date(trigger.id)
+                        logger.info("%s %s" % (trigger, entry.title))
 
             if read_entries:
-                logger.info(" Entries created {} / Read {}".format(created_entries, read_entries))
+                logger.info("Entries created {} / Read {}".format(created_entries, read_entries))
             else:
                 logger.info("no feeds read")

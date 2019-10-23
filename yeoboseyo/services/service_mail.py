@@ -1,13 +1,14 @@
 # coding: utf-8
+"""
+   여보세요 Service Mail
+"""
 # std lib
 from __future__ import unicode_literals
-# stdlib
-# Import the email modules we'll need
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from logging import getLogger
 import smtplib
-# starlette
+# external lib
 from starlette.config import Config
 # yeoboseyo
 from yeoboseyo.services import Service

@@ -1,10 +1,12 @@
 # coding: utf-8
+"""
+   여보세요 Service Reddit
+"""
 # std lib
 from __future__ import unicode_literals
 from logging import getLogger
 # external lib
 from praw import Reddit
-# starlette
 from starlette.config import Config
 # yeoboseyo
 from yeoboseyo.services import Service
@@ -35,11 +37,12 @@ class RedditService(Service):
         :return: boolean
         """
         status = False
-        try:
-            self.reddit.subreddit(trigger.reddit).submit(entry.title, url=entry.link)
-            status = True
-        except ValueError as e:
-            logger.error(e)
-            status = False
+        if trigger.reddit:
+            try:
+                self.reddit.subreddit(trigger.reddit).submit(entry.title, url=entry.link)
+                status = True
+            except ValueError as e:
+                logger.error(e)
+                status = False
 
         return status

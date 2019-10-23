@@ -1,4 +1,7 @@
 # coding: utf-8
+"""
+   여보세요 Service Mastodon
+"""
 # std lib
 from __future__ import unicode_literals
 from logging import getLogger
@@ -28,24 +31,26 @@ class MastodonService(Service):
         :param entry: data from Feeds
         :return: boolean
         """
-        # check if we have a 'good' title
-        content = str("{title} {link}").format(title=entry.title, link=entry.link)
-        # if not then use the content
-        content = self.set_mastodon_content(content)
         status = False
-        try:
-            toot_api = MastodonAPI(access_token='yeoboseyo_clientcred.secret',
-                                   api_base_url=config('MASTODON_INSTANCE'))
-            status = True
-        except ValueError as e:
-            logger.error(e)
+        if trigger.mastodon:
+            # check if we have a 'good' title
+            content = str("{title} {link}").format(title=entry.title, link=entry.link)
+            # if not then use the content
+            content = self.set_mastodon_content(content)
             status = False
+            try:
+                toot_api = MastodonAPI(access_token='yeoboseyo_clientcred.secret',
+                                       api_base_url=config('MASTODON_INSTANCE'))
+                status = True
+            except ValueError as e:
+                logger.error(e)
+                status = False
 
-        try:
-            toot_api.toot(content)
-            status = True
-        except Exception:
-            status = False
+            try:
+                toot_api.toot(content)
+                status = True
+            except Exception:
+                status = False
         return status
 
     def set_mastodon_content(self, content):

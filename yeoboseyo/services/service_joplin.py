@@ -1,10 +1,12 @@
 # coding: utf-8
+"""
+   여보세요 Service Joplin
+"""
 # std lib
 from __future__ import unicode_literals
 from logging import getLogger
 # external lib
 import httpx
-# starlette
 from starlette.config import Config
 # yeoboseyo
 from yeoboseyo.services import Service
@@ -27,6 +29,10 @@ class JoplinService(Service):
         init parms
         """
         super(JoplinService, self).__init__()
+        # overwritting config
+        self.format_to = 'markdown_github'
+        self.format_from = 'html'
+
         self.joplin_port = config('JOPLIN_PORT', default=41184)
         self.joplin_url = config('JOPLIN_URL', default='http://127.0.0.1')
 
@@ -46,31 +52,40 @@ class JoplinService(Service):
         :param entry: data from Feeds
         :return: boolean
         """
-        # get the content of the Feeds
-        content = await self.create_body_content(trigger.description, entry)
-        # build the json data
-        folders = await self.get_folders()
+        if trigger.joplin_folder:
+            # get the content of the Feeds
+            content = await self.create_body_content(trigger.description, entry)
+            # build the json data
+            folders = await self.get_folders()
 
-        notebook_id = 0
-        for folder in folders:
-            if folder.get('title') == trigger.joplin_folder:
-                notebook_id = folder.get('id')
-        if notebook_id == 0:
+            notebook_id = 0
             for folder in folders:
-                if 'children' in folder:
-                    for child in folder.get('children'):
-                        if child.get('title') == trigger.joplin_folder:
-                            notebook_id = child.get('id')
-        data = {'title': entry.title,
-                'body': content,
-                'parent_id': notebook_id,
-                'author': entry.author,
-                'source_url': entry.link}
-        url = "{}:{}/notes".format(self.joplin_url, self.joplin_port)
-        logger.debug(url)
-        logger.debug(data)
-        async with httpx.AsyncClient() as client:
-            res = await client.post(url, json=data)
-        if res.status_code == 200:
-            return True
+                if folder.get('title') == trigger.joplin_folder:
+                    notebook_id = folder.get('id')
+            if notebook_id == 0:
+                for folder in folders:
+                    if 'children' in folder:
+                        for child in folder.get('children'):
+                            if child.get('title') == trigger.joplin_folder:
+                                notebook_id = child.get('id')
+            data = {'title': entry.title,
+                    'body': content,
+                    'parent_id': notebook_id,
+                    'author': entry.author,
+                    'source_url': entry.link}
+            url = "{}:{}/notes".format(self.joplin_url, self.joplin_port)
+            logger.debug(url)
+            logger.debug(data)
+            async with httpx.AsyncClient() as client:
+                res = await client.post(url, json=data)
+            if res.status_code == 200:
+                return True
         return False
+
+    async def check_service(self):
+        # if trigger.joplin_folder:
+        async with httpx.AsyncClient() as client:
+            res = await client.get('{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT')))
+            if res.text == 'JoplinClipperServer':
+                return True
+            return False

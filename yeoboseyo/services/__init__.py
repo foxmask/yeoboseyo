@@ -1,10 +1,12 @@
 # coding: utf-8
-# stdlib
+"""
+   여보세요 Service
+"""
+# std lib
 from logging import getLogger
-# others lib
+# external lib
 import feedparser
 import pypandoc
-# starlette
 from starlette.config import Config
 
 config = Config('.env')
@@ -72,7 +74,7 @@ class Service:
         :return:
         """
         # call pypandoc to convert html to markdown
-        logger.info("%s %s %s" % (self.set_content(entry), self.format_to, self.format_from))
+        logger.debug("%s %s %s" % (self.set_content(entry), self.format_to, self.format_from))
         content = pypandoc.convert(self.set_content(entry), self.format_to, format=self.format_from)
         content += await self.footer(name, entry.link)
         return content
