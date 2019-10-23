@@ -103,17 +103,19 @@ async def go():
                                 if res:
                                     created_entries += 1
                                     await _update_date(trigger.id)
+                                    logger.info("%s %s" % (trigger, entry.title))
                                 else:
                                     logger.critical("Note not created in joplin, Something went wrong ")
                             else:
                                 logger.warning('Check "Tools > Webclipper options"  if the service is enable')
                     # REDDIT
-                    if trigger.subreddit:
+                    if trigger.reddit:
                         reddit = RedditService()
                         res = await reddit.save_data(trigger, entry)
                         if res:
                             created_entries += 1
                             await _update_date(trigger.id)
+                            logger.info("%s %s" % (trigger, entry.title))
                         else:
                             logger.warning("SubReddit post not created, Something went wrong ")
 
@@ -124,6 +126,7 @@ async def go():
                         if res:
                             created_entries += 1
                             await _update_date(trigger.id)
+                            logger.info("%s %s" % (trigger, entry.title))
                         else:
                             logger.warning("Toot not created, Something went wrong ")
 
@@ -134,6 +137,7 @@ async def go():
                         if res:
                             created_entries += 1
                             await _update_date(trigger.id)
+                            logger.info("%s %s" % (trigger, entry.title))
                         else:
                             logger.warning("Toot not created, Something went wrong ")
 

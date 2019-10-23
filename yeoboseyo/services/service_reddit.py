@@ -6,6 +6,8 @@ from logging import getLogger
 from praw import Reddit
 # starlette
 from starlette.config import Config
+# yeoboseyo
+from yeoboseyo.services import Service
 
 # create logger
 logger = getLogger(__name__)
@@ -15,11 +17,12 @@ config = Config('.env')
 __all__ = ['RedditService']
 
 
-class RedditService:
+class RedditService(Service):
     """
         Service Mastodon
     """
     def __init__(self):
+        super(RedditService, self).__init__()
         self.reddit = Reddit(client_id=config('REDDIT_CLIENT_ID'), client_secret=config('REDDIT_CLIENT_SECRET'),
                              password=config('REDDIT_PASSWORD'), user_agent=config('REDDIT_USERAGENT'),
                              username=config('REDDIT_USERNAME'))
@@ -27,13 +30,13 @@ class RedditService:
     async def save_data(self, trigger, entry):
         """
         Post a new toot to Mastodon
-        :param entry:
-        :param trigger:
+        :param trigger: current trigger
+        :param entry: data from Feeds
         :return: boolean
         """
         status = False
         try:
-            self.reddit.subreddit(trigger.subreddit).submit(entry.title, url=entry.link)
+            self.reddit.subreddit(trigger.reddit).submit(entry.title, url=entry.link)
             status = True
         except ValueError as e:
             logger.error(e)

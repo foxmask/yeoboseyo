@@ -6,6 +6,8 @@ from logging import getLogger
 from mastodon import Mastodon as MastodonAPI
 # starlette
 from starlette.config import Config
+# yeoboseyo
+from yeoboseyo.services import Service
 
 # create logger
 logger = getLogger(__name__)
@@ -15,15 +17,15 @@ config = Config('.env')
 __all__ = ['MastodonService']
 
 
-class MastodonService:
+class MastodonService(Service):
     """
         Service Mastodon
     """
     async def save_data(self, trigger, entry):
         """
         Post a new toot to Mastodon
-        :param entry:
-        :param trigger:
+        :param trigger: current trigger
+        :param entry: data from Feeds
         :return: boolean
         """
         # check if we have a 'good' title

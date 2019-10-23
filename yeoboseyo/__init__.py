@@ -9,7 +9,7 @@ from yeoboseyo.services.service_mail import MailService
 from yeoboseyo.services.service_mastodon import MastodonService
 from yeoboseyo.services.service_reddit import RedditService
 
-from yeoboseyo.services import set_content
+from yeoboseyo.services import Service
 from yeoboseyo.forms import TriggerSchema
 from yeoboseyo.models import Trigger
 
