@@ -4,11 +4,10 @@ from __future__ import unicode_literals
 from logging import getLogger
 # external lib
 import httpx
-import pypandoc
 # starlette
 from starlette.config import Config
 # yeoboseyo
-from yeoboseyo.services import set_content
+from yeoboseyo.services import Service
 
 # create logger
 logger = getLogger(__name__)
@@ -18,10 +17,8 @@ config = Config('.env')
 __all__ = ['JoplinService']
 
 
-class JoplinService:
+class JoplinService(Service):
 
-    format_to = 'html'
-    format_from = 'markdown_github'
     joplin_port = 41184
     joplin_url = 'http://127.0.0.1'
 
@@ -29,22 +26,9 @@ class JoplinService:
         """
         init parms
         """
-        self.format_to = config('FORMAT_TO', default='html')
-        self.format_from = config('FORMAT_FROM', default='markdown_github')
+        super(JoplinService, self).__init__()
         self.joplin_port = config('JOPLIN_PORT', default=41184)
         self.joplin_url = config('JOPLIN_URL', default='http://127.0.0.1')
-
-    async def create_note_content(self, name, entry):
-        """
-        convert the HTML "body" into Markdown
-        :param entry:
-        :param name:
-        :return:
-        """
-        # call pypandoc to convert html to markdown
-        content = pypandoc.convert(set_content(entry), self.format_from, format=self.format_to)
-        content += '\n[Provided by {}]({})'.format(name, entry.link)
-        return content
 
     async def get_folders(self):
         """
@@ -58,12 +42,12 @@ class JoplinService:
     async def save_data(self, trigger, entry):
         """
         Post a new note to the JoplinWebclipperServer
-        :param entry:
-        :param trigger:
+        :param trigger: current trigger
+        :param entry: data from Feeds
         :return: boolean
         """
         # get the content of the Feeds
-        content = await self.create_note_content(trigger.description, entry)
+        content = await self.create_body_content(trigger.description, entry)
         # build the json data
         folders = await self.get_folders()
 
