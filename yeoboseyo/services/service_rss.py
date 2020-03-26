@@ -33,7 +33,7 @@ class RssService(Service):
         if url_to_parse is False:
             raise ValueError('you have to provide "url_to_parse" value')
         bypass_bozo = kwargs.get('bypass_bozo', "False")
-        async with httpx.AsyncClient(http_versions=["HTTP/1.1"]) as client:
+        async with httpx.AsyncClient(timeout=30) as client:
             data = await client.get(url_to_parse)
             logger.debug(url_to_parse)
             data = feedparser.parse(data.text, agent=self.USER_AGENT)

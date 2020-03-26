@@ -27,13 +27,6 @@ source bin/activate
 pip install -r requirements.txt
 ```
 
-## :dvd: Database
-
-create the database (to execute only once)
-```bash
-python models.py
-```
-
 ##  :wrench: Settings
 ```bash
 mv env.sample .env
@@ -57,6 +50,13 @@ REDDIT_CLIENT_SECRET= # see below explanation
 REDDIT_PASSWORD=   # put your reddit password
 REDDIT_USERAGENT=Yeoboseyo/1.0   # whatever :P
 REDDIT_USERNAME=  #put your reddit login
+```
+
+## :dvd: Database
+
+create the database (to execute only once)
+```bash
+python models.py
 ```
 
 ##  :shell: Mastodon Service
@@ -87,7 +87,8 @@ Use those info to fill the `.env` file
 start the application
 ```bash
 cd yeoboseyo
-python app.py &여보세요 !
+python app.py &
+여보세요 !
 INFO: Started server process [13588]
 INFO: Waiting for application startup.
 INFO: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
@@ -144,7 +145,7 @@ Publication on Mastodon
 ### get the list
 get the list of your feeds to check which one provided articles or not
 ```bash
-python run.py report
+python run.py -a report
 
 여보세요 ! Report
 ID    Name                           Notebook                       Mastodon Status  Triggered

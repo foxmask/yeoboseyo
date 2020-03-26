@@ -100,8 +100,9 @@ async def go():
             rss = RssService()
             # retrieve the data
             feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
-            now = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
+            now = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DDTHH:mm:ssZZ')
             date_triggered = arrow.get(trigger.date_triggered).format('YYYY-MM-DDTHH:mm:ssZZ')
+
             read_entries = 0
             created_entries = 0
             for entry in feeds.entries:
@@ -109,7 +110,7 @@ async def go():
                 # so will have the "now" date as default
                 published = get_published(entry)
                 if published:
-                    published = arrow.get(published).format('YYYY-MM-DDTHH:mm:ssZZ')
+                    published = arrow.get(published).to(config('TIME_ZONE')).format('YYYY-MM-DDTHH:mm:ssZZ')
                 # last triggered execution
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1
