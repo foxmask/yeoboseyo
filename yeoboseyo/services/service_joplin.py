@@ -8,6 +8,7 @@ from logging import getLogger
 # external lib
 import httpx
 from starlette.config import Config
+import sys
 # yeoboseyo
 from yeoboseyo.services import Service
 
@@ -83,9 +84,14 @@ class JoplinService(Service):
         return False
 
     async def check_service(self):
-        # if trigger.joplin_folder:
+        url = '{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT'))
         async with httpx.AsyncClient() as client:
-            res = await client.get('{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT')))
-            if res.text == 'JoplinClipperServer':
-                return True
-            return False
+            try:
+                res = await client.get(url)
+                if res.text == 'JoplinClipperServer':
+                    return True
+            except OSError as e:
+                print("Connection failed to {}. Check if joplin is started".format(url))
+                print(e)
+                print('Yeoboseyo aborted!')
+                sys.exit(1)

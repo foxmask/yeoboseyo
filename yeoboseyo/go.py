@@ -90,16 +90,14 @@ async def go():
     - then reports how many data have been created
     :return:
     """
+    if await JoplinService().check_service() is False:
+        raise ConnectionError("Joplin service is not started")
     triggers = await Trigger.objects.all()
     for trigger in triggers:
         if trigger.status:
             logger.info("Trigger {}".format(trigger.description))
             # RSS PART
             rss = RssService()
-
-            if trigger.joplin_folder and await JoplinService().check_service() is False:
-                raise ConnectionError("Joplin service is not started")
-
             # retrieve the data
             feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
             now = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
