@@ -4,9 +4,11 @@
 """
 import os
 import sys
+import arrow
 
 # starlette
 from starlette.applications import Starlette
+from starlette.config import Config
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
@@ -27,6 +29,7 @@ from yeoboseyo.models import Trigger
 forms = typesystem.Jinja2Forms(package="bootstrap4")
 templates = Jinja2Templates(directory="templates")
 statics = StaticFiles(directory="static")
+config = Config('.env')
 
 
 class TriggerEndpoint(HTTPEndpoint):
@@ -95,7 +98,10 @@ async def switch_status(request):
     if 'trigger_id' in request.path_params:
         trigger_id = int(request.path_params['trigger_id'])
         trigger = await Trigger.objects.get(id=trigger_id)
-        await trigger.update(status=not trigger.status)
+        date_triggered = trigger.date_triggered
+        if trigger.status is False:
+            date_triggered = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ')
+        await trigger.update(status=not trigger.status, date_triggered=date_triggered)
     return RedirectResponse(request.url_for("homepage"))
 
 

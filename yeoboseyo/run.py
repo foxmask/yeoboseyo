@@ -5,25 +5,31 @@ import asyncio
 import os
 import sys
 
+import arrow
+from starlette.config import Config
+
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
 
 from yeoboseyo.models import Trigger
 from yeoboseyo.go import go
+config = Config('.env')
 
 
 async def report():
     triggers = await Trigger.objects.all()
-    print("{:5} {:30} {:30} {:7} {:7} {:22}".format("ID", "Name", "Notebook", "Mastodon", "Status", "Triggered",))
+    print("{:5} {:30} {:30} {:7} {:8} {:22}".format("ID", "Name", "Notebook", "Mastodon", "Status", "Triggered",))
     for trigger in triggers:
+        status = "enabled" if trigger.status else "disabled"
+        masto = "Yes" if trigger.mastodon else "No"
         date_triggered = trigger.date_triggered if trigger.date_triggered is not None else '***Not triggered yet**'
         joplin_folder = trigger.joplin_folder if trigger.joplin_folder is not None else '***Not used ***'
-        print("{:5} {:<30} {:<30} {:>8} {:>7} {}".format(trigger.id,
+        print("{:5} {:<30} {:<30} {:>8} {:>8} {}".format(trigger.id,
                                                          trigger.description,
                                                          joplin_folder,
-                                                         trigger.mastodon,
-                                                         trigger.status,
+                                                         masto,
+                                                         status,
                                                          date_triggered
                                                          )
               )
@@ -36,9 +42,14 @@ async def switch(trigger_id):
     :return:
     """
     trigger = await Trigger.objects.get(id=trigger_id)
-    status = not trigger.status
-    await trigger.update(status=status)
-    print(f"Successfully switched Trigger '{trigger.description}' to {status}")
+    date_triggered = trigger.date_triggered
+    msg = f"Successfully enabled Trigger '{trigger.description}'"
+    if trigger.status is False:
+        msg = f"Successfully disabled Trigger '{trigger.description}'"
+        date_triggered = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ')
+    await trigger.update(status=not trigger.status, date_triggered=date_triggered)
+
+    print(msg)
 
 
 if __name__ == '__main__':
