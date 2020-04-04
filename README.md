@@ -1,4 +1,5 @@
 # 여보세요
+![Yeoboseyo](https://scrutinizer-ci.com/g/foxmask/yeoboseyo/badges/quality-score.png?b=master "Yeboseyo")
 
 let's the services say "hello" (여보세요 in Korean : `yeoboseyo`) to each others
 
@@ -21,7 +22,7 @@ So today, you can read RSS Feeds and this will:
 create a virtualenv
 
 ```bash
-python3.6 -m venv yeoboseyo
+python3 -m venv yeoboseyo
 cd yeoboseyo
 source bin/activate
 pip install -r requirements.txt
@@ -148,11 +149,11 @@ get the list of your feeds to check which one provided articles or not
 python run.py -a report
 
 여보세요 ! Report
-ID    Name                           Notebook                       Mastodon Status  Triggered
-    1 Joplin News                    News                                  0       0 2019-09-27 23:10:26
-    2 Un odieux connard              Connard                               0       1 2019-10-10 21:48:55
-    3 New Protonmail                 Protonmail                            0       1 2019-10-10 21:48:55
-1      0
+ID    Name                           Notebook                       Mastodon Status   Triggered
+    1 Joplin News                    News                                 No Disabled 2019-09-27 23:10:26
+    2 Un odieux connard              Connard                              No Enabled  2019-10-10 21:48:55
+    3 New Protonmail                 Protonmail                           No Enabled  2019-10-10 21:48:55
+
 ```
 
 ### switch the status of a trigger
@@ -161,7 +162,7 @@ switch the status of trigger to on/off
 python run.py -a switch -trigger_id 1
 
 여보세요 ! Switch
-Successfully switched Trigger 'FoxMasK blog' to True
+Successfully enabled Trigger 'FoxMasK blog'
 ```
 and check it again to see the status moving
 ```bash
@@ -169,8 +170,7 @@ python run.py -a report
 
 여보세요 ! Report
 ID    Name                           Notebook                       Mastodon Status  Triggered
-    1 Joplin News                    News                                  0       1 2019-09-27 23:10:26
-    2 Un odieux connard              Connard                               0       1 2019-10-10 21:48:55
-    3 New Protonmail                 Protonmail                            0       1 2019-10-10 21:48:55
-1      0
+    1 Joplin News                    News                                 No Enabled 2019-09-27 23:12:26
+    2 Un odieux connard              Connard                              No Enabled 2019-10-10 21:48:55
+    3 New Protonmail                 Protonmail                           No Enabled 2019-10-10 21:48:55
 ```
