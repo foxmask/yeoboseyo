@@ -5,6 +5,7 @@
 # std lib
 from __future__ import unicode_literals
 from logging import getLogger
+import typing
 # external lib
 import feedparser
 import httpx
@@ -21,7 +22,7 @@ class RssService(Service):
 
     USER_AGENT = 'Yeoboseyo/1.0 +https://github.com/foxmask/yeoboseyo'
 
-    async def get_data(self, **kwargs):
+    async def get_data(self, **kwargs) -> typing.Any:
         """
         read the data from a given URL or path to a local file
         :param kwargs:

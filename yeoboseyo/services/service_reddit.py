@@ -29,7 +29,7 @@ class RedditService(Service):
                              password=config('REDDIT_PASSWORD'), user_agent=config('REDDIT_USERAGENT'),
                              username=config('REDDIT_USERNAME'))
 
-    async def save_data(self, trigger, entry):
+    async def save_data(self, trigger, entry) -> bool:
         """
         Post a new toot to Mastodon
         :param trigger: current trigger

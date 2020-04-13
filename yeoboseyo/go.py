@@ -29,7 +29,7 @@ logging.config.fileConfig('logging.conf')
 logger = getLogger(__name__)
 
 
-async def _update_date(trigger_id):
+async def _update_date(trigger_id) -> None:
     """
     update the database table  with the execution date
     :param trigger_id: id to update
@@ -40,7 +40,7 @@ async def _update_date(trigger_id):
     await trigger.update(date_triggered=now)
 
 
-def get_published(entry):
+def get_published(entry) -> datetime:
     """
     get the 'published' attribute
     :param entry:
@@ -59,7 +59,7 @@ def get_published(entry):
     return published
 
 
-async def service(the_service, trigger, entry, created_entries):
+async def service(the_service, trigger, entry, created_entries) -> int:
     """
     dynamic loading of service and submitting data to this one
     :param the_service:
@@ -125,6 +125,6 @@ async def go():
                         logger.info("%s %s" % (trigger, entry.title))
 
             if read_entries:
-                logger.info("Entries created {} / Read {}".format(created_entries, read_entries))
+                logger.info(f'Entries created {created_entries} / Read {read_entries}')
             else:
                 logger.info("no feeds read")

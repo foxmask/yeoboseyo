@@ -24,7 +24,7 @@ class MastodonService(Service):
     """
         Service Mastodon
     """
-    async def save_data(self, trigger, entry):
+    async def save_data(self, trigger, entry) -> bool:
         """
         Post a new toot to Mastodon
         :param trigger: current trigger
@@ -53,7 +53,7 @@ class MastodonService(Service):
                 status = False
         return status
 
-    def set_mastodon_content(self, content):
+    def set_mastodon_content(self, content) -> str:
         """
         cleaning content by removing any existing html tag
         :param content:

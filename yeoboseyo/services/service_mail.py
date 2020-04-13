@@ -36,7 +36,7 @@ class MailService(Service):
         self.email_sender = config('EMAIL_SENDER', default='root')
         self.email_receiver = config('EMAIL_RECEIVER')
 
-    async def save_data(self, trigger, entry):
+    async def save_data(self, trigger, entry) -> bool:
         """
         Send a new mail
         :param trigger: current trigger

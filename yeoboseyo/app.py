@@ -40,7 +40,12 @@ class TriggerEndpoint(HTTPEndpoint):
         trigger = await Trigger.objects.get(id=trigger_id)
         form = forms.Form(TriggerSchema, values=trigger)
         triggers = await Trigger.objects.all()
-        context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
+        now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
+        context = {"request": request,
+                   "form": form,
+                   "triggers_list": triggers,
+                   "trigger_id": trigger_id,
+                   "year": now_year}
         return templates.TemplateResponse("index.html", context)
 
     async def post(self, request):
@@ -51,7 +56,8 @@ class TriggerEndpoint(HTTPEndpoint):
 
         if errors:
             form = forms.Form(TriggerSchema, values=data, errors=errors)
-            context = {"request": request, "form": form, "triggers_list": triggers}
+            now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
+            context = {"request": request, "form": form, "triggers_list": triggers, "year": now_year}
             return templates.TemplateResponse("index.hml", context)
 
         if 'trigger_id' in request.path_params:
@@ -85,7 +91,12 @@ async def homepage(request):
     trigger_id = 0
     form = forms.Form(TriggerSchema)
     triggers = await Trigger.objects.all()
-    context = {"request": request, "form": form, "triggers_list": triggers, "trigger_id": trigger_id}
+    now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
+    context = {"request": request,
+               "form": form,
+               "triggers_list": triggers,
+               "trigger_id": trigger_id,
+               "year": now_year}
     return templates.TemplateResponse("index.html", context)
 
 

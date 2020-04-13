@@ -5,6 +5,7 @@
 # std lib
 from __future__ import unicode_literals
 from logging import getLogger
+import typing
 # external lib
 import httpx
 from starlette.config import Config
@@ -37,16 +38,16 @@ class JoplinService(Service):
         self.joplin_port = config('JOPLIN_PORT', default=41184)
         self.joplin_url = config('JOPLIN_URL', default='http://127.0.0.1')
 
-    async def get_folders(self):
+    async def get_folders(self) -> typing.Any:
         """
         get the list of all the folders of the joplin profile
         :return:
         """
         async with httpx.AsyncClient() as client:
-            res = await client.get("{}:{}/folders".format(self.joplin_url, self.joplin_port))
+            res = await client.get(f'{self.joplin_url}:{self.joplin_port}/folders')
             return res.json()
 
-    async def save_data(self, trigger, entry):
+    async def save_data(self, trigger, entry) -> bool:
         """
         Post a new note to the JoplinWebclipperServer
         :param trigger: current trigger
@@ -74,7 +75,7 @@ class JoplinService(Service):
                     'parent_id': notebook_id,
                     'author': entry.author,
                     'source_url': entry.link}
-            url = "{}:{}/notes".format(self.joplin_url, self.joplin_port)
+            url = f'{self.joplin_url}:{self.joplin_port}/notes'
             logger.debug(url)
             logger.debug(data)
             async with httpx.AsyncClient() as client:
@@ -83,15 +84,15 @@ class JoplinService(Service):
                 return True
         return False
 
-    async def check_service(self):
-        url = '{}:{}/ping'.format(config('JOPLIN_URL'), config('JOPLIN_PORT'))
+    async def check_service(self) -> bool:
+        url = f'{self.joplin_url}:{self.joplin_port}/ping'
         async with httpx.AsyncClient() as client:
             try:
                 res = await client.get(url)
                 if res.text == 'JoplinClipperServer':
                     return True
             except OSError as e:
-                print("Connection failed to {}. Check if joplin is started".format(url))
+                print(f"Connection failed to {url}. Check if joplin is started")
                 print(e)
                 print('Yeoboseyo aborted!')
                 sys.exit(1)
