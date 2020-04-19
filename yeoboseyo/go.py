@@ -20,7 +20,7 @@ PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
 
 from yeoboseyo.models import Trigger
-from yeoboseyo import JoplinService, RssService
+from yeoboseyo import Joplin, Rss
 
 config = Config('.env')
 
@@ -75,7 +75,7 @@ async def service(the_service, trigger, entry, created_entries) -> int:
     if await klass().save_data(trigger, entry):
         created_entries += 1
     else:
-        logger.info("no %s created" % service_name)
+        logger.info(f'no {service_name} created')
     return created_entries
 
 
@@ -90,14 +90,14 @@ async def go():
     - then reports how many data have been created
     :return:
     """
-    if await JoplinService().check_service() is False:
+    if await Joplin().check_service() is False:
         raise ConnectionError("Joplin service is not started")
     triggers = await Trigger.objects.all()
     for trigger in triggers:
         if trigger.status:
-            logger.info("Trigger {}".format(trigger.description))
+            logger.info(f'Trigger {trigger.description}')
             # RSS PART
-            rss = RssService()
+            rss = Rss()
             # retrieve the data
             feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
             now = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DDTHH:mm:ssZZ')
@@ -122,7 +122,7 @@ async def go():
 
                     if created_entries > 0:
                         await _update_date(trigger.id)
-                        logger.info("%s %s" % (trigger, entry.title))
+                        logger.info(f'{trigger} {entry.title}')
 
             if read_entries:
                 logger.info(f'Entries created {created_entries} / Read {read_entries}')

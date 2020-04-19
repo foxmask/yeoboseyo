@@ -6,7 +6,7 @@
 from __future__ import unicode_literals
 from logging import getLogger
 # external lib
-from praw import Reddit
+from praw import Reddit as RedditAPI
 from starlette.config import Config
 # yeoboseyo
 from yeoboseyo.services import Service
@@ -16,18 +16,20 @@ logger = getLogger(__name__)
 
 config = Config('.env')
 
-__all__ = ['RedditService']
+__all__ = ['Reddit']
 
 
-class RedditService(Service):
+class Reddit(Service):
     """
         Service Mastodon
     """
     def __init__(self):
-        super(RedditService, self).__init__()
-        self.reddit = Reddit(client_id=config('REDDIT_CLIENT_ID'), client_secret=config('REDDIT_CLIENT_SECRET'),
-                             password=config('REDDIT_PASSWORD'), user_agent=config('REDDIT_USERAGENT'),
-                             username=config('REDDIT_USERNAME'))
+        super().__init__()
+        self.reddit = RedditAPI(client_id=config('REDDIT_CLIENT_ID'),
+                                client_secret=config('REDDIT_CLIENT_SECRET'),
+                                password=config('REDDIT_PASSWORD'),
+                                user_agent=config('REDDIT_USERAGENT'),
+                                username=config('REDDIT_USERNAME'))
 
     async def save_data(self, trigger, entry) -> bool:
         """

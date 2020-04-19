@@ -3,14 +3,14 @@
 """
    여보세요
 """
-from yeoboseyo.services.service_rss import RssService
-from yeoboseyo.services.service_joplin import JoplinService
-from yeoboseyo.services.service_mail import MailService
-from yeoboseyo.services.service_mastodon import MastodonService
-from yeoboseyo.services.service_reddit import RedditService
+from yeoboseyo.services.rss import Rss
+from yeoboseyo.services.joplin import Joplin
+from yeoboseyo.services.mail import Mail
+from yeoboseyo.services.mastodon import Mastodon
+from yeoboseyo.services.reddit import Reddit
 
 from yeoboseyo.services import Service
 from yeoboseyo.forms import TriggerSchema
 from yeoboseyo.models import Trigger
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'

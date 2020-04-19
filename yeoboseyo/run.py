@@ -70,23 +70,32 @@ if __name__ == '__main__':
     if 'a' not in args:
         parser.print_help()
     elif args.a == 'go':
+        """
         loop = asyncio.get_event_loop()
         try:
             print(' RUN and GO')
             loop.run_until_complete(go())
         finally:
             loop.close()
+        """
+        asyncio.run(go())
     elif args.a == 'report':
         print(' Report')
+        """
         loop = asyncio.get_event_loop()
         try:
             loop.run_until_complete(report())
         finally:
             loop.close()
+        """
+        asyncio.run(report())
     elif args.a == 'switch':
         print(' Switch')
+        """
         loop = asyncio.get_event_loop()
         try:
             loop.run_until_complete(switch(args.trigger_id))
         finally:
             loop.close()
+        """
+        asyncio.run(switch(args.trigger_id))

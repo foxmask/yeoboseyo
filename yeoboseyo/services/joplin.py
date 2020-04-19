@@ -18,10 +18,10 @@ logger = getLogger(__name__)
 
 config = Config('.env')
 
-__all__ = ['JoplinService']
+__all__ = ['Joplin']
 
 
-class JoplinService(Service):
+class Joplin(Service):
 
     joplin_port = 41184
     joplin_url = 'http://127.0.0.1'
@@ -30,7 +30,7 @@ class JoplinService(Service):
         """
         init parms
         """
-        super(JoplinService, self).__init__()
+        super().__init__()
         # overwritting config
         self.format_to = 'markdown_github'
         self.format_from = 'html'

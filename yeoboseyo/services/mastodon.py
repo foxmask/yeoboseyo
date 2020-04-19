@@ -17,10 +17,10 @@ logger = getLogger(__name__)
 
 config = Config('.env')
 
-__all__ = ['MastodonService']
+__all__ = ['Mastodon']
 
 
-class MastodonService(Service):
+class Mastodon(Service):
     """
         Service Mastodon
     """

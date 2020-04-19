@@ -15,10 +15,10 @@ from yeoboseyo.services import Service
 # create logger
 logger = getLogger(__name__)
 
-__all__ = ['RssService']
+__all__ = ['Rss']
 
 
-class RssService(Service):
+class Rss(Service):
 
     USER_AGENT = 'Yeoboseyo/1.0 +https://github.com/foxmask/yeoboseyo'
 

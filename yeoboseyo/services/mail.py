@@ -18,10 +18,10 @@ logger = getLogger(__name__)
 
 config = Config('.env')
 
-__all__ = ['MailService']
+__all__ = ['Mail']
 
 
-class MailService(Service):
+class Mail(Service):
 
     email_server = 'localhost'
     email_sender = 'root'
@@ -31,7 +31,7 @@ class MailService(Service):
         """
         init parms
         """
-        super(MailService, self).__init__()
+        super().__init__()
         self.email_server = config('EMAIL_SERVER', default='localhost')
         self.email_sender = config('EMAIL_SENDER', default='root')
         self.email_receiver = config('EMAIL_RECEIVER')

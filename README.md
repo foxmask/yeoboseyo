@@ -19,6 +19,17 @@ So today, you can read RSS Feeds and this will:
 
 ## :package: Installation
 
+### pre requisistes
+
+- python 3.7
+- starlette (the web application)
+- feedparser (for RSS support)
+- mastodon.py (for Mastodon support)
+- praw (for Reddit support)
+- joplin-api (for Joplin support)
+- pypandoc (to convert html to markdown)
+
+### Installation
 create a virtualenv
 
 ```bash
