@@ -68,14 +68,13 @@ async def service(the_service, trigger, entry, created_entries) -> int:
     :param created_entries:
     :return:
     """
-    service_name = the_service.split('Service')[0]  # name of the service
     # load the module/class + create class instance of the service
-    klass = getattr(__import__('services.service_' + service_name.lower(), fromlist=[the_service]), the_service)
+    klass = getattr(__import__('services.' + the_service.lower(), fromlist=[the_service]), the_service)
     # save the data
     if await klass().save_data(trigger, entry):
         created_entries += 1
     else:
-        logger.info(f'no {service_name} created')
+        logger.info(f'no {the_service} created')
     return created_entries
 
 
@@ -115,10 +114,10 @@ async def go():
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1
 
-                    created_entries = await service('JoplinService', trigger, entry, created_entries)
-                    created_entries = await service('MailService', trigger, entry, created_entries)
-                    created_entries = await service('MastodonService', trigger, entry, created_entries)
-                    created_entries = await service('RedditService', trigger, entry, created_entries)
+                    created_entries = await service('Joplin', trigger, entry, created_entries)
+                    created_entries = await service('Mail', trigger, entry, created_entries)
+                    created_entries = await service('Mastodon', trigger, entry, created_entries)
+                    created_entries = await service('Reddit', trigger, entry, created_entries)
 
                     if created_entries > 0:
                         await _update_date(trigger.id)
