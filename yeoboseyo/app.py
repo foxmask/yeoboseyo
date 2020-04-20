@@ -43,6 +43,7 @@ class TriggerEndpoint(HTTPEndpoint):
         now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
         context = {"request": request,
                    "form": form,
+                   "data": trigger,
                    "triggers_list": triggers,
                    "trigger_id": trigger_id,
                    "year": now_year}
@@ -57,7 +58,11 @@ class TriggerEndpoint(HTTPEndpoint):
         if errors:
             form = forms.Form(TriggerSchema, values=data, errors=errors)
             now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
-            context = {"request": request, "form": form, "triggers_list": triggers, "year": now_year}
+            context = {"request": request,
+                       "form": form,
+                       "data": trigger,
+                       "triggers_list": triggers,
+                       "year": now_year}
             return templates.TemplateResponse("index.hml", context)
 
         if 'trigger_id' in request.path_params:

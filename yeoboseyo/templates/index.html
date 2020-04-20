@@ -10,7 +10,68 @@
         <div class="alert alert-info" role="alert">
           the form is in 3 parts, the description, the source of the data (RSS URL), the services that will use it
         </div>
-        {{ form }}
+        {# form #}
+        <div class="form-group">
+            <label for="form-triggerschema-description">Description</label>
+            <input type="text" class="form-control "
+                   id="form-triggerschema-description"
+                   name="description" required {% if trigger_id > 0 %}value="{{ data.description }}"{% endif %}>
+        </div>
+        <fieldset class="border p-2">
+            <legend>Origin of the data</legend>
+            <div class="form-group">
+                <input type="text"
+                       placeholder="RSS Feed URL"
+                       class="form-control "
+                       id="form-triggerschema-rss-url"
+                       name="rss_url" required {% if trigger_id > 0 %}value="{{ data.rss_url }}"{% endif %}>
+                <i>Put the URL from which you want to get the data to spread</i>
+            </div>
+        </fieldset>
+        <fieldset class="border p-2">
+            <legend>Destinations of the data</legend>
+            <div class="form-group">
+                <input type="text"
+                       placeholder="Joplin Folder"
+                       class="form-control "
+                       id="form-triggerschema-joplin-folder"
+                       name="joplin_folder"  {% if trigger_id > 0 and data.joplin_folder %}value="{{ data.joplin_folder }}"{% endif %}>
+                <i>Put the name of the joplin folder that will store the data coming from the RSS Feeds</i>
+            </div>
+            <div class="form-group">
+                <input type="text"
+                       placeholder="subreddit name"
+                       class="form-control "
+                       id="form-triggerschema-reddit"
+                       name="reddit" {% if trigger_id > 0 and data.reddit %}value="{{ data.reddit }}"{% endif %}>
+                <i>Put the name of the subreddit that will receive the data coming from the RSS Feeds</i>
+            </div>
+            <div class="form-check">
+                <input type="checkbox"
+                       class="form-check-input "
+                       id="form-triggerschema-mail"
+                       name="mail"
+                       {% if trigger_id > 0 and data.mail %}checked="checked"{% endif %}>
+                <label class="form-check-label" for="form-triggerschema-mail">Would you like to send that data by mail ?</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox"
+                       class="form-check-input "
+                       id="form-triggerschema-mastodon"
+                       name="mastodon"
+                       {% if trigger_id > 0 and data.mastodon %}checked="checked"{% endif %}>
+                <label class="form-check-label" for="form-triggerschema-mastodon">Would you like to publish that data on Mastodon ?</label>
+                </div>
+        </fieldset>
+        <div class="form-check">
+            <input type="checkbox"
+                   class="form-check-input "
+                   id="form-triggerschema-status"
+                   name="status"
+                   {% if trigger_id > 0 and data.status %}checked="checked"{% endif %}>
+            <label class="form-check-label" for="form-triggerschema-status">Status</label>
+        </div>
+
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
