@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="col-xs-4 col-md-4 col-lg-4">
     {% if trigger_id > 0 %}
@@ -7,45 +6,55 @@
     {% else %}
     <form method="POST" action="{{ url_for('new') }}">
     {% endif %}
-        <div class="alert alert-info" role="alert">
-          the form is in 3 parts, the description, the source of the data (RSS URL), the services that will use it
-        </div>
-        {# form #}
+        <fieldset class="border p-2 alert alert-primary">
         <div class="form-group">
             <label for="form-triggerschema-description">Description</label>
             <input type="text" class="form-control "
+                   placeholder="put a short name for your new 'yeoboseyo'"
                    id="form-triggerschema-description"
                    name="description" required {% if trigger_id > 0 %}value="{{ data.description }}"{% endif %}>
         </div>
-        <fieldset class="border p-2">
-            <legend>Origin of the data</legend>
-            <div class="form-group">
+        </fieldset>
+        <h2><i class="fa fa-dot-circle"></i></h2>
+        <fieldset class="border p-2 alert alert-primary">
+            <legend class="alert alert-secondary">Origin of the data</legend>
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text"><i class="fa fa-rss-square"></i></div>
+                </div>
                 <input type="text"
                        placeholder="RSS Feed URL"
                        class="form-control "
                        id="form-triggerschema-rss-url"
                        name="rss_url" required {% if trigger_id > 0 %}value="{{ data.rss_url }}"{% endif %}>
-                <i>Put the URL from which you want to get the data to spread</i>
             </div>
+            <i>Put the URL from which you want to get the data to spread</i>
         </fieldset>
-        <fieldset class="border p-2">
-            <legend>Destinations of the data</legend>
-            <div class="form-group">
+        <h2><i class="fa fa-arrow-alt-circle-down"></i></h2>
+        <fieldset class="border p-2 alert alert-primary">
+            <legend class="alert alert-secondary">Destinations of the data</legend>
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text"><i class="fa fa-folder-open"></i></div>
+                </div>
                 <input type="text"
                        placeholder="Joplin Folder"
                        class="form-control "
                        id="form-triggerschema-joplin-folder"
                        name="joplin_folder"  {% if trigger_id > 0 and data.joplin_folder %}value="{{ data.joplin_folder }}"{% endif %}>
-                <i>Put the name of the joplin folder that will store the data coming from the RSS Feeds</i>
             </div>
-            <div class="form-group">
+            <i>Put the name of the joplin folder that will store the data coming from the RSS Feeds</i>
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text"><i class="fa fa-spider"></i></div>
+                </div>
                 <input type="text"
                        placeholder="subreddit name"
                        class="form-control "
                        id="form-triggerschema-reddit"
                        name="reddit" {% if trigger_id > 0 and data.reddit %}value="{{ data.reddit }}"{% endif %}>
-                <i>Put the name of the subreddit that will receive the data coming from the RSS Feeds</i>
             </div>
+            <i>Put the name of the subreddit that will receive the data coming from the RSS Feeds</i>
             <div class="form-check">
                 <input type="checkbox"
                        class="form-check-input "
@@ -69,10 +78,10 @@
                    id="form-triggerschema-status"
                    name="status"
                    {% if trigger_id > 0 and data.status %}checked="checked"{% endif %}>
-            <label class="form-check-label" for="form-triggerschema-status">Status</label>
+            <label class="form-check-label" for="form-triggerschema-status">'Yeoboseyo' status</label>
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>
     </form>
 </div>
 <div class="col-xs-8 col-md-8 col-lg-8">
@@ -145,6 +154,4 @@
         {% endif %}
     </table>
 </div>
-
-
 {% endblock %}
