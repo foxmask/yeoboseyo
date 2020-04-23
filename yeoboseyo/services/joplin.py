@@ -43,9 +43,16 @@ class Joplin(Service):
         get the list of all the folders of the joplin profile
         :return:
         """
+        url = f'{self.joplin_url}:{self.joplin_port}/folders'
         async with httpx.AsyncClient() as client:
-            res = await client.get(f'{self.joplin_url}:{self.joplin_port}/folders')
-            return res.json()
+            try:
+                res = await client.get(url)
+                return res.json()
+            except (OSError, httpx._exceptions.NetworkError) as e:
+                logger.error(f"Connection failed to {url}. Check if joplin is started")
+                logger.error(e)
+                logger.error('Yeoboseyo: Joplin access failed!')
+                return False
 
     async def save_data(self, trigger, entry) -> bool:
         """
@@ -54,12 +61,11 @@ class Joplin(Service):
         :param entry: data from Feeds
         :return: boolean
         """
-        if trigger.joplin_folder:
-            # get the content of the Feeds
-            content = await self.create_body_content(trigger.description, entry)
-            # build the json data
-            folders = await self.get_folders()
-
+        # get the content of the Feeds
+        content = await self.create_body_content(trigger.description, entry)
+        # build the json data
+        folders = await self.get_folders()
+        if folders:
             notebook_id = 0
             for folder in folders:
                 if folder.get('title') == trigger.joplin_folder:
@@ -91,8 +97,8 @@ class Joplin(Service):
                 res = await client.get(url)
                 if res.text == 'JoplinClipperServer':
                     return True
-            except OSError as e:
-                print(f"Connection failed to {url}. Check if joplin is started")
-                print(e)
-                print('Yeoboseyo aborted!')
-                sys.exit(1)
+            except (OSError, httpx._exceptions.NetworkError) as e:
+                logger.error(f"Connection failed to {url}. Check if joplin is started")
+                logger.error(e)
+                logger.error('Yeoboseyo: Joplin access aborted!')
+                return False

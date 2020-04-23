@@ -32,25 +32,24 @@ class Mastodon(Service):
         :return: boolean
         """
         status = False
-        if trigger.mastodon:
-            # check if we have a 'good' title
-            content = str("{title} {link}").format(title=entry.title, link=entry.link)
-            # if not then use the content
-            content = self.set_mastodon_content(content)
+        # check if we have a 'good' title
+        content = str("{title} {link}").format(title=entry.title, link=entry.link)
+        # if not then use the content
+        content = self.set_mastodon_content(content)
+        status = False
+        try:
+            toot_api = MastodonAPI(access_token='yeoboseyo_clientcred.secret',
+                                   api_base_url=config('MASTODON_INSTANCE'))
+            status = True
+        except ValueError as e:
+            logger.error(e)
             status = False
-            try:
-                toot_api = MastodonAPI(access_token='yeoboseyo_clientcred.secret',
-                                       api_base_url=config('MASTODON_INSTANCE'))
-                status = True
-            except ValueError as e:
-                logger.error(e)
-                status = False
 
-            try:
-                toot_api.toot(content)
-                status = True
-            except Exception:
-                status = False
+        try:
+            toot_api.toot(content)
+            status = True
+        except Exception:
+            status = False
         return status
 
     def set_mastodon_content(self, content) -> str:

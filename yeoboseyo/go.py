@@ -59,23 +59,22 @@ def get_published(entry) -> datetime:
     return published
 
 
-async def service(the_service, trigger, entry, created_entries) -> int:
+async def service(the_service, trigger, entry) -> int:
     """
     dynamic loading of service and submitting data to this one
     :param the_service:
     :param trigger:
     :param entry:
-    :param created_entries:
     :return:
     """
     # load the module/class + create class instance of the service
     klass = getattr(__import__('services.' + the_service.lower(), fromlist=[the_service]), the_service)
     # save the data
     if await klass().save_data(trigger, entry):
-        created_entries += 1
+        return 1
     else:
         logger.info(f'no {the_service} created')
-    return created_entries
+        return 0
 
 
 async def go():
@@ -89,12 +88,9 @@ async def go():
     - then reports how many data have been created
     :return:
     """
-    if await Joplin().check_service() is False:
-        raise ConnectionError("Joplin service is not started")
     triggers = await Trigger.objects.all()
     for trigger in triggers:
         if trigger.status:
-            logger.info(f'Trigger {trigger.description}')
             # RSS PART
             rss = Rss()
             # retrieve the data
@@ -114,16 +110,20 @@ async def go():
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1
 
-                    created_entries = await service('Joplin', trigger, entry, created_entries)
-                    created_entries = await service('Mail', trigger, entry, created_entries)
-                    created_entries = await service('Mastodon', trigger, entry, created_entries)
-                    created_entries = await service('Reddit', trigger, entry, created_entries)
+                    if trigger.joplin_folder:
+                        created_entries += await service('Joplin', trigger, entry)
+                    if trigger.mail:
+                        created_entries += await service('Mail', trigger, entry)
+                    if trigger.mastodon:
+                        created_entries += await service('Mastodon', trigger, entry)
+                    if trigger.reddit:
+                        created_entries += await service('Reddit', trigger, entry)
 
                     if created_entries > 0:
                         await _update_date(trigger.id)
-                        logger.info(f'{trigger} {entry.title}')
+                        logger.info(f'Trigger {trigger.description} : {trigger} {entry.title}')
 
             if read_entries:
-                logger.info(f'Entries created {created_entries} / Read {read_entries}')
+                logger.info(f'Trigger {trigger.description} : Entries created {created_entries} / Read {read_entries}')
             else:
-                logger.info("no feeds read")
+                logger.info(f'Trigger {trigger.description} : no feeds read')

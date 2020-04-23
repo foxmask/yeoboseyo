@@ -39,12 +39,10 @@ class Reddit(Service):
         :return: boolean
         """
         status = False
-        if trigger.reddit:
-            try:
-                self.reddit.subreddit(trigger.reddit).submit(entry.title, url=entry.link)
-                status = True
-            except ValueError as e:
-                logger.error(e)
-                status = False
-
+        try:
+            self.reddit.subreddit(trigger.reddit).submit(entry.title, url=entry.link)
+            status = True
+        except ValueError as e:
+            logger.error(e)
+            status = False
         return status
