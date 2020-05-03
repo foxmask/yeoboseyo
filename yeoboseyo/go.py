@@ -118,6 +118,8 @@ async def go():
                         created_entries += await service('Mastodon', trigger, entry)
                     if trigger.reddit:
                         created_entries += await service('Reddit', trigger, entry)
+                    if trigger.localstorage:
+                        created_entries += await service('LocalStorage', trigger, entry)
 
                     if created_entries > 0:
                         await _update_date(trigger.id)

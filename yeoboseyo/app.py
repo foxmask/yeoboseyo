@@ -32,21 +32,37 @@ statics = StaticFiles(directory="static")
 config = Config('.env')
 
 
+async def get_context(request, trigger_id):
+    """
+
+    :param request:
+    :param trigger_id:
+    :return:
+    """
+    if trigger_id > 0:
+        trigger = await Trigger.objects.get(id=trigger_id)
+        form = forms.Form(TriggerSchema, values=trigger)
+    else:
+        form = forms.Form(TriggerSchema)
+    triggers = await Trigger.objects.all()
+    now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
+    context = {"request": request,
+               "form": form,
+               "triggers_list": triggers,
+               "trigger_id": trigger_id,
+               "root_localstorage_folder": config('MARKDOWN_NOTES_FOLDER'),
+               "year": now_year}
+    if trigger_id > 0:
+        context['data'] = trigger
+    return context
+
+
 class TriggerEndpoint(HTTPEndpoint):
 
     async def get(self, request):
         # trigger_id provided, form to edit this one
         trigger_id = request.path_params['trigger_id']
-        trigger = await Trigger.objects.get(id=trigger_id)
-        form = forms.Form(TriggerSchema, values=trigger)
-        triggers = await Trigger.objects.all()
-        now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
-        context = {"request": request,
-                   "form": form,
-                   "data": trigger,
-                   "triggers_list": triggers,
-                   "trigger_id": trigger_id,
-                   "year": now_year}
+        context = await get_context(request, trigger_id)
         return templates.TemplateResponse("index.html", context)
 
     async def post(self, request):
@@ -72,6 +88,7 @@ class TriggerEndpoint(HTTPEndpoint):
                                            joplin_folder=trigger.joplin_folder,
                                            reddit=trigger.reddit,
                                            mastodon=trigger.mastodon,
+                                           localstorage=trigger.localstorage,
                                            mail=trigger.mail,
                                            status=trigger.status,
                                            description=trigger.description)
@@ -80,6 +97,7 @@ class TriggerEndpoint(HTTPEndpoint):
                                          joplin_folder=trigger.joplin_folder,
                                          reddit=trigger.reddit,
                                          mastodon=trigger.mastodon,
+                                         localstorage=trigger.localstorage,
                                          status=trigger.status,
                                          mail=trigger.mail,
                                          description=trigger.description)
@@ -94,14 +112,7 @@ async def homepage(request):
     :return:
     """
     trigger_id = 0
-    form = forms.Form(TriggerSchema)
-    triggers = await Trigger.objects.all()
-    now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
-    context = {"request": request,
-               "form": form,
-               "triggers_list": triggers,
-               "trigger_id": trigger_id,
-               "year": now_year}
+    context = await get_context(request, trigger_id)
     return templates.TemplateResponse("index.html", context)
 
 
@@ -131,6 +142,19 @@ async def switch_masto(request):
         trigger_id = int(request.path_params['trigger_id'])
         trigger = await Trigger.objects.get(id=trigger_id)
         await trigger.update(mastodon=not trigger.mastodon)
+    return RedirectResponse(request.url_for("homepage"))
+
+
+async def switch_localstorage(request):
+    """
+    switch localstorage of that trigger
+    :param request:
+    :return:
+    """
+    if 'trigger_id' in request.path_params:
+        trigger_id = int(request.path_params['trigger_id'])
+        trigger = await Trigger.objects.get(id=trigger_id)
+        await trigger.update(localstorage=not trigger.localstorage)
     return RedirectResponse(request.url_for("homepage"))
 
 
@@ -169,6 +193,8 @@ app = Starlette(
         Route('/delete/{trigger_id:int}', delete, methods=['GET'], name='delete'),
         Route('/switch/masto/{trigger_id:int}', switch_masto, methods=['GET'], name='switch_masto'),
         Route('/switch/mail/{trigger_id:int}', switch_mail, methods=['GET'], name='switch_mail'),
+        Route('/switch/localstorage/{trigger_id:int}',
+              switch_localstorage, methods=['GET'], name='switch_localstorage'),
         Route('/switch/status/{trigger_id:int}', switch_status, methods=['GET'], name='switch_status'),
         Mount('/static', StaticFiles(directory='static'), name='static')
     ],

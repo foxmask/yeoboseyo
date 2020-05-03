@@ -15,4 +15,5 @@ class TriggerSchema(typesystem.Schema):
     reddit = typesystem.String(title="Subreddit", max_length=80, allow_null=True)
     mail = typesystem.Boolean(title="Send a mail ?", default=False)
     mastodon = typesystem.Boolean(title="Publish on Mastodon ?", default=False)
+    localstorage = typesystem.String(title="Markdown Folder")
     status = typesystem.Boolean(title="Status", default=False)

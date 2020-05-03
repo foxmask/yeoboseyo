@@ -25,6 +25,7 @@ class Trigger(orm.Model):
     reddit = orm.String(max_length=80, allow_null=True)
     mastodon = orm.Boolean(default=False)
     mail = orm.Boolean(default=False)
+    localstorage = orm.String(max_length=255)
     description = orm.String(max_length=200)
     date_created = orm.DateTime(default=datetime.datetime.now)
     date_triggered = orm.DateTime(default=datetime.datetime.now)

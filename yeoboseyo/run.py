@@ -19,19 +19,22 @@ config = Config('.env')
 
 async def report():
     triggers = await Trigger.objects.all()
-    print("{:5} {:30} {:30} {:7} {:8} {:22}".format("ID", "Name", "Notebook", "Mastodon", "Status", "Triggered",))
+    print("{:5} {:30} {:30} {:30} {:7} {:8} {:22}".format(
+        "ID", "Name", "Md Folder", "Joplin Folder", "Mastodon", "Status", "Triggered",))
     for trigger in triggers:
         status = "enabled" if trigger.status else "disabled"
         masto = "Yes" if trigger.mastodon else "No"
         date_triggered = trigger.date_triggered if trigger.date_triggered is not None else '***Not triggered yet**'
         joplin_folder = trigger.joplin_folder if trigger.joplin_folder is not None else '***Not used ***'
-        print("{:5} {:<30} {:<30} {:>8} {:>8} {}".format(trigger.id,
-                                                         trigger.description,
-                                                         joplin_folder,
-                                                         masto,
-                                                         status,
-                                                         date_triggered
-                                                         )
+        localstorage = trigger.localstorage if trigger.localstorage is not None else '***Not used ***'
+        print("{:5} {:<30} {:<30} {:<30} {:>8} {:>8} {}".format(trigger.id,
+                                                                trigger.description,
+                                                                localstorage,
+                                                                joplin_folder,
+                                                                masto,
+                                                                status,
+                                                                date_triggered
+                                                                )
               )
 
 
