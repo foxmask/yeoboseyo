@@ -25,7 +25,7 @@ class Trigger(orm.Model):
     reddit = orm.String(max_length=80, allow_null=True)
     mastodon = orm.Boolean(default=False)
     mail = orm.Boolean(default=False)
-    localstorage = orm.String(max_length=255)
+    localstorage = orm.String(max_length=255, allow_null=True)
     description = orm.String(max_length=200)
     date_created = orm.DateTime(default=datetime.datetime.now)
     date_triggered = orm.DateTime(default=datetime.datetime.now)
@@ -35,7 +35,7 @@ class Trigger(orm.Model):
 # Bootstrap
 if __name__ == '__main__':
     # Create the database
-    print("database creation")
+    print(f"database creation {DATABASE_URL}")
     engine = sqlalchemy.create_engine(DATABASE_URL)
     metadata.create_all(engine)
     print("done!")

@@ -1,7 +1,6 @@
 aiofiles
 aiosqlite
 arrow
-bootstrap4
 feedparser
 httpx
 jinja2

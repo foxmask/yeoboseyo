@@ -2,21 +2,19 @@
 """
    여보세요 App
 """
+import arrow
+import logging
 import os
 import sys
-import arrow
 
 # starlette
 from starlette.applications import Starlette
 from starlette.config import Config
-from starlette.endpoints import HTTPEndpoint
-from starlette.responses import RedirectResponse
-from starlette.routing import Mount, Route
+from starlette.responses import JSONResponse
+from starlette.routing import Mount, Route, Router
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-# schema validation
-import typesystem
 # uvicorn
 import uvicorn
 # yeoboseyo
@@ -26,149 +24,153 @@ sys.path.append(PARENT_FOLDER)
 from yeoboseyo.forms import TriggerSchema
 from yeoboseyo.models import Trigger
 
-forms = typesystem.Jinja2Forms(package="bootstrap4")
 templates = Jinja2Templates(directory="templates")
 statics = StaticFiles(directory="static")
 config = Config('.env')
 
+main_app = Starlette()
+main_app.debug = config('', default=False)
 
-async def get_context(request, trigger_id):
-    """
+logger = logging.getLogger(__name__)
 
-    :param request:
-    :param trigger_id:
-    :return:
+
+async def homepage(request):
+    context = {"request": request}
+    return templates.TemplateResponse("base.html", context)
+
+
+async def get_all(request):
     """
-    if trigger_id > 0:
-        trigger = await Trigger.objects.get(id=trigger_id)
-        form = forms.Form(TriggerSchema, values=trigger)
+    responses:
+      200:
+        description: get the list of source of feeds
+        examples:
+          [{"id": 1}, {"title": "Github Rss Feeds"}, {"url": "https://github.com/rss"}, {"folder": 1},
+          {"date_created": "2020-05-12T01:00"}, {"date_modified": "2020-05-12T18:27:2"}, {"status": True}]
+    """
+    data = await Trigger.objects.all()
+    content = [
+        {
+            "id": result["id"],
+            "rss_url": result["rss_url"],
+            "description": result["description"],
+            "joplin_folder": result["joplin_folder"],
+            "reddit": result["reddit"],
+            "localstorage": result["localstorage"],
+            "mastodon": result["mastodon"],
+            "mail": result["mail"],
+            "status": result["status"],
+            "date_created": result['date_created'],
+            "date_triggered": result['date_triggered']
+        }
+        for result in data
+    ]
+    logger.debug("get that trigger")
+    return JSONResponse(content)
+
+
+async def get(request):
+    """
+    responses:
+      200:
+        description: get the list of source of feeds
+        examples:
+          [{"id": 1}, {"title": "Github Rss Feeds"}, {"url": "https://github.com/rss"}, {"folder": 1},
+          {"date_created": "2020-05-12T01:00"}, {"date_modified": "2020-05-12T18:27:2"}, {"status": True}]
+    """
+    # trigger_id provided, form to edit this one
+    trigger_id = request.path_params['trigger_id']
+    result = await Trigger.objects.get(id=trigger_id)
+    content = {"id": trigger_id,
+               "rss_url": result["rss_url"],
+               "description": result["description"],
+               "joplin_folder": result["joplin_folder"],
+               "reddit": result["reddit"],
+               "localstorage": result["localstorage"],
+               "mastodon": result["mastodon"],
+               "mail": result["mail"],
+               "status": result["status"],
+               "date_created": result['date_created'],
+               "date_triggered": result['date_triggered']}
+    logger.debug("get all Triggers")
+    return JSONResponse(content)
+
+
+async def create(request):
+    payload = await request.json()
+    trigger, errors = TriggerSchema.validate_or_error(payload)
+
+    if errors:
+        content = {"errors": errors, "data": payload}
+        logger.debug("error during creating a trigger")
+
     else:
-        form = forms.Form(TriggerSchema)
-    triggers = await Trigger.objects.all()
-    now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
-    context = {"request": request,
-               "form": form,
-               "triggers_list": triggers,
-               "trigger_id": trigger_id,
-               "root_localstorage_folder": config('MARKDOWN_NOTES_FOLDER'),
-               "year": now_year}
-    if trigger_id > 0:
-        context['data'] = trigger
-    return context
+        result = await Trigger.objects.create(description=trigger.description,
+                                              rss_url=trigger.rss_url,
+                                              joplin_folder=trigger.joplin_folder,
+                                              reddit=trigger.reddit,
+                                              localstorage=trigger.localstorage,
+                                              mastodon=trigger.mastodon,
+                                              mail=trigger.mail,
+                                              status=trigger.status,
+                                              )
+        payload = {
+            'description': result.description,
+            'rss_url': result.rss_url,
+            'joplin_folder': result.joplin_folder,
+            'reddit': result.reddit,
+            'localstorage': result.localstorage,
+            'mastodon': result.mastodon,
+            'mail': result.mail,
+            'status': result.status,
+            'date_created': str(result.date_created),
+            'date_triggered': str(result.date_triggered),
+        }
+        content = {"errors": errors, "data": payload}
+        logger.debug("create a trigger")
+    return JSONResponse(content)
 
 
-class TriggerEndpoint(HTTPEndpoint):
-
-    async def get(self, request):
-        # trigger_id provided, form to edit this one
-        trigger_id = request.path_params['trigger_id']
-        context = await get_context(request, trigger_id)
-        return templates.TemplateResponse("index.html", context)
-
-    async def post(self, request):
-        triggers = await Trigger.objects.all()
-
+async def update(request):
+    if 'trigger_id' in request.path_params:
+        trigger_id = int(request.path_params['trigger_id'])
         data = await request.form()
         trigger, errors = TriggerSchema.validate_or_error(data)
 
         if errors:
-            form = forms.Form(TriggerSchema, values=data, errors=errors)
-            now_year = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY')
-            context = {"request": request,
-                       "form": form,
+            content = {"errors": errors,
                        "data": trigger,
-                       "triggers_list": triggers,
-                       "year": now_year}
-            return templates.TemplateResponse("index.hml", context)
-
-        if 'trigger_id' in request.path_params:
-            trigger_id = request.path_params['trigger_id']
-            trigger_to_update = await Trigger.objects.get(id=trigger_id)
-            await trigger_to_update.update(rss_url=trigger.rss_url,
-                                           joplin_folder=trigger.joplin_folder,
-                                           reddit=trigger.reddit,
-                                           mastodon=trigger.mastodon,
-                                           localstorage=trigger.localstorage,
-                                           mail=trigger.mail,
-                                           status=trigger.status,
-                                           description=trigger.description)
+                       "trigger_id": trigger_id}
+            logger.debug(f"error during updating trigger {trigger_id}")
         else:
-            await Trigger.objects.create(rss_url=trigger.rss_url,
-                                         joplin_folder=trigger.joplin_folder,
-                                         reddit=trigger.reddit,
-                                         mastodon=trigger.mastodon,
-                                         localstorage=trigger.localstorage,
-                                         status=trigger.status,
-                                         mail=trigger.mail,
-                                         description=trigger.description)
+            trigger_to_update = await Trigger.objects.get(id=trigger_id)
+            result = await trigger_to_update.update(rss_url=trigger.rss_url,
+                                                    joplin_folder=trigger.joplin_folder,
+                                                    reddit=trigger.reddit,
+                                                    mastodon=trigger.mastodon,
+                                                    localstorage=trigger.localstorage,
+                                                    mail=trigger.mail,
+                                                    status=trigger.status,
+                                                    description=trigger.description)
+            payload = {
+                'description': result.description,
+                'rss_url': result.rss_url,
+                'joplin_folder': result.joplin_folder,
+                'reddit': result.reddit,
+                'localstorage': result.localstorage,
+                'mastodon': result.mastodon,
+                'mail': result.mail,
+                'status': result.status,
+                'date_created': str(result.date_created),
+                'date_triggered': str(result.date_triggered),
+            }
+            content = {'errors': [], 'data': payload}
+    else:
+        errors = dict({'message': 'Trigger id is missing'})
+        content = {'errors': errors, 'data': ''}
 
-        return RedirectResponse(request.url_for("homepage"))
-
-
-async def homepage(request):
-    """
-    get the list of triggers
-    :param request:
-    :return:
-    """
-    trigger_id = 0
-    context = await get_context(request, trigger_id)
-    return templates.TemplateResponse("index.html", context)
-
-
-async def switch_status(request):
-    """
-    switch masto of that trigger
-    :param request:
-    :return:
-    """
-    if 'trigger_id' in request.path_params:
-        trigger_id = int(request.path_params['trigger_id'])
-        trigger = await Trigger.objects.get(id=trigger_id)
-        date_triggered = trigger.date_triggered
-        if trigger.status is False:
-            date_triggered = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ')
-        await trigger.update(status=not trigger.status, date_triggered=date_triggered)
-    return RedirectResponse(request.url_for("homepage"))
-
-
-async def switch_masto(request):
-    """
-    switch masto of that trigger
-    :param request:
-    :return:
-    """
-    if 'trigger_id' in request.path_params:
-        trigger_id = int(request.path_params['trigger_id'])
-        trigger = await Trigger.objects.get(id=trigger_id)
-        await trigger.update(mastodon=not trigger.mastodon)
-    return RedirectResponse(request.url_for("homepage"))
-
-
-async def switch_localstorage(request):
-    """
-    switch localstorage of that trigger
-    :param request:
-    :return:
-    """
-    if 'trigger_id' in request.path_params:
-        trigger_id = int(request.path_params['trigger_id'])
-        trigger = await Trigger.objects.get(id=trigger_id)
-        await trigger.update(localstorage=not trigger.localstorage)
-    return RedirectResponse(request.url_for("homepage"))
-
-
-async def switch_mail(request):
-    """
-    switch masto of that trigger
-    :param request:
-    :return:
-    """
-    if 'trigger_id' in request.path_params:
-        trigger_id = int(request.path_params['trigger_id'])
-        trigger = await Trigger.objects.get(id=trigger_id)
-        await trigger.update(mail=not trigger.mail)
-    return RedirectResponse(request.url_for("homepage"))
+    logger.debug(f"update trigger {trigger_id}")
+    return JSONResponse(content)
 
 
 async def delete(request):
@@ -180,49 +182,90 @@ async def delete(request):
     if 'trigger_id' in request.path_params:
         trigger_id = int(request.path_params['trigger_id'])
         trigger = await Trigger.objects.get(id=trigger_id)
-        await trigger.delete()
-    return RedirectResponse(request.url_for("homepage"))
+        result = await trigger.delete()
+        logger.debug("delete a trigger")
+        content = {'errors': [], 'data': result}
+        logger.debug(f"error during deleting trigger {trigger_id}")
+    else:
+        errors = dict({'message': 'Trigger id is missing'})
+        content = {'errors': errors, 'data': ''}
+        logger.debug(f"delete trigger")
+    return JSONResponse(content)
 
+
+async def switch(request):
+    """
+    switch some status of that trigger
+    :param request:
+    :return:
+    """
+    if 'trigger_id' in request.path_params:
+        trigger_id = int(request.path_params['trigger_id'])
+        trigger = await Trigger.objects.get(id=trigger_id)
+        date_triggered = trigger.date_triggered
+        if trigger.status is False:
+            date_triggered = arrow.utcnow().to(
+                config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ')
+        trace = ''
+        if 'switch_type' in request.path_params and \
+                request.path_params['switch_type'] == 'status':
+            await trigger.update(status=not trigger.status,
+                                 date_triggered=date_triggered)
+            trace = f"switch status trigger {trigger_id}"
+        elif 'switch_type' in request.path_params and \
+                request.path_params['switch_type'] == 'masto':
+            await trigger.update(mastodon=not trigger.mastodon)
+            trace = f"switch mastodon trigger {trigger_id}"
+        elif 'switch_type' in request.path_params and \
+                request.path_params['switch_type'] == 'mail':
+            await trigger.update(mail=not trigger.mail)
+            trace = f"switch mail trigger {trigger_id}"
+
+        payload = {
+            'description': trigger.description,
+            'rss_url': trigger.rss_url,
+            'joplin_folder': trigger.joplin_folder,
+            'reddit': trigger.reddit,
+            'localstorage': trigger.localstorage,
+            'mastodon': trigger.mastodon,
+            'mail': trigger.mail,
+            'status': trigger.status,
+            'date_created': str(trigger.date_created),
+            'date_triggered': str(trigger.date_triggered),
+        }
+        content = {'errors': [], 'data': payload}
+        logger.debug(trace)
+    else:
+        errors = dict({'message': 'Trigger id is missing'})
+        content = {'errors': errors, 'data': ''}
+        logger.debug(f"error during switch status trigger")
+    return JSONResponse(content)
+
+
+# The API Routes
+api = Router(routes=[
+    Mount('/yeoboseyo', app=Router([
+        Route('/', endpoint=get_all, methods=['GET']),
+        Route('/{trigger_id}', endpoint=get, methods=['GET']),
+        Route('/', endpoint=create, methods=['POST']),
+        Route('/{trigger_id}', endpoint=update, methods=['PATCH']),
+        Route('/{trigger_id}', endpoint=delete, methods=['DELETE']),
+        Route('/switch/{switch_type}/{trigger_id:int}', switch, methods=['PATCH'], name='switch'),
+    ]))
+])
 
 app = Starlette(
     debug=True,
     routes=[
-        Route('/', homepage, methods=['GET', 'POST'], name='homepage'),
-        Route('/new', endpoint=TriggerEndpoint, methods=['POST'], name='new'),
-        Route('/edit/{trigger_id:int}', endpoint=TriggerEndpoint, methods=['POST', 'GET'], name='edit'),
-        Route('/delete/{trigger_id:int}', delete, methods=['GET'], name='delete'),
-        Route('/switch/masto/{trigger_id:int}', switch_masto, methods=['GET'], name='switch_masto'),
-        Route('/switch/mail/{trigger_id:int}', switch_mail, methods=['GET'], name='switch_mail'),
-        Route('/switch/localstorage/{trigger_id:int}',
-              switch_localstorage, methods=['GET'], name='switch_localstorage'),
-        Route('/switch/status/{trigger_id:int}', switch_status, methods=['GET'], name='switch_status'),
-        Mount('/static', StaticFiles(directory='static'), name='static')
+        Route('/', homepage, methods=['GET'], name='homepage'),
+        Mount('/static', StaticFiles(directory="static")),
     ],
 )
 
-
-# HTTP Requests
-# Error Pages
-@app.exception_handler(404)
-async def not_found(request, exc):
-    """
-    Return an HTTP 404 page.
-    """
-    template = "404.html"
-    context = {"request": request}
-    return templates.TemplateResponse(template, context, status_code=404)
-
-
-@app.exception_handler(500)
-async def server_error(request, exc):
-    """
-    Return an HTTP 500 page.
-    """
-    template = "500.html"
-    context = {"request": request}
-    return templates.TemplateResponse(template, context, status_code=500)
+main_app.mount('/api', app=api)
+main_app.mount('/', app=app)
 
 # Bootstrap
 if __name__ == '__main__':
     print('여보세요 !')
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+    uvicorn.run(main_app, host='0.0.0.0', port=8000)
