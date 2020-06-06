@@ -117,7 +117,11 @@ Go on http://0.0.0.0:8000 and fill the form to add new Feeds to track
 
 Yeoboseyo home page
 
-![Yeoboseyo home page](doc/Yeoboseyo.png)
+![Yeoboseyo home page](doc/Yeoboseyo_list.png)
+
+Yeoboseyo form
+
+![Yeoboseyo home page](doc/Yeoboseyo_form.png)
 
 ###  :dizzy: Running the engine
 
