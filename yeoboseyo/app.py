@@ -35,18 +35,14 @@ logger = logging.getLogger(__name__)
 
 
 async def homepage(request):
-    context = {"request": request}
+    MY_NOTES_FOLDER = config.get('MY_NOTES_FOLDER')
+    context = {"request": request, 'MY_NOTES_FOLDER': MY_NOTES_FOLDER}
     return templates.TemplateResponse("base.html", context)
 
 
 async def get_all(request):
     """
-    responses:
-      200:
-        description: get the list of source of feeds
-        examples:
-          [{"id": 1}, {"title": "Github Rss Feeds"}, {"url": "https://github.com/rss"}, {"folder": 1},
-          {"date_created": "2020-05-12T01:00"}, {"date_modified": "2020-05-12T18:27:2"}, {"status": True}]
+    get all the data
     """
     data = await Trigger.objects.all()
     content = [
@@ -71,12 +67,7 @@ async def get_all(request):
 
 async def get(request):
     """
-    responses:
-      200:
-        description: get the list of source of feeds
-        examples:
-          [{"id": 1}, {"title": "Github Rss Feeds"}, {"url": "https://github.com/rss"}, {"folder": 1},
-          {"date_created": "2020-05-12T01:00"}, {"date_modified": "2020-05-12T18:27:2"}, {"status": True}]
+    get the choosen data
     """
     # trigger_id provided, form to edit this one
     trigger_id = request.path_params['trigger_id']
@@ -97,46 +88,40 @@ async def get(request):
 
 
 async def create(request):
+    """
+    create a data
+    """
     payload = await request.json()
     trigger, errors = TriggerSchema.validate_or_error(payload)
 
     if errors:
-        content = {"errors": errors, "data": payload}
+        content = {"errors": errors}
         logger.debug("error during creating a trigger")
 
     else:
-        result = await Trigger.objects.create(description=trigger.description,
-                                              rss_url=trigger.rss_url,
-                                              joplin_folder=trigger.joplin_folder,
-                                              reddit=trigger.reddit,
-                                              localstorage=trigger.localstorage,
-                                              mastodon=trigger.mastodon,
-                                              mail=trigger.mail,
-                                              status=trigger.status,
-                                              )
-        payload = {
-            'description': result.description,
-            'rss_url': result.rss_url,
-            'joplin_folder': result.joplin_folder,
-            'reddit': result.reddit,
-            'localstorage': result.localstorage,
-            'mastodon': result.mastodon,
-            'mail': result.mail,
-            'status': result.status,
-            'date_created': str(result.date_created),
-            'date_triggered': str(result.date_triggered),
-        }
-        content = {"errors": errors, "data": payload}
-        logger.debug("create a trigger")
+        await Trigger.objects.create(description=trigger.description,
+                                     rss_url=trigger.rss_url,
+                                     joplin_folder=trigger.joplin_folder,
+                                     reddit=trigger.reddit,
+                                     localstorage=trigger.localstorage,
+                                     mastodon=trigger.mastodon,
+                                     mail=trigger.mail,
+                                     status=trigger.status,
+                                     )
+        content = {"errors": ''}
+        logger.debug("trigger created")
     return JSONResponse(content)
 
 
 async def update(request):
+    """
+    update a data
+    """
     if 'trigger_id' in request.path_params:
         trigger_id = int(request.path_params['trigger_id'])
-        data = await request.form()
-        trigger, errors = TriggerSchema.validate_or_error(data)
 
+        data = await request.json()
+        trigger, errors = TriggerSchema.validate_or_error(data)
         if errors:
             content = {"errors": errors,
                        "data": trigger,
@@ -144,30 +129,18 @@ async def update(request):
             logger.debug(f"error during updating trigger {trigger_id}")
         else:
             trigger_to_update = await Trigger.objects.get(id=trigger_id)
-            result = await trigger_to_update.update(rss_url=trigger.rss_url,
-                                                    joplin_folder=trigger.joplin_folder,
-                                                    reddit=trigger.reddit,
-                                                    mastodon=trigger.mastodon,
-                                                    localstorage=trigger.localstorage,
-                                                    mail=trigger.mail,
-                                                    status=trigger.status,
-                                                    description=trigger.description)
-            payload = {
-                'description': result.description,
-                'rss_url': result.rss_url,
-                'joplin_folder': result.joplin_folder,
-                'reddit': result.reddit,
-                'localstorage': result.localstorage,
-                'mastodon': result.mastodon,
-                'mail': result.mail,
-                'status': result.status,
-                'date_created': str(result.date_created),
-                'date_triggered': str(result.date_triggered),
-            }
-            content = {'errors': [], 'data': payload}
+            await trigger_to_update.update(description=trigger.description,
+                                           rss_url=trigger.rss_url,
+                                           localstorage=trigger.localstorage,
+                                           joplin_folder=trigger.joplin_folder,
+                                           reddit=trigger.reddit,
+                                           mastodon=trigger.mastodon,
+                                           mail=trigger.mail,
+                                           status=trigger.status,
+                                           )
+            content = {'errors': ''}
     else:
-        errors = dict({'message': 'Trigger id is missing'})
-        content = {'errors': errors, 'data': ''}
+        content = {'errors': {'message': 'Trigger id is missing'}}
 
     logger.debug(f"update trigger {trigger_id}")
     return JSONResponse(content)
@@ -176,28 +149,22 @@ async def update(request):
 async def delete(request):
     """
     delete a trigger
-    :param request:
-    :return:
     """
     if 'trigger_id' in request.path_params:
         trigger_id = int(request.path_params['trigger_id'])
         trigger = await Trigger.objects.get(id=trigger_id)
-        result = await trigger.delete()
-        logger.debug("delete a trigger")
-        content = {'errors': [], 'data': result}
-        logger.debug(f"error during deleting trigger {trigger_id}")
+        await trigger.delete()
+        content = {'errors': ''}
+        logger.debug("trigger deleted")
     else:
-        errors = dict({'message': 'Trigger id is missing'})
-        content = {'errors': errors, 'data': ''}
-        logger.debug(f"delete trigger")
+        content = {'errors': {'message': 'Trigger id is missing'}}
+        logger.debug(f"error during deleting trigger")
     return JSONResponse(content)
 
 
 async def switch(request):
     """
     switch some status of that trigger
-    :param request:
-    :return:
     """
     if 'trigger_id' in request.path_params:
         trigger_id = int(request.path_params['trigger_id'])
@@ -221,23 +188,10 @@ async def switch(request):
             await trigger.update(mail=not trigger.mail)
             trace = f"switch mail trigger {trigger_id}"
 
-        payload = {
-            'description': trigger.description,
-            'rss_url': trigger.rss_url,
-            'joplin_folder': trigger.joplin_folder,
-            'reddit': trigger.reddit,
-            'localstorage': trigger.localstorage,
-            'mastodon': trigger.mastodon,
-            'mail': trigger.mail,
-            'status': trigger.status,
-            'date_created': str(trigger.date_created),
-            'date_triggered': str(trigger.date_triggered),
-        }
-        content = {'errors': [], 'data': payload}
+        content = {'errors': ''}
         logger.debug(trace)
     else:
-        errors = dict({'message': 'Trigger id is missing'})
-        content = {'errors': errors, 'data': ''}
+        content = {'errors': {'message': 'Trigger id is missing'}}
         logger.debug(f"error during switch status trigger")
     return JSONResponse(content)
 

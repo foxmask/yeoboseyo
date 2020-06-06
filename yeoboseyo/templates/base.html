@@ -10,8 +10,8 @@
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
     <meta name="author" content="FoxMaSk">
     <!-- Load Vue followed by BootstrapVue -->
-    <script src="//unpkg.com/vue@latest/dist/vue.js"></script>
-    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <script src="//unpkg.com/vue@latest/dist/vue.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <!-- Load the following for BootstrapVueIcons support -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
     <script src="//unpkg.com/axios/dist/axios.min.js"></script>
@@ -20,20 +20,7 @@
 <body role="document">
   <!-- main node of the application-->
   <div id="app">
-    <!-- give props 'show' this the navar knows if the form is displayed or not -->
-    <trigger-navbar :show="show"
-                    v-on:showform="showMeTheForm($event)"></trigger-navbar>
-    <!-- give props 'show' coming from the navbar, for the sister component to display the form or not -->
-    <trigger-form :show="show"
-                  :trigger="trigger"
-                  v-on:showform="showMeTheForm($event)"
-                  v-on:getdata="getData($event)"></trigger-form>
     <b-container fluid>
-        <b-row>
-            <trigger-list :triggers="triggers"
-                          v-on:getdata="getData($event)"
-                          v-on:edittrigger="editTrigger($event)"></trigger-list>
-        </b-row>
     </b-container>
     <hr/>
     <footer class="footer">
@@ -45,214 +32,28 @@
 
 
 <script>
-// First pomonent 'navbar'
-Vue.component('trigger-navbar', {
-  props: ['show'],
-  delimiters: ["{?","?}"],
+var app = new Vue({
+  el: '#app',
   data() {
     return {
-
-    }
-  },
-  methods: {
-    // call the function to change the status 'show'
-    showform() {
-      this.$emit("showform", !this.show)
-    }
-  },
-  template: `
-  <div>
-    <b-navbar toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand href="#">Yeoboseyo</b-navbar-brand>
-      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-      <b-collapse id="nav-collapse" is-nav>
-        <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto">
-          <b-nav-form>
-            <b-button size="sm" class="ml-sm-2" v-on:click="showform">New feed</b-button>
-          </b-nav-form>
-        </b-navbar-nav>
-      </b-collapse>
-    </b-navbar>
-  </div>
-  `
-})
-// Second component 'form'
-Vue.component('trigger-form', {
-  props: ['show', 'trigger'],
-  delimiters: ["{?","?}"],
-  data() {
-    return {
-      //description: '',
-      //rss_url: '',
-      // joplin_folder: '',
-      // reddit: '',
-      // localstorage: '',
-      // mail: false,
-      // mastodon: false,
-      // status: true,
-      errors: ''
-    }
-  },
-  computed: {
-    description() {
-      return this.trigger['description']
-    },
-    rss_url() {
-      return this.trigger['rss_url']
-    },
-    joplin_folder() {
-      return this.trigger['joplin_folder']
-    },
-    reddit() {
-      return this.trigger['reddit']
-    },
-    localstorage() {
-      return this.trigger['localstorage']
-    },
-    mail() {
-      if (this.trigger['mail']) {
-        return this.trigger['mail']
-      }
-      else {
-        return false
-      }
-    },
-    mastodon() {
-      if (this.trigger['mastodon']) {
-        return this.trigger['mastodon']
-      }
-      else {
-        return false
-      }
-    },
-    status() {
-      if (this.trigger['status']) {
-        return this.trigger['status']
-      }
-      else {
-        return true
-      }
-    }
-  },
-  methods: {
-    handleSubmit() {
-      if (this.joplin_folder == '' && this.reddit == '' && this.localstorage =='') {
-        alert('One of the 3 fields "Markdown Folder", "Joplin Folder", or "Reddit" needs to be filled"');
-      }
-      else {
-        const payload = {
-          description: this.description,
-          rss_url: this.rss_url,
-          joplin_folder: this.joplin_folder,
-          reddit: this.reddit,
-          localstorage: this.localstorage,
-          mail: this.mail,
-          mastodon: this.mastodon,
-          status: this.status
-        }
-        axios.post('/api/yeoboseyo/', payload)
-        .then((res) => {
-          if (res.status === 200) {
-            this.$emit("getdata", true)
-
-            // reset everything
-            this.description = ''
-            this.rss_url = ''
-            this.joplin_folder = ''
-            this.reddit = ''
-            this.mail = false
-            this.mastodon = false
-            this.status = true
-
-            this.$emit("showform", false)
-          }
-          else {
-            this.errors = res.data['errors']
-          }
-        })
-        .catch(error => { error.statusText })
-      }
-    }
-  },
-  template: `
-  <b-col cols="12">
-    <div v-if="errors" class="alert alert-danger">{? errors ?}</div>
-    <form v-if="show" ref="form" class="mt-4" @submit.stop.prevent="handleSubmit">
-        <b-form-input
-          class="mb-4"
-          v-model="description"
-          required
-          placeholder="put a short name for your new 'yeoboseyo'"
-        ></b-form-input>
-
-        <h2><i class="fa fa-dot-circle"></i> Origin of the data</h2>
-        <b-form-group
-            description="Put the URL from which you want to get the data to spread">
-            <b-input-group size="sm" class="mb-2">
-              <b-input-group-prepend is-text>
-                <b-icon icon="bookmark"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input
-                  v-model="rss_url"
-                  required
-                  placeholder="RSS Feed URL"
-              ></b-form-input>
-            </b-input-group>
-        </b-form-group>
-
-        <h2><i class="fa fa-arrow-alt-circle-down"></i> Destinations of the data</h2>
-        <b-form-group
-            description="Put the name of the folder (inside {{ root_localstorage_folder }}) that will store the generated Markdown files coming from the RSS Feeds">
-            <b-input-group size="sm" class="mb-2">
-              <b-input-group-prepend is-text>
-                <b-icon icon="folder"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input
-                  v-model="localstorage"
-                  placeholder="Markdown folder"
-              ></b-form-input>
-            </b-input-group>
-        </b-form-group>
-        <b-form-group
-            description="Put the name of the joplin folder that will store the data coming from the RSS Feeds">
-            <b-input-group size="sm" class="mb-2">
-              <b-input-group-prepend is-text>
-                <b-icon icon="folder"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input
-                  v-model="joplin_folder"
-                  placeholder="Joplin folder"
-              ></b-form-input>
-            </b-input-group>
-        </b-form-group>
-        <b-form-group
-            description="Put the name of the subreddit that will receive the data coming from the RSS Feeds">
-            <div class="input-group mb-2">
-                <div class="input-group-prepend">
-                    <div class="input-group-text"><i class="fa fa-spider"></i></div>
-                </div>
-                <b-form-input
-                  v-model="reddit"
-                  placeholder="SubReddit"
-                ></b-form-input>
-            </div>
-        </b-form-group>
-        </fieldset>
-        <b-form-checkbox v-model="mastodon" name="mastodon">Publish on Mastodon ?</b-form-checkbox>
-        <b-form-checkbox v-model="mail" name="mail">Send by Mail ?</b-form-checkbox>
-        <b-form-checkbox v-model="status" name="status">Status</b-form-checkbox>
-        <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>
-    </form>
-  </b-col>
-  `
-})
-// Third pomponent 'list'
-Vue.component('trigger-list', {
-  props: ['triggers'],
-  delimiters: ["{?","?}"],
-  data () {
-    return {
+      delimiters: ["{?","?}"],
+      // DATA
+      triggers: [],
+      // FORM
+      show: false,
+      formData: {
+        triggerId: 0,
+        errors: '',
+        description: '',
+        rss_url: '',
+        joplin_folder: '',
+        reddit: '',
+        localstorage: '',
+        mastodon: false,
+        mail: false,
+        status: true
+      },
+      // LIST
       search: '',
       fields: [
         { key: 'description', sortable: true },
@@ -269,11 +70,153 @@ Vue.component('trigger-list', {
       ],
       filter: null,
       selected: '',
-      selectMode: 'single'
+      selectMode: 'single',
+      errors: ''
+    }
+  },
+
+  methods: {
+    // THE FORM
+    showForm() {
+      return this.show = !this.show
+    },
+    submitForm () {
+      if (this.formData.joplin_folder == '' &&
+          this.formData.reddit == '' &&
+          this.formData.localstorage =='') {
+        alert('One of the 3 fields "Markdown Folder", "Joplin Folder", or "Reddit" needs to be filled"');
+      }
+      else {
+        const payload = {
+          description: this.formData.description,
+          rss_url: this.formData.rss_url,
+          joplin_folder: this.formData.joplin_folder,
+          reddit: this.formData.reddit,
+          localstorage: this.formData.localstorage,
+          mail: this.formData.mail,
+          mastodon: this.formData.mastodon,
+          status: this.formData.status
+        }
+        console.log(payload)
+        if (this.formData.triggerId == 0) {
+          axios.post('/api/yeoboseyo/', payload)
+          .then((res) => {
+            if (res.status === 200) {
+              this.getData()
+              this.resetForm()
+              this.showForm()
+            }
+            else {
+              this.formData.errors = res.data['errors']
+            }
+          })
+          .catch(error => { error.statusText })
+        }
+        else {
+          console.log(payload)
+          axios.patch('/api/yeoboseyo/' + this.formData.triggerId, payload)
+          .then((res) => {
+            if (res.status === 200) {
+              this.getData()
+              this.resetForm()
+              this.showForm()
+            }
+            else {
+              this.formData.errors = res.data['errors']
+            }
+          })
+          .catch(error => { error.statusText })
+        }
+      }
+    },
+    editTrigger (triggerId) {
+      axios
+        .get('/api/yeoboseyo/' + triggerId)
+        .then(response => {
+          this.formData.triggerId = triggerId
+          this.formData.description = response.data['description']
+          this.formData.rss_url = response.data['rss_url']
+          this.formData.joplin_folder = response.data['joplin_folder']
+          this.formData.reddit =  response.data['reddit']
+          this.formData.localstorage = response.data['localstorage']
+          this.formData.mastodon = response.data['mastodon']
+          this.formData.mail = response.data['mail']
+          this.formData.status = response.data['status']
+          this.showForm()
+        })
+    },
+    resetForm () {
+      // reset everything
+      this.formData.triggerId = 0
+      this.formData.description = ''
+      this.formData.rss_url = ''
+      this.formData.joplin_folder = ''
+      this.formData.reddit = ''
+      this.formData.localstorage = ''
+      this.formData.mail = false
+      this.formData.mastodon = false
+      this.status = true
+    },
+    getData() {
+      axios
+       .get('/api/yeoboseyo/')
+       .then(response => {this.triggers = response.data})
+    },
+
+    // SWITCHING DATA and STATUS FROM THE LIST
+
+    switchMail (triggerId) {
+      axios.patch('/api/yeoboseyo/switch/mail/' + triggerId)
+        .then((res) => {
+          if (res.status === 200) {
+            this.getData()
+          }
+          else {
+            this.errors = res.data['errors']
+          }
+        })
+        .catch(error => { error.statusText })
+    },
+    switchMastodon (triggerId) {
+      axios.patch('/api/yeoboseyo/switch/masto/' + triggerId)
+        .then((res) => {
+          if (res.status === 200) {
+            this.getData()
+          }
+          else {
+            this.errors = res.data['errors']
+          }
+        })
+        .catch(error => { error.statusText })
+    },
+    switchStatus (triggerId) {
+      axios.patch('/api/yeoboseyo/switch/status/' + triggerId)
+        .then((res) => {
+          if (res.status === 200) {
+            this.getData()
+          }
+          else {
+            this.errors = res.data['errors']
+          }
+        })
+        .catch(error => { error.statusText })
+    },
+
+    deleteTrigger (triggerId) {
+      axios.delete('/api/yeoboseyo/' + triggerId)
+        .then((res) => {
+          if (res.status === 200) {
+            this.getData()
+          }
+          else {
+            this.errors = res.data['errors']
+          }
+        })
+        .catch(error => { error.statusText })
     }
   },
   computed: {
-    searchTrigger: function(){
+    searchTrigger (){
       let result = this.triggers
       if (!this.search) {
         return result
@@ -282,63 +225,103 @@ Vue.component('trigger-list', {
       return result.filter(search)
     }
   },
-  methods: {
-    switchMail: function(triggerId) {
-      axios.patch('/api/yeoboseyo/switch/mail/' + triggerId)
-        .then((res) => {
-          if (res.status === 200) {
-            this.$emit("getdata", true)
-          }
-          else {
-            this.errors = res.data['errors']
-          }
-        })
-        .catch(error => { error.statusText })
-    },
-    switchMastodon: function(triggerId) {
-      axios.patch('/api/yeoboseyo/switch/masto/' + triggerId)
-        .then((res) => {
-          if (res.status === 200) {
-            this.$emit("getdata", true)
-          }
-          else {
-            this.errors = res.data['errors']
-          }
-        })
-        .catch(error => { error.statusText })
-    },
-    switchStatus: function(triggerId) {
-      axios.patch('/api/yeoboseyo/switch/status/' + triggerId)
-        .then((res) => {
-          if (res.status === 200) {
-            this.$emit("getdata", true)
-          }
-          else {
-            this.errors = res.data['errors']
-          }
-        })
-        .catch(error => { error.statusText })
-    },
-    editTrigger: function(triggerId) {
-      this.$emit("edittrigger", triggerId)
-    },
-    deleteTrigger: function(triggerId) {
-      axios.delete('/api/yeoboseyo/' + triggerId)
-        .then((res) => {
-          if (res.status === 200) {
-            this.$emit("getdata", true)
-          }
-          else {
-            this.errors = res.data['errors']
-          }
-        })
-        .catch(error => { error.statusText })
-    }
+  mounted () {
+    axios
+    .get('/api/yeoboseyo/')
+    .then(response => {this.triggers = response.data})
   },
+
   template: `
   <div>
+    <!-- 'Yeoboseyo' NAVBAR -->
+    <b-navbar toggleable="lg" type="dark" variant="info">
+      <b-navbar-brand href="#">Yeoboseyo</b-navbar-brand>
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <b-collapse id="nav-collapse" is-nav>
+        <!-- Right aligned nav items -->
+        <b-navbar-nav class="ml-auto">
+          <b-nav-form>
+            <b-button size="sm" class="ml-sm-2" v-on:click="showForm">New feed</b-button>
+          </b-nav-form>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
+  <!-- End of 'Yeoboseyo' NAVBAR -->
+  <!-- 'Yeoboseyo' FORM -->
+  <b-col cols="12">
+    <b-row>
+    <b-col cols="2"> </b-col>
+    <b-col cols="8">
+    <div v-if="errors" class="alert alert-danger">{? errors ?}</div>
+    <form v-if="show" ref="form" class="mt-4" @submit.stop.prevent="submitForm">
+        <label>Set a description for this 'Yeoboseyo'</label>
+        <b-form-input
+          class="mb-4"
+          v-model="formData.description"
+          required
+        ></b-form-input>
+        <h2><i class="fa fa-dot-circle"></i> Origin of the data</h2>
+        <b-form-group
+            description="Put the URL from which you want to get the data to spread eg http://somethinglookslikethat.org/feeds.xml">
+            <b-input-group size="sm" class="mb-2">
+              <b-input-group-prepend is-text>
+                <b-icon icon="bookmark"></b-icon>
+              </b-input-group-prepend>
+              <b-form-input
+                  v-model="formData.rss_url"
+                  required
+              ></b-form-input>
+            </b-input-group>
+        </b-form-group>
+        <h2><i class="fa fa-arrow-alt-circle-down"></i> Destinations of the data</h2>
+        <b-form-group
+            description="Put the name of the folder (inside {{ MY_NOTES_FOLDER }}) that will store the generated Markdown files coming from the RSS Feeds">
+            <b-input-group size="sm" class="mb-2">
+              <b-input-group-prepend is-text>
+                <b-icon icon="folder"></b-icon>
+              </b-input-group-prepend>
+              <b-form-input
+                  v-model="formData.localstorage"
+              ></b-form-input>
+            </b-input-group>
+        </b-form-group>
+        <b-form-group
+            description="Put the name of the joplin folder that will store the data coming from the RSS Feeds">
+            <b-input-group size="sm" class="mb-2">
+              <b-input-group-prepend is-text>
+                <b-icon icon="folder"></b-icon>
+              </b-input-group-prepend>
+              <b-form-input
+                  v-model="formData.joplin_folder"
+              ></b-form-input>
+            </b-input-group>
+        </b-form-group>
+        <b-form-group
+            description="Put the name of the subreddit that will receive the data coming from the RSS Feeds">
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text"><i class="fa fa-spider"></i></div>
+                </div>
+                <b-form-input
+                  v-model="formData.reddit"
+                ></b-form-input>
+            </div>
+        </b-form-group>
+        </fieldset>
+        <b-form-checkbox v-model="formData.mastodon" name="mastodon">Publish on Mastodon ?</b-form-checkbox>
+        <b-form-checkbox v-model="formData.mail" name="mail">Send by Mail ?</b-form-checkbox>
+        <b-form-checkbox v-model="formData.status" name="status">Status</b-form-checkbox>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>
+    </form>
+  </b-col>
+  <b-col cols="2"> </b-col>
+  </b-col>
+  </b-row>
+  <b-row>
+  <!-- End of 'Yeoboseyo' FORM -->
+  <!-- 'Yeoboseyo' TABLE  -->
   <b-col cols="6">
-    <b-input-group class="mt-4 mb-4" size="sm">
+    <b-input-group class="mr-2 ml-2 mt-4 mb-4" size="sm">
       <!-- search field -->
       <b-input-group-prepend is-text><b-icon icon="search"></b-icon></b-input-group-prepend>
       <b-form-input v-model="filter" type="search" id="filterInput" placeholder="Type to Search"></b-form-input>
@@ -346,8 +329,9 @@ Vue.component('trigger-list', {
     </b-input-group>
   </b-col>
   <b-col cols="12">
-    <!-- table of 'Yeoboseyo' -->
     <b-table
+            class="ml-2 mr-2 "
+            ref="triggerstable"
             striped
             hover
             sort-icon-left
@@ -398,51 +382,11 @@ Vue.component('trigger-list', {
               </b-button>
             </template>
     </b-table>
-    <!-- end of table of 'Yeoboseyo' -->
+    <!-- end of table 'Yeoboseyo' TABLE -->
   </b-col>
+  </b-row>
   </div>
-  `
-})
-
-var app = new Vue({
-  el: '#app',
-  data() {
-    return {
-      show: false,
-      refresh: false,
-      triggerId: 0,
-      triggers: [],
-      trigger: '',
-      delimiters: ["{?","?}"]
-    }
-  },
-  methods: {
-    // get the show status to share it with sibling component
-    showMeTheForm(show) {
-      this.show = show;
-    },
-    getData() {
-      axios
-       .get('/api/yeoboseyo/')
-       .then(response => {this.triggers = response.data})
-    },
-    editTrigger(triggerId) {
-      axios
-        .get('/api/yeoboseyo/' + triggerId)
-        .then(response => {
-          this.trigger = response.data
-        })
-
-      this.show = true
-    },
-  },
-  mounted () {
-    axios
-    .get('/api/yeoboseyo/')
-    .then(response => {this.triggers = response.data})
-  },
-
-})
+  `})
 </script>
 </body>
 </html>
