@@ -30,7 +30,7 @@ class LocalStorage(Service):
         super().__init__()
         self.format_to = "markdown_github"
         self.format_from = "html"
-        self.local_storage = config('MARKDOWN_NOTES_FOLDER')
+        self.local_storage = config('MY_NOTES_FOLDER')
 
     async def save_data(self, trigger, entry) -> bool:
         """
