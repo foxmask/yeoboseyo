@@ -9,6 +9,7 @@ orm
 praw
 pypandoc
 python-multipart
+rich
 starlette
 uvicorn
 Mastodon.py
