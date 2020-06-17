@@ -5,9 +5,8 @@
 # std lib
 from __future__ import unicode_literals
 import datetime
-from logging import getLogger
-import logging.config
 import os
+from rich.console import Console
 import sys
 import time
 # external lib
@@ -22,11 +21,9 @@ sys.path.append(PARENT_FOLDER)
 from yeoboseyo.models import Trigger
 from yeoboseyo import Joplin, Rss
 
-config = Config('.env')
+console = Console()
 
-# create logger
-logging.config.fileConfig('logging.conf')
-logger = getLogger(__name__)
+config = Config('.env')
 
 
 async def _update_date(trigger_id) -> None:
@@ -73,7 +70,7 @@ async def service(the_service, trigger, entry) -> int:
     if await klass().save_data(trigger, entry):
         return 1
     else:
-        logger.info(f'no {the_service} created')
+        console.print(f'no {the_service} created')
         return 0
 
 
@@ -123,9 +120,13 @@ async def go():
 
                     if created_entries > 0:
                         await _update_date(trigger.id)
-                        logger.info(f'Trigger {trigger.description} : {trigger} {entry.title}')
+                        console.print(f'[magenta]Trigger {trigger.description}[/] : '
+                                      f'[green]{trigger}'
+                                      f' {entry.title}[/]')
 
             if read_entries:
-                logger.info(f'Trigger {trigger.description} : Entries created {created_entries} / Read {read_entries}')
+                console.print(f'[magenta]Trigger {trigger.description}[/] : '
+                              f'[green]Entries[/] [bold]created[/] {created_entries} / '
+                              f'[bold]Read[/] {read_entries}')
             else:
-                logger.info(f'Trigger {trigger.description} : no feeds read')
+                console.print(f'[magenta]Trigger {trigger.description}[/] : no feeds read')

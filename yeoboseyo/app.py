@@ -3,8 +3,8 @@
    여보세요 App
 """
 import arrow
-import logging
 import os
+from rich.console import Console
 import sys
 
 # starlette
@@ -24,14 +24,14 @@ sys.path.append(PARENT_FOLDER)
 from yeoboseyo.forms import TriggerSchema
 from yeoboseyo.models import Trigger
 
+console = Console()
+
 templates = Jinja2Templates(directory="templates")
 statics = StaticFiles(directory="static")
 config = Config('.env')
 
 main_app = Starlette()
 main_app.debug = config('', default=False)
-
-logger = logging.getLogger(__name__)
 
 
 async def homepage(request):
@@ -61,7 +61,7 @@ async def get_all(request):
         }
         for result in data
     ]
-    logger.debug("get that trigger")
+    console.print("get that trigger", style="blue")
     return JSONResponse(content)
 
 
@@ -83,7 +83,7 @@ async def get(request):
                "status": result["status"],
                "date_created": result['date_created'],
                "date_triggered": result['date_triggered']}
-    logger.debug("get all Triggers")
+    console.print("get all Triggers", style="blue")
     return JSONResponse(content)
 
 
@@ -96,7 +96,7 @@ async def create(request):
 
     if errors:
         content = {"errors": errors}
-        logger.debug("error during creating a trigger")
+        console.print("error during creating a trigger", style="red")
 
     else:
         await Trigger.objects.create(description=trigger.description,
@@ -109,7 +109,7 @@ async def create(request):
                                      status=trigger.status,
                                      )
         content = {"errors": ''}
-        logger.debug("trigger created")
+        console.print("trigger created", style="blue")
     return JSONResponse(content)
 
 
@@ -126,7 +126,7 @@ async def update(request):
             content = {"errors": errors,
                        "data": trigger,
                        "trigger_id": trigger_id}
-            logger.debug(f"error during updating trigger {trigger_id}")
+            console.print(f"error during updating trigger {trigger_id}", style="red")
         else:
             trigger_to_update = await Trigger.objects.get(id=trigger_id)
             await trigger_to_update.update(description=trigger.description,
@@ -142,7 +142,7 @@ async def update(request):
     else:
         content = {'errors': {'message': 'Trigger id is missing'}}
 
-    logger.debug(f"update trigger {trigger_id}")
+    console.print(f"update trigger {trigger_id}", style="blue")
     return JSONResponse(content)
 
 
@@ -155,10 +155,10 @@ async def delete(request):
         trigger = await Trigger.objects.get(id=trigger_id)
         await trigger.delete()
         content = {'errors': ''}
-        logger.debug("trigger deleted")
+        console.print("trigger deleted", style="blue")
     else:
         content = {'errors': {'message': 'Trigger id is missing'}}
-        logger.debug(f"error during deleting trigger")
+        console.print(f"error during deleting trigger", style="blue")
     return JSONResponse(content)
 
 
@@ -189,10 +189,10 @@ async def switch(request):
             trace = f"switch mail trigger {trigger_id}"
 
         content = {'errors': ''}
-        logger.debug(trace)
+        console.print(trace, style="blue")
     else:
         content = {'errors': {'message': 'Trigger id is missing'}}
-        logger.debug(f"error during switch status trigger")
+        console.print(f"error during switch status trigger", style="red")
     return JSONResponse(content)
 
 
@@ -221,5 +221,5 @@ main_app.mount('/', app=app)
 
 # Bootstrap
 if __name__ == '__main__':
-    print('여보세요 !')
+    console.print('[green]여보세요 ![/]')
     uvicorn.run(main_app, host='0.0.0.0', port=8000)
