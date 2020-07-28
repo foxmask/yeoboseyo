@@ -42,10 +42,14 @@ class LocalStorage(Service):
         # get the content of the Feeds
         content = await self.create_body_content(trigger.description, entry)
         p = Path(self.local_storage + '/' + trigger.localstorage)
+        try:
+            author = entry.author
+        except AttributeError:
+            author = '' # Not all feeds always provide an author
         if p.is_dir():
             data = {'title': entry.title,
                     'body': content,
-                    'author': entry.author,
+                    'author': author,
                     'source_url': entry.link,
                     'localstorage': trigger.localstorage}
             logger.debug(data)
