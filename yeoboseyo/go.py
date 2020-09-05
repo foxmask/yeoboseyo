@@ -19,7 +19,7 @@ PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
 
 from yeoboseyo.models import Trigger
-from yeoboseyo import Joplin, Rss
+from yeoboseyo import Rss
 
 console = Console()
 
@@ -121,8 +121,7 @@ async def go():
                     if created_entries > 0:
                         await _update_date(trigger.id)
                         console.print(f'[magenta]Trigger {trigger.description}[/] : '
-                                      f'[green]{trigger}'
-                                      f' {entry.title}[/]')
+                                      f'[green]{entry.title}[/]')
 
             if read_entries:
                 console.print(f'[magenta]Trigger {trigger.description}[/] : '

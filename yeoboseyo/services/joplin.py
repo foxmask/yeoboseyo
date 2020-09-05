@@ -61,11 +61,9 @@ class Joplin(Service):
         :param entry: data from Feeds
         :return: boolean
         """
-        # get the content of the Feeds
-        content = await self.create_body_content(trigger.description, entry)
         # build the json data
         folders = await self.get_folders()
-        if folders:
+        if folders is not False:
             notebook_id = 0
             for folder in folders:
                 if folder.get('title') == trigger.joplin_folder:
@@ -76,6 +74,8 @@ class Joplin(Service):
                         for child in folder.get('children'):
                             if child.get('title') == trigger.joplin_folder:
                                 notebook_id = child.get('id')
+            # get the content of the Feeds
+            content = await self.create_body_content(trigger.description, entry)
             data = {'title': entry.title,
                     'body': content,
                     'parent_id': notebook_id,
