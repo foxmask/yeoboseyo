@@ -77,6 +77,12 @@ var app = new Vue({
 
   methods: {
     // THE FORM
+    newForm() {
+        this.resetForm();
+        if (!this.show) {
+          this.showForm();
+        }
+    },
     showForm() {
       return this.show = !this.show
     },
@@ -129,6 +135,10 @@ var app = new Vue({
         }
       }
     },
+    focusInput() {
+      var element = this.$els['desc'];
+      element.scrollIntoView()
+    },
     editTrigger (triggerId) {
       axios
         .get('/api/yeoboseyo/' + triggerId)
@@ -142,8 +152,11 @@ var app = new Vue({
           this.formData.mastodon = response.data['mastodon']
           this.formData.mail = response.data['mail']
           this.formData.status = response.data['status']
-          this.showForm()
+          if (!this.show) {
+            this.showForm()
+          }
         })
+        this.focusInput()
     },
     resetForm () {
       // reset everything
@@ -241,7 +254,7 @@ var app = new Vue({
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-form>
-            <b-button size="sm" class="ml-sm-2" v-on:click="showForm">New feed</b-button>
+            <b-button size="sm" class="ml-sm-2" v-on:click="newForm">New feed</b-button>
           </b-nav-form>
         </b-navbar-nav>
       </b-collapse>
@@ -256,8 +269,9 @@ var app = new Vue({
     <form v-if="show" ref="form" class="mt-4" @submit.stop.prevent="submitForm">
         <label>Set a description for this 'Yeoboseyo'</label>
         <b-form-input
+          ref="desc"
           class="mb-4"
-          v-model="formData.description"
+          :value="formData.description"
           required
         ></b-form-input>
         <h2><i class="fa fa-dot-circle"></i> Origin of the data</h2>
@@ -312,6 +326,7 @@ var app = new Vue({
         <b-form-checkbox v-model="formData.mail" name="mail">Send by Mail ?</b-form-checkbox>
         <b-form-checkbox v-model="formData.status" name="status">Status</b-form-checkbox>
         <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>
+        <button type="cancel" class="btn btn-danger"><i class="fas fa-window-close"></i> Close</button>
     </form>
   </b-col>
   <b-col cols="2"> </b-col>

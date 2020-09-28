@@ -61,7 +61,7 @@ async def get_all(request):
         }
         for result in data
     ]
-    console.print("get that trigger", style="blue")
+    console.print("get all triggers", style="blue")
     return JSONResponse(content)
 
 
@@ -83,7 +83,7 @@ async def get(request):
                "status": result["status"],
                "date_created": result['date_created'],
                "date_triggered": result['date_triggered']}
-    console.print("get all Triggers", style="blue")
+    console.print("get that trigger {} - {}".format(trigger_id, result['rss_url']), style="blue")
     return JSONResponse(content)
 
 
