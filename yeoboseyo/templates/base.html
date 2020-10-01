@@ -15,7 +15,6 @@
     <!-- Load the following for BootstrapVueIcons support -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
     <script src="//unpkg.com/axios/dist/axios.min.js"></script>
-    <!--script src="https://unpkg.com/vee-validate@latest"></script-->
 </head>
 <body role="document">
   <!-- main node of the application-->
@@ -64,7 +63,6 @@ var app = new Vue({
         { key: 'mastodon', sortable: false },
         { key: 'mail', sortable: false },
         { key: 'date_triggered', sortable: true },
-        { key: 'date_created', sortable: true },
         { key: 'status', sortable: true },
         { key: 'actions', label: 'Actions' }
       ],
@@ -259,9 +257,9 @@ var app = new Vue({
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
-  <!-- End of 'Yeoboseyo' NAVBAR -->
-  <!-- 'Yeoboseyo' FORM -->
-  <b-col cols="12">
+    <!-- End of 'Yeoboseyo' NAVBAR -->
+    <!-- 'Yeoboseyo' FORM -->
+    <b-col cols="12">
     <b-row>
     <b-col cols="2"> </b-col>
     <b-col cols="8">
@@ -271,7 +269,7 @@ var app = new Vue({
         <b-form-input
           ref="desc"
           class="mb-4"
-          :value="formData.description"
+          v-model="formData.description"
           required
         ></b-form-input>
         <h2><i class="fa fa-dot-circle"></i> Origin of the data</h2>
@@ -330,7 +328,6 @@ var app = new Vue({
     </form>
   </b-col>
   <b-col cols="2"> </b-col>
-  </b-col>
   </b-row>
   <b-row>
   <!-- End of 'Yeoboseyo' FORM -->
@@ -345,7 +342,7 @@ var app = new Vue({
   </b-col>
   <b-col cols="12">
     <b-table
-            class="ml-2 mr-2 "
+
             ref="triggerstable"
             striped
             hover
@@ -356,50 +353,52 @@ var app = new Vue({
             :items="triggers"
             >
             <template v-slot:cell(mastodon)="row">
-              <b-button v-if="row.item.mastodon" variant="outline-info" class="mb-2"
+              <b-button v-if="row.item.mastodon" variant="outline-info"
                         @click="switchMastodon(row.item.id)" title="Mastodon publishing is on. Switch to off">
                 <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
               </b-button>
-              <b-button v-else variant="outline-danger" class="mb-2"
+              <b-button v-else variant="outline-danger"
                         @click="switchMastodon(row.item.id)" title="Mastodon publishing is Off. Switch to on">
                 <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
               </b-button>
             </template>
             <template v-slot:cell(mail)="row">
-              <b-button v-if="row.item.mail" variant="outline-info" class="mb-2"
+              <b-button v-if="row.item.mail" variant="outline-info"
                         @click="switchMail(row.item.id)" title="Mail publishing is on. Switch to off">
                 <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
               </b-button>
-              <b-button v-else variant="outline-danger" class="mb-2"
+              <b-button v-else variant="outline-danger"
                         @click="switchMail(row.item.id)" title="Mail publishing is Off. Switch to on">
                 <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
               </b-button>
             </template>
             <template v-slot:cell(status)="row">
-              <b-button v-if="row.item.status" variant="outline-info" class="mb-2"
+              <b-button v-if="row.item.status" variant="outline-info"
                         @click="switchStatus(row.item.id)" title="Status is on. Switch to off">
                 <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
               </b-button>
-              <b-button v-else variant="outline-danger" class="mb-2"
+              <b-button v-else variant="outline-danger"
                         @click="switchStatus(row.item.id)" title="Status is Off. Switch to on">
                 <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
               </b-button>
-
             </template>
             <template v-slot:cell(actions)="row">
-              <b-button variant="outline-info" class="mb-2"
-                        @click="editTrigger(row.item.id)">
-                <b-icon icon="pen" aria-hidden="true"></b-icon>
-              </b-button>
-              <b-button variant="outline-danger" class="mb-2"
-                        @click="deleteTrigger(row.item.id)">
-                <b-icon icon="trash" aria-hidden="true"></b-icon>
-              </b-button>
+              <b-button-group>
+                <b-button variant="outline-info" class="ml-2 mr-2 mb-2"
+                          @click="editTrigger(row.item.id)">
+                  <b-icon icon="pen" aria-hidden="true"></b-icon>
+                </b-button>
+                <b-button variant="outline-danger" class="ml-2 mr-2 mb-2"
+                          @click="deleteTrigger(row.item.id)">
+                  <b-icon icon="trash" aria-hidden="true"></b-icon>
+                </b-button>
+              </b-button-group>
             </template>
     </b-table>
     <!-- end of table 'Yeoboseyo' TABLE -->
   </b-col>
   </b-row>
+  </b-col>
   </div>
   `})
 </script>

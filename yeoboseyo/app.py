@@ -56,7 +56,7 @@ async def get_all(request):
             "mastodon": result["mastodon"],
             "mail": result["mail"],
             "status": result["status"],
-            "date_created": result['date_created'],
+            # "date_created": result['date_created'],
             "date_triggered": result['date_triggered']
         }
         for result in data
@@ -81,7 +81,7 @@ async def get(request):
                "mastodon": result["mastodon"],
                "mail": result["mail"],
                "status": result["status"],
-               "date_created": result['date_created'],
+               # "date_created": result['date_created'],
                "date_triggered": result['date_triggered']}
     console.print("get that trigger {} - {}".format(trigger_id, result['rss_url']), style="blue")
     return JSONResponse(content)
