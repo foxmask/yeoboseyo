@@ -100,7 +100,7 @@ def get_published(entry) -> datetime:
     return published
 
 
-async def service(the_service, trigger, entry) -> int:
+def service(the_service, trigger, entry) -> int:
     """
     dynamic loading of service and submitting data to this one
     :param the_service:
@@ -108,14 +108,18 @@ async def service(the_service, trigger, entry) -> int:
     :param entry:
     :return:
     """
-    # load the module/class + create class instance of the service
-    klass = getattr(__import__('services.' + the_service.lower(), fromlist=[the_service]), the_service)
-    # save the data
-    if await klass().save_data(trigger, entry):
-        return 1
-    else:
-        console.print(f'no {the_service} created')
-        return 0
+    attr = 'joplin_folder' if the_service.lower() == 'joplin' else the_service.lower()
+    # check if the attributes mail, mastodon, reddit, jopln_folder, localstorage are set
+    # to trigger the associated service
+    if getattr(trigger, attr):
+        klass = getattr(__import__('yeoboseyo.services.' + the_service.lower(), fromlist=[the_service]), the_service)
+        # save the data
+        if klass().save_data(trigger, entry):
+            return 1
+        else:
+            console.print(f'no {the_service} created')
+
+    return 0
 
 
 async def go():
@@ -151,16 +155,11 @@ async def go():
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1
 
-                    if trigger.joplin_folder:
-                        created_entries += await service('Joplin', trigger, entry)
-                    if trigger.mail:
-                        created_entries += await service('Mail', trigger, entry)
-                    if trigger.mastodon:
-                        created_entries += await service('Mastodon', trigger, entry)
-                    if trigger.reddit:
-                        created_entries += await service('Reddit', trigger, entry)
-                    if trigger.localstorage:
-                        created_entries += await service('LocalStorage', trigger, entry)
+                    created_entries += service('Joplin', trigger, entry)
+                    created_entries += service('Mail', trigger, entry)
+                    created_entries += service('Mastodon', trigger, entry)
+                    created_entries += service('Reddit', trigger, entry)
+                    created_entries += service('LocalStorage', trigger, entry)
 
                     if created_entries > 0:
                         await _update_date(trigger.id)

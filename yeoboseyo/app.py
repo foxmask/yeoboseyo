@@ -158,7 +158,7 @@ async def delete(request):
         console.print("trigger deleted", style="blue")
     else:
         content = {'errors': {'message': 'Trigger id is missing'}}
-        console.print(f"error during deleting trigger", style="blue")
+        console.print("error during deleting trigger", style="blue")
     return JSONResponse(content)
 
 
@@ -192,7 +192,7 @@ async def switch(request):
         console.print(trace, style="blue")
     else:
         content = {'errors': {'message': 'Trigger id is missing'}}
-        console.print(f"error during switch status trigger", style="red")
+        console.print("error during switch status trigger", style="red")
     return JSONResponse(content)
 
 
