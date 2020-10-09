@@ -3,7 +3,6 @@
 """
    여보세요
 """
-from yeoboseyo.services.rss import Rss
 from yeoboseyo.services.joplin import Joplin
 from yeoboseyo.services.mail import Mail
 from yeoboseyo.services.mastodon import Mastodon

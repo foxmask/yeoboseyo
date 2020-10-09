@@ -1,9 +1,10 @@
 # 여보세요
-![Yeoboseyo](https://scrutinizer-ci.com/g/foxmask/yeoboseyo/badges/quality-score.png?b=master "Yeboseyo")
 
 let's the services say "hello" (여보세요 in Korean : `yeoboseyo`) to each others
 
 This `hello` can be any data you want to get and send from any internet service to another
+
+![Yeoboseyo home page](doc/Yeoboseyo_list.png)
 
 Services covered:
 
@@ -12,17 +13,19 @@ Services covered:
 - [Mastodon](https://mastodon.social)
 - [Reddit](https://reddit.com)
 
-So today, you can read RSS Feeds and this will:
+So today, you can grab RSS Feeds and this will:
 * create notes in Joplin automatically in the folder you defined in the form
 * post "toot" to your mastodon account
 * post stuff to the subreddit of your choice
+* be stored on the local filesytem in Markdown file format
 
 ## :package: Installation
 
 ### pre requisistes
 
-- python 3.7
+- python 3.8
 - starlette (the web application)
+- ([for Django instead of Starlette, same project here](https://github.com/foxmask/yeoboseyo-django))
 - feedparser (for RSS support)
 - mastodon.py (for Mastodon support)
 - praw (for Reddit support)
@@ -114,12 +117,7 @@ Go on http://0.0.0.0:8000 and fill the form to add new Feeds to track
 * If you plan to publish RSS Feeds into a joplin note, fill the "Joplin folder" field, if not leave it empty.
 * If you plan to publish RSS Feeds on your Mastodon account, check the checkbox "Publish on Mastodon?", if not, leave it unchecked
 
-
-Yeoboseyo home page
-
-![Yeoboseyo home page](doc/Yeoboseyo_list.png)
-
-Yeoboseyo form
+#### Yeoboseyo form
 
 ![Yeoboseyo home page](doc/Yeoboseyo_form.png)
 

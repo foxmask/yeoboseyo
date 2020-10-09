@@ -3,6 +3,7 @@ import argparse
 import arrow
 import asyncio
 import datetime
+from feedparser_data import RssAsync as Rss
 import os
 from rich.console import Console
 from rich.table import Table
@@ -18,7 +19,7 @@ PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
 
 from yeoboseyo.models import Trigger
-from yeoboseyo import Rss
+
 
 config = Config('.env')
 
