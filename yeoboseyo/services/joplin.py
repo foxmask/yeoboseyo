@@ -79,7 +79,7 @@ class Joplin(Service):
             data = {'title': entry.title,
                     'body': content,
                     'parent_id': notebook_id,
-                    'author': entry.author,
+                    'author': entry.author if 'author' in entry else '',
                     'source_url': entry.link}
             url = f'{self.joplin_url}:{self.joplin_port}/notes'
             logger.debug(url)

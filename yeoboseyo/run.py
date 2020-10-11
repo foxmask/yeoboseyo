@@ -100,7 +100,7 @@ def get_published(entry) -> datetime:
     return published
 
 
-def service(the_service, trigger, entry) -> int:
+async def service(the_service, trigger, entry) -> int:
     """
     dynamic loading of service and submitting data to this one
     :param the_service:
@@ -114,7 +114,7 @@ def service(the_service, trigger, entry) -> int:
     if getattr(trigger, attr):
         klass = getattr(__import__('yeoboseyo.services.' + the_service.lower(), fromlist=[the_service]), the_service)
         # save the data
-        if klass().save_data(trigger, entry):
+        if await klass().save_data(trigger, entry):
             return 1
         else:
             console.print(f'no {the_service} created')
@@ -155,11 +155,11 @@ async def go():
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1
 
-                    created_entries += service('Joplin', trigger, entry)
-                    created_entries += service('Mail', trigger, entry)
-                    created_entries += service('Mastodon', trigger, entry)
-                    created_entries += service('Reddit', trigger, entry)
-                    created_entries += service('LocalStorage', trigger, entry)
+                    created_entries += await service('Joplin', trigger, entry)
+                    created_entries += await service('Mail', trigger, entry)
+                    created_entries += await service('Mastodon', trigger, entry)
+                    created_entries += await service('Reddit', trigger, entry)
+                    created_entries += await service('LocalStorage', trigger, entry)
 
                     if created_entries > 0:
                         await _update_date(trigger.id)
