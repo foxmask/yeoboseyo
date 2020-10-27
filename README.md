@@ -25,7 +25,7 @@ So today, you can grab RSS Feeds and this will:
 
 - python 3.8
 - starlette (the web application)
-- ([for Django instead of Starlette, same project here](https://github.com/foxmask/yeoboseyo-django))
+- ([for Django instead of Starlette, same project here](https://gitlab.com/annyong/yeoboseyo-django))
 - feedparser (for RSS support)
 - mastodon.py (for Mastodon support)
 - praw (for Reddit support)
@@ -187,3 +187,6 @@ ID    Name                           Notebook                       Mastodon Sta
     2 Un odieux connard              Connard                              No Enabled 2019-10-10 21:48:55
     3 New Protonmail                 Protonmail                           No Enabled 2019-10-10 21:48:55
 ```
+
+
+(Image credits to [Emojipedia](https://emojipedia.org/))
