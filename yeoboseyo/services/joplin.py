@@ -64,16 +64,16 @@ class Joplin(Service):
         # build the json data
         folders = await self.get_folders()
         if folders is not False:
-            notebook_id = 0
-            for folder in folders:
-                if folder.get('title') == trigger.joplin_folder:
-                    notebook_id = folder.get('id')
-            if notebook_id == 0:
+
+            def search_folders_recursively(folders, search_title):
                 for folder in folders:
-                    if 'children' in folder:
-                        for child in folder.get('children'):
-                            if child.get('title') == trigger.joplin_folder:
-                                notebook_id = child.get('id')
+                    if folder.get('title') == trigger.joplin_folder:
+                        return folder.get('id')
+                    elif 'children' in folder:
+                        result = search_folders_recursively(folder.get('children'), search_title)
+                        if result is not None:
+                            return result
+            notebook_id = search_folders_recursively(folders, trigger.joplin_folder) or 0
             # get the content of the Feeds
             content = await self.create_body_content(trigger.description, entry)
             data = {'title': entry.title,
