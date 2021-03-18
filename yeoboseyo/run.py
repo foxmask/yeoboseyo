@@ -30,25 +30,19 @@ async def report():
     table.add_column("ID")
     table.add_column("Name")
     table.add_column("Md Folder")
-    table.add_column("Joplin Folder")
-    table.add_column("Mastodon")
-    table.add_column("Mail")
+    table.add_column("Tags")
     table.add_column("Status")
     table.add_column("Triggered", style="dim")
 
     for trigger in triggers:
-        status = "[green]Ok[/]" if trigger.status else "[yellow]Disabled[/]"
-        masto = "[green]Ok[/]" if trigger.mastodon else "[yellow]Disabled[/]"
-        mail = "[green]Ok[/]" if trigger.mail else "[yellow]Disabled[/]"
-        date_triggered = trigger.date_triggered if trigger.date_triggered is not None else '***Not triggered yet**'
-        joplin_folder = trigger.joplin_folder if trigger.joplin_folder is not None else '***Not used ***'
         localstorage = trigger.localstorage if trigger.localstorage is not None else '***Not used ***'
+        tags = trigger.tags if trigger.tags is not None else '***Not used ***'
+        status = "[green]Ok[/]" if trigger.status else "[yellow]Disabled[/]"
+        date_triggered = trigger.date_triggered if trigger.date_triggered is not None else '***Not triggered yet**'
         table.add_row(str(trigger.id),
                       trigger.description,
                       localstorage,
-                      joplin_folder,
-                      masto,
-                      mail,
+                      tags,
                       status,
                       str(date_triggered))
     console.print(table)
@@ -136,9 +130,7 @@ async def go():
     triggers = await Trigger.objects.all()
     for trigger in triggers:
         if trigger.status:
-            # RSS PART
             rss = Rss()
-            # retrieve the data
             feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
             now = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DDTHH:mm:ssZZ')
             date_triggered = arrow.get(trigger.date_triggered).format('YYYY-MM-DDTHH:mm:ssZZ')
@@ -155,10 +147,6 @@ async def go():
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1
 
-                    created_entries += await service('Joplin', trigger, entry)
-                    created_entries += await service('Mail', trigger, entry)
-                    created_entries += await service('Mastodon', trigger, entry)
-                    created_entries += await service('Reddit', trigger, entry)
                     created_entries += await service('LocalStorage', trigger, entry)
 
                     if created_entries > 0:

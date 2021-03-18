@@ -3,11 +3,6 @@
 """
    여보세요
 """
-from yeoboseyo.services.joplin import Joplin
-from yeoboseyo.services.mail import Mail
-from yeoboseyo.services.mastodon import Mastodon
-from yeoboseyo.services.reddit import Reddit
-
 from yeoboseyo.services import Service
 from yeoboseyo.forms import TriggerSchema
 from yeoboseyo.models import Trigger

@@ -45,11 +45,8 @@ var app = new Vue({
         errors: '',
         description: '',
         rss_url: '',
-        joplin_folder: '',
-        reddit: '',
         localstorage: '',
-        mastodon: false,
-        mail: false,
+        tags: '',
         status: true
       },
       // LIST
@@ -57,11 +54,8 @@ var app = new Vue({
       fields: [
         { key: 'description', sortable: true },
         { key: 'rss_url', sortable: false },
-        { key: 'joplin_folder', sortable: true },
-        { key: 'reddit', sortable: true },
         { key: 'localstorage', sortable: true },
-        { key: 'mastodon', sortable: false },
-        { key: 'mail', sortable: false },
+        { key: 'tags', sortable: false },
         { key: 'date_triggered', sortable: true },
         { key: 'status', sortable: true },
         { key: 'actions', label: 'Actions' }
@@ -85,23 +79,17 @@ var app = new Vue({
       return this.show = !this.show
     },
     submitForm () {
-      if (this.formData.joplin_folder == '' &&
-          this.formData.reddit == '' &&
-          this.formData.localstorage =='') {
-        alert('One of the 3 fields "Markdown Folder", "Joplin Folder", or "Reddit" needs to be filled"');
+      if (this.formData.localstorage =='') {
+        alert('Local storage is mandatory');
       }
       else {
         const payload = {
-          description: this.formData.description,
           rss_url: this.formData.rss_url,
-          joplin_folder: this.formData.joplin_folder,
-          reddit: this.formData.reddit,
+          description: this.formData.description,
           localstorage: this.formData.localstorage,
-          mail: this.formData.mail,
-          mastodon: this.formData.mastodon,
+          tags: this.formData.tags,
           status: this.formData.status
         }
-        console.log(payload)
         if (this.formData.triggerId == 0) {
           axios.post('/api/yeoboseyo/', payload)
           .then((res) => {
@@ -117,7 +105,6 @@ var app = new Vue({
           .catch(error => { error.statusText })
         }
         else {
-          console.log(payload)
           axios.patch('/api/yeoboseyo/' + this.formData.triggerId, payload)
           .then((res) => {
             if (res.status === 200) {
@@ -133,10 +120,6 @@ var app = new Vue({
         }
       }
     },
-    focusInput() {
-      var element = this.$els['desc'];
-      element.scrollIntoView()
-    },
     editTrigger (triggerId) {
       axios
         .get('/api/yeoboseyo/' + triggerId)
@@ -144,61 +127,27 @@ var app = new Vue({
           this.formData.triggerId = triggerId
           this.formData.description = response.data['description']
           this.formData.rss_url = response.data['rss_url']
-          this.formData.joplin_folder = response.data['joplin_folder']
-          this.formData.reddit =  response.data['reddit']
           this.formData.localstorage = response.data['localstorage']
-          this.formData.mastodon = response.data['mastodon']
-          this.formData.mail = response.data['mail']
+          this.formData.tags = response.data['tags']
           this.formData.status = response.data['status']
           if (!this.show) {
             this.showForm()
           }
         })
-        this.focusInput()
     },
     resetForm () {
       // reset everything
       this.formData.triggerId = 0
       this.formData.description = ''
       this.formData.rss_url = ''
-      this.formData.joplin_folder = ''
-      this.formData.reddit = ''
       this.formData.localstorage = ''
-      this.formData.mail = false
-      this.formData.mastodon = false
+      this.formData.tags = ''
       this.status = true
     },
     getData() {
       axios
        .get('/api/yeoboseyo/')
        .then(response => {this.triggers = response.data})
-    },
-
-    // SWITCHING DATA and STATUS FROM THE LIST
-
-    switchMail (triggerId) {
-      axios.patch('/api/yeoboseyo/switch/mail/' + triggerId)
-        .then((res) => {
-          if (res.status === 200) {
-            this.getData()
-          }
-          else {
-            this.errors = res.data['errors']
-          }
-        })
-        .catch(error => { error.statusText })
-    },
-    switchMastodon (triggerId) {
-      axios.patch('/api/yeoboseyo/switch/masto/' + triggerId)
-        .then((res) => {
-          if (res.status === 200) {
-            this.getData()
-          }
-          else {
-            this.errors = res.data['errors']
-          }
-        })
-        .catch(error => { error.statusText })
     },
     switchStatus (triggerId) {
       axios.patch('/api/yeoboseyo/switch/status/' + triggerId)
@@ -272,12 +221,12 @@ var app = new Vue({
           v-model="formData.description"
           required
         ></b-form-input>
-        <h2><i class="fa fa-dot-circle"></i> Origin of the data</h2>
+        <h2><i class="fa fa-globe"></i> Origin of the data</h2>
         <b-form-group
             description="Put the URL from which you want to get the data to spread eg http://somethinglookslikethat.org/feeds.xml">
             <b-input-group size="sm" class="mb-2">
               <b-input-group-prepend is-text>
-                <b-icon icon="bookmark"></b-icon>
+                <b-icon icon="globe"></b-icon>
               </b-input-group-prepend>
               <b-form-input
                   v-model="formData.rss_url"
@@ -285,7 +234,7 @@ var app = new Vue({
               ></b-form-input>
             </b-input-group>
         </b-form-group>
-        <h2><i class="fa fa-arrow-alt-circle-down"></i> Destinations of the data</h2>
+        <h2><i class="fa fa-folder"></i> Destinations of the data</h2>
         <b-form-group
             description="Put the name of the folder (inside {{ MY_NOTES_FOLDER }}) that will store the generated Markdown files coming from the RSS Feeds">
             <b-input-group size="sm" class="mb-2">
@@ -297,31 +246,20 @@ var app = new Vue({
               ></b-form-input>
             </b-input-group>
         </b-form-group>
-        <b-form-group
-            description="Put the name of the joplin folder that will store the data coming from the RSS Feeds">
+        </fieldset>
+        <h2><i class="fa fa-tag"></i> Tags</h2>
+        <b-form-group description="set some tags separeted by a space">
             <b-input-group size="sm" class="mb-2">
               <b-input-group-prepend is-text>
-                <b-icon icon="folder"></b-icon>
+                <b-icon icon="tag"></b-icon>
               </b-input-group-prepend>
               <b-form-input
-                  v-model="formData.joplin_folder"
+                  v-model="formData.tags"
               ></b-form-input>
             </b-input-group>
         </b-form-group>
-        <b-form-group
-            description="Put the name of the subreddit that will receive the data coming from the RSS Feeds">
-            <div class="input-group mb-2">
-                <div class="input-group-prepend">
-                    <div class="input-group-text"><i class="fa fa-spider"></i></div>
-                </div>
-                <b-form-input
-                  v-model="formData.reddit"
-                ></b-form-input>
-            </div>
-        </b-form-group>
         </fieldset>
-        <b-form-checkbox v-model="formData.mastodon" name="mastodon">Publish on Mastodon ?</b-form-checkbox>
-        <b-form-checkbox v-model="formData.mail" name="mail">Send by Mail ?</b-form-checkbox>
+
         <b-form-checkbox v-model="formData.status" name="status">Status</b-form-checkbox>
         <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>
         <button type="cancel" class="btn btn-danger"><i class="fas fa-window-close"></i> Close</button>
@@ -342,7 +280,6 @@ var app = new Vue({
   </b-col>
   <b-col cols="12">
     <b-table
-
             ref="triggerstable"
             striped
             hover
@@ -352,26 +289,6 @@ var app = new Vue({
             :fields="fields"
             :items="triggers"
             >
-            <template v-slot:cell(mastodon)="row">
-              <b-button v-if="row.item.mastodon" variant="outline-info"
-                        @click="switchMastodon(row.item.id)" title="Mastodon publishing is on. Switch to off">
-                <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
-              </b-button>
-              <b-button v-else variant="outline-danger"
-                        @click="switchMastodon(row.item.id)" title="Mastodon publishing is Off. Switch to on">
-                <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
-              </b-button>
-            </template>
-            <template v-slot:cell(mail)="row">
-              <b-button v-if="row.item.mail" variant="outline-info"
-                        @click="switchMail(row.item.id)" title="Mail publishing is on. Switch to off">
-                <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
-              </b-button>
-              <b-button v-else variant="outline-danger"
-                        @click="switchMail(row.item.id)" title="Mail publishing is Off. Switch to on">
-                <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
-              </b-button>
-            </template>
             <template v-slot:cell(status)="row">
               <b-button v-if="row.item.status" variant="outline-info"
                         @click="switchStatus(row.item.id)" title="Status is on. Switch to off">

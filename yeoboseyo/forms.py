@@ -11,11 +11,6 @@ class TriggerSchema(typesystem.Schema):
     """
     description = typesystem.String(title="Description", max_length=200)
     rss_url = typesystem.String(title="RSS URL", max_length=255)
-
-    joplin_folder = typesystem.String(title="Joplin Folder", max_length=80, allow_blank=True)
-    reddit = typesystem.String(title="Subreddit", max_length=80, allow_blank=True)
     localstorage = typesystem.String(title="Markdown Folder", allow_blank=True)
-
-    mail = typesystem.Boolean(title="Send a mail ?", default=False)
-    mastodon = typesystem.Boolean(title="Publish on Mastodon ?", default=False)
+    tags = typesystem.String(title="Tags", max_length=255)
     status = typesystem.Boolean(title="Status", default=False)

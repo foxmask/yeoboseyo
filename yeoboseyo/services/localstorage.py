@@ -4,6 +4,7 @@
 """
 # std lib
 from __future__ import unicode_literals
+import arrow
 from logging import getLogger
 from pathlib import Path
 # external lib
@@ -47,6 +48,9 @@ class LocalStorage(Service):
                     'body': content,
                     'author': entry.author,
                     'source_url': entry.link,
+                    'tags': trigger.tags,
+                    'date': arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ'),
+                    'style': config('STYLE'),
                     'localstorage': trigger.localstorage}
             logger.debug(data)
             yesno = await self.save_file(**data)
