@@ -12,7 +12,6 @@ The app allow you to generate markdown files from grabbed RSS Feeds
 
 - python 3.8+
 - starlette (the web application)
-- ([for Django instead of Starlette, same project here](https://gitlab.com/annyong/yeoboseyo-django))
 - feedparser (for RSS support)
 - pypandoc (to convert html to markdown)
 
