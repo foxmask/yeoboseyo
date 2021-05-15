@@ -118,8 +118,6 @@ async def service(the_service, trigger, entry) -> int:
 
 async def go():
     """
-    this function:
-    - check if joplinwebclipper is available
     - get the triggers where the status is On
     - get the RSS Feed of that trigger
     - compare the date of the feed item with the last triggered date of that trigger
@@ -127,10 +125,12 @@ async def go():
     - then reports how many data have been created
     :return:
     """
+    console.print('Yeoboseyo - 여보세요 - in progress', style="green")
     triggers = await Trigger.objects.all()
     for trigger in triggers:
         if trigger.status:
             rss = Rss()
+            console.print(f"Feeds {trigger.rss_url}", style="magenta")
             feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
             now = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DDTHH:mm:ssZZ')
             date_triggered = arrow.get(trigger.date_triggered).format('YYYY-MM-DDTHH:mm:ssZZ')
@@ -160,7 +160,7 @@ async def go():
                               f'[bold]Read[/] {read_entries}')
             else:
                 console.print(f'[magenta]Trigger {trigger.description}[/] : no feeds read')
-
+    console.print('Yeoboseyo - 여보세요 - Finished!', style="green")
 
 if __name__ == '__main__':
     console.print('[green]여보세요 ![/]')

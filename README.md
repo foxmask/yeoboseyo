@@ -1,35 +1,19 @@
 # 여보세요
 
-let's the services say "hello" (여보세요 in Korean : `yeoboseyo`) to each others
-
-This `hello` can be any data you want to get and send from any internet service to another
-
 ![Yeoboseyo home page](doc/Yeoboseyo_list.png)
 
-Services covered:
+## Description
 
-- [Joplin markdown editor](https://joplinapp.org)
-- RSS Feeds
-- [Mastodon](https://mastodon.social)
-- [Reddit](https://reddit.com)
-
-So today, you can grab RSS Feeds and this will:
-* create notes in Joplin automatically in the folder you defined in the form
-* post "toot" to your mastodon account
-* post stuff to the subreddit of your choice
-* be stored on the local filesytem in Markdown file format
+The app allow you to generate markdown files from grabbed RSS Feeds
 
 ## :package: Installation
 
 ### pre requisistes
 
-- python 3.8
+- python 3.8+
 - starlette (the web application)
 - ([for Django instead of Starlette, same project here](https://gitlab.com/annyong/yeoboseyo-django))
 - feedparser (for RSS support)
-- mastodon.py (for Mastodon support)
-- praw (for Reddit support)
-- joplin-api (for Joplin support)
 - pypandoc (to convert html to markdown)
 
 ### Installation
@@ -50,21 +34,10 @@ set the correct values for your own environment
 ```ini
 DATABASE_URL=sqlite:///db.sqlite3
 TIME_ZONE=Europe/Paris
-JOPLIN_URL=http://127.0.0.1
-JOPLIN_PORT=41184
-JOPLIN_TOKEN=  # put the token you can find in the webclipper page of joplin editor
 FORMAT_FROM=markdown_github
 FORMAT_TO=html
 BYPASS_BOZO=False   # if you don't want to get the malformed RSS Feeds set it to False
 LOG_LEVEL=logging.INFO
-MASTODON_USERNAME=  # your mastodon username
-MASTODON_PASSWORD=  # your mastodon password
-MASTODON_INSTANCE=https://mastodon.social  # your mastodon instance
-REDDIT_CLIENT_ID=   # see below explanation
-REDDIT_CLIENT_SECRET= # see below explanation
-REDDIT_PASSWORD=   # put your reddit password
-REDDIT_USERAGENT=Yeoboseyo/1.0   # whatever :P
-REDDIT_USERNAME=  #put your reddit login
 ```
 
 ## :dvd: Database
@@ -73,29 +46,6 @@ create the database (to execute only once)
 ```bash
 python models.py
 ```
-
-##  :shell: Mastodon Service
-once your settings are ready run the following commands once
-
-```bash
-python mastodon_create_app.py
-```
-this will create an app named 'Yeoboseyo' with the username/pass you provided in the `.env` setting file .
-
-this command will also create a file named `yeoboseyo_clientcred.secret` containing the token allowing us to publish stuff automatically.
-
-##  :shell: Reddit service
-
-you will need to declare an app from this page [https://www.reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)
-
-* enter th name of your app (eg "Yeoboseyo")
-* select 'script'
-* fill a description (eg "The bus for your internet services - an opensource alternative to IFTTT.com")
-* about url : http://localhost
-* redirect url : http://localhost/callback
-then press create ; once it's done
-in the frame you see the name "Yeoboseyo" under it "personal use script" and under it ; the precious REDDIT_CLIENT_ID, then the REDDIT_CLIENT_SECRET
-Use those info to fill the `.env` file
 
 ## :mega: Running the Web application
 
@@ -116,10 +66,6 @@ Go on http://0.0.0.0:8000 and fill the form to add new Feeds to track
 
 * If you plan to publish RSS Feeds into a joplin note, fill the "Joplin folder" field, if not leave it empty.
 * If you plan to publish RSS Feeds on your Mastodon account, check the checkbox "Publish on Mastodon?", if not, leave it unchecked
-
-#### Yeoboseyo form
-
-![Yeoboseyo home page](doc/Yeoboseyo_form.png)
 
 ###  :dizzy: Running the engine
 
@@ -145,27 +91,37 @@ Trigger FoxMasK blog
  Entries created 1 / Read 1
 
 ```
-
-RSS Source
-
-![RSS Source](doc/Source_RSS.png)
-
-Publication on Mastodon
-
-![On Mastodon](doc/Mastodon.png)
-
-## :mega: Monitoring, managing triggers
-
 ### get the list
 get the list of your feeds to check which one provided articles or not
 ```bash
-python run.py -a report
-
-여보세요 ! Report
-ID    Name                           Notebook                       Mastodon Status   Triggered
-    1 Joplin News                    News                                 No Disabled 2019-09-27 23:10:26
-    2 Un odieux connard              Connard                              No Enabled  2019-10-10 21:48:55
-    3 New Protonmail                 Protonmail                           No Enabled  2019-10-10 21:48:55
+$ python run.py -a report
+여보세요 !
+ Report
+┏━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ID ┃ Name                ┃ Md Folder ┃ Tags    ┃ Status ┃ Triggered                  ┃
+┡━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 1  │ Mon Blog            │ test      │ News    │ Ok     │ 2021-03-18 22:35:21        │
+│ 2  │ KBS Culture         │ test      │ News    │ Ok     │ 2021-04-05 09:59:03        │
+│ 3  │ KBS journal du jour │ test      │ News    │ Ok     │ 2021-04-05 09:59:05        │
+│ 4  │ KBS Show biz        │ test      │ News    │ Ok     │ 2021-04-05 09:59:06        │
+│ 5  │ Jux Video           │ test      │ jeux    │ Ok     │ 2021-04-01 22:22:15.113871 │
+│ 6  │ PlayStation Blog    │ test      │ jeux    │ Ok     │ 2021-04-01 22:22:57.189312 │
+│ 7  │ GameKult            │ test      │ jeux    │ Ok     │ 2021-04-01 22:23:21.049307 │
+│ 8  │ Gameblog            │ test      │ jeux    │ Ok     │ 2021-04-01 22:23:48.350934 │
+│ 9  │ NoFrag              │ test      │ jeux    │ Ok     │ 2021-04-01 22:24:15.721174 │
+│ 10 │ Frandroid           │ test      │ android │ Ok     │ 2021-04-01 22:24:47.324475 │
+│ 11 │ Les Numeriques      │ test      │ android │ Ok     │ 2021-04-01 22:25:09.740677 │
+│ 12 │ VueJS News          │ test      │ vuejs   │ Ok     │ 2021-04-01 22:25:34.307735 │
+│ 13 │ Cacktus Blog        │ test      │ python  │ Ok     │ 2021-04-01 22:26:02.412688 │
+│ 14 │ Python News         │ test      │ python  │ Ok     │ 2021-04-01 22:26:41.975564 │
+│ 15 │ nedbatchelder       │ test      │ python  │ Ok     │ 2021-04-01 22:28:21.838166 │
+│ 16 │ Django News         │ test      │ Python  │ Ok     │ 2021-04-01 22:28:47.804644 │
+│ 17 │ Python Insider      │ test      │ Python  │ Ok     │ 2021-04-01 22:29:18.791661 │
+│ 18 │ PyCharm Blog        │ test      │ Python  │ Ok     │ 2021-04-01 22:29:44.568828 │
+│ 19 │ Real Python         │ test      │ Python  │ Ok     │ 2021-04-01 22:30:10.952486 │
+│ 20 │ VueJS               │ test      │ VueJS   │ Ok     │ 2021-04-01 22:30:34.507337 │
+│ 21 │ Odieux Connard      │ test      │ Humour  │ Ok     │ 2021-04-01 22:31:03.458147 │
+└────┴─────────────────────┴───────────┴─────────┴────────┴────────────────────────────┘
 
 ```
 
@@ -175,17 +131,39 @@ switch the status of trigger to on/off
 python run.py -a switch -trigger_id 1
 
 여보세요 ! Switch
-Successfully enabled Trigger 'FoxMasK blog'
+Successfully disabled Trigger 'Mon Blog'
 ```
 and check it again to see the status moving
-```bash
-python run.py -a report
+```bash 
+09:00 $ python run.py -a report
+여보세요 !
+ Report
+┏━━━━┳━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ ID ┃ Name                ┃ Md Folder ┃ Tags    ┃ Status   ┃ Triggered                  ┃
+┡━━━━╇━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 1  │ Mon Blog            │ test      │ News    │ Disabled │ 2021-05-15 09:00:27        │
+│ 2  │ KBS Culture         │ test      │ News    │ Ok       │ 2021-04-05 09:59:03        │
+│ 3  │ KBS journal du jour │ test      │ News    │ Ok       │ 2021-04-05 09:59:05        │
+│ 4  │ KBS Show biz        │ test      │ News    │ Ok       │ 2021-04-05 09:59:06        │
+│ 5  │ Jux Video           │ test      │ jeux    │ Ok       │ 2021-04-01 22:22:15.113871 │
+│ 6  │ PlayStation Blog    │ test      │ jeux    │ Ok       │ 2021-04-01 22:22:57.189312 │
+│ 7  │ GameKult            │ test      │ jeux    │ Ok       │ 2021-04-01 22:23:21.049307 │
+│ 8  │ Gameblog            │ test      │ jeux    │ Ok       │ 2021-04-01 22:23:48.350934 │
+│ 9  │ NoFrag              │ test      │ jeux    │ Ok       │ 2021-04-01 22:24:15.721174 │
+│ 10 │ Frandroid           │ test      │ android │ Ok       │ 2021-04-01 22:24:47.324475 │
+│ 11 │ Les Numeriques      │ test      │ android │ Ok       │ 2021-04-01 22:25:09.740677 │
+│ 12 │ VueJS News          │ test      │ vuejs   │ Ok       │ 2021-04-01 22:25:34.307735 │
+│ 13 │ Cacktus Blog        │ test      │ python  │ Ok       │ 2021-04-01 22:26:02.412688 │
+│ 14 │ Python News         │ test      │ python  │ Ok       │ 2021-04-01 22:26:41.975564 │
+│ 15 │ nedbatchelder       │ test      │ python  │ Ok       │ 2021-04-01 22:28:21.838166 │
+│ 16 │ Django News         │ test      │ Python  │ Ok       │ 2021-04-01 22:28:47.804644 │
+│ 17 │ Python Insider      │ test      │ Python  │ Ok       │ 2021-04-01 22:29:18.791661 │
+│ 18 │ PyCharm Blog        │ test      │ Python  │ Ok       │ 2021-04-01 22:29:44.568828 │
+│ 19 │ Real Python         │ test      │ Python  │ Ok       │ 2021-04-01 22:30:10.952486 │
+│ 20 │ VueJS               │ test      │ VueJS   │ Ok       │ 2021-04-01 22:30:34.507337 │
+│ 21 │ Odieux Connard      │ test      │ Humour  │ Ok       │ 2021-04-01 22:31:03.458147 │
+└────┴─────────────────────┴───────────┴─────────┴──────────┴────────────────────────────┘
 
-여보세요 ! Report
-ID    Name                           Notebook                       Mastodon Status  Triggered
-    1 Joplin News                    News                                 No Enabled 2019-09-27 23:12:26
-    2 Un odieux connard              Connard                              No Enabled 2019-10-10 21:48:55
-    3 New Protonmail                 Protonmail                           No Enabled 2019-10-10 21:48:55
 ```
 
 
