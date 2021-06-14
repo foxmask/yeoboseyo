@@ -30,19 +30,19 @@ async def report():
     table.add_column("ID")
     table.add_column("Name")
     table.add_column("Md Folder")
-    table.add_column("Tags")
+    table.add_column("Mastodon")
     table.add_column("Status")
     table.add_column("Triggered", style="dim")
 
     for trigger in triggers:
-        localstorage = trigger.localstorage if trigger.localstorage is not None else '***Not used ***'
-        tags = trigger.tags if trigger.tags is not None else '***Not used ***'
         status = "[green]Ok[/]" if trigger.status else "[yellow]Disabled[/]"
+        masto = "[green]Ok[/]" if trigger.mastodon else "[yellow]Disabled[/]"
         date_triggered = trigger.date_triggered if trigger.date_triggered is not None else '***Not triggered yet**'
+        localstorage = trigger.localstorage if trigger.localstorage is not None else '***Not used ***'
         table.add_row(str(trigger.id),
                       trigger.description,
                       localstorage,
-                      tags,
+                      masto,
                       status,
                       str(date_triggered))
     console.print(table)
@@ -102,8 +102,8 @@ async def service(the_service, trigger, entry) -> int:
     :param entry:
     :return:
     """
-    attr = 'joplin_folder' if the_service.lower() == 'joplin' else the_service.lower()
-    # check if the attributes mail, mastodon, reddit, jopln_folder, localstorage are set
+    attr = the_service.lower()
+    # check if the attributes mastodon, localstorage are set
     # to trigger the associated service
     if getattr(trigger, attr):
         klass = getattr(__import__('yeoboseyo.services.' + the_service.lower(), fromlist=[the_service]), the_service)
@@ -125,12 +125,10 @@ async def go():
     - then reports how many data have been created
     :return:
     """
-    console.print('Yeoboseyo - 여보세요 - in progress', style="green")
     triggers = await Trigger.objects.all()
     for trigger in triggers:
         if trigger.status:
             rss = Rss()
-            console.print(f"Feeds {trigger.rss_url}", style="magenta")
             feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
             now = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DDTHH:mm:ssZZ')
             date_triggered = arrow.get(trigger.date_triggered).format('YYYY-MM-DDTHH:mm:ssZZ')
@@ -147,6 +145,7 @@ async def go():
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1
 
+                    created_entries += await service('Mastodon', trigger, entry)
                     created_entries += await service('LocalStorage', trigger, entry)
 
                     if created_entries > 0:
@@ -160,7 +159,7 @@ async def go():
                               f'[bold]Read[/] {read_entries}')
             else:
                 console.print(f'[magenta]Trigger {trigger.description}[/] : no feeds read')
-    console.print('Yeoboseyo - 여보세요 - Finished!', style="green")
+
 
 if __name__ == '__main__':
     console.print('[green]여보세요 ![/]')

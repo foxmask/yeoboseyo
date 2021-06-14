@@ -51,12 +51,12 @@ async def get_all(request):
             "rss_url": result["rss_url"],
             "description": result["description"],
             "localstorage": result["localstorage"],
+            "mastodon": result["mastodon"],
             "status": result["status"],
             "date_triggered": result['date_triggered']
         }
         for result in data
     ]
-    console.print("get all triggers", style="blue")
     return JSONResponse(content)
 
 
@@ -71,7 +71,7 @@ async def get(request):
                "rss_url": result["rss_url"],
                "description": result["description"],
                "localstorage": result["localstorage"],
-               "tags": result["tags"],
+               "mastodon": result["mastodon"],
                "status": result["status"],
                "date_triggered": result['date_triggered']}
     console.print("get that trigger {} - {}".format(trigger_id, result['rss_url']), style="blue")
@@ -84,8 +84,6 @@ async def create(request):
     """
     payload = await request.json()
     trigger, errors = TriggerSchema.validate_or_error(payload)
-    console.print(trigger, style="yellow bold")
-    console.print(errors, style="red bold")
 
     if errors:
         content = {"errors": errors}
@@ -95,7 +93,7 @@ async def create(request):
         await Trigger.objects.create(description=trigger.description,
                                      rss_url=trigger.rss_url,
                                      localstorage=trigger.localstorage,
-                                     tags=trigger.tags,
+                                     mastodon=trigger.mastodon,
                                      status=trigger.status,
                                      )
         content = {"errors": ''}
@@ -122,7 +120,7 @@ async def update(request):
             await trigger_to_update.update(description=trigger.description,
                                            rss_url=trigger.rss_url,
                                            localstorage=trigger.localstorage,
-                                           tags=trigger.tags,
+                                           mastodon=trigger.mastodon,
                                            status=trigger.status,
                                            )
             content = {'errors': ''}
@@ -166,6 +164,10 @@ async def switch(request):
             await trigger.update(status=not trigger.status,
                                  date_triggered=date_triggered)
             trace = f"switch status trigger {trigger_id}"
+        elif 'switch_type' in request.path_params and \
+                request.path_params['switch_type'] == 'masto':
+            await trigger.update(mastodon=not trigger.mastodon)
+            trace = f"switch mastodon trigger {trigger_id}"
 
         content = {'errors': ''}
         console.print(trace, style="blue")

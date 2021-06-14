@@ -11,6 +11,6 @@ class TriggerSchema(typesystem.Schema):
     """
     description = typesystem.String(title="Description", max_length=200)
     rss_url = typesystem.String(title="RSS URL", max_length=255)
-    localstorage = typesystem.String(title="Markdown Folder", allow_blank=True)
-    tags = typesystem.String(title="Tags", max_length=255)
-    status = typesystem.Boolean(title="Status", default=False)
+    localstorage = typesystem.String(title="Create Files in that Markdown Folder", allow_blank=True)
+    mastodon = typesystem.Boolean(title="Publish on Mastodon ?", default=True)
+    status = typesystem.Boolean(title="Status", default=True)

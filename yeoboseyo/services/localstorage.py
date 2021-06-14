@@ -48,7 +48,6 @@ class LocalStorage(Service):
                     'body': content,
                     'author': entry.author,
                     'source_url': entry.link,
-                    'tags': trigger.tags,
                     'date': arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ'),
                     'style': config('STYLE'),
                     'localstorage': trigger.localstorage}

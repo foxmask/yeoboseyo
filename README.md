@@ -37,7 +37,25 @@ FORMAT_FROM=markdown_github
 FORMAT_TO=html
 BYPASS_BOZO=False   # if you don't want to get the malformed RSS Feeds set it to False
 LOG_LEVEL=logging.INFO
+MASTODON_USERNAME=your email
+MASTODON_PASSWORD=your pass
+MASTODON_INSTANCE=https://url instance of mastodon
 ```
+
+to create the app on mastodon :
+
+on https://yourmasto instance/settings/applications/new
+
+Application name : Yeoboseyo
+Scopes : check : read / write / push / follow
+then submit
+
+then select Yeoboseyo again to retreive the access token, in a file name `yeoboseyo_clientcred.secret` put on the first line the value of "Your access token" and on the second line the https url of your masto instance eg
+```
+Azdfghy5678hefdsgghjuju09knb
+https://framapiaf.org
+```
+this file will be read each time something will be posted on masto
 
 ## :dvd: Database
 

@@ -21,8 +21,8 @@ class Trigger(orm.Model):
 
     id = orm.Integer(primary_key=True)
     rss_url = orm.String(max_length=255)
+    mastodon = orm.Boolean(default=False)
     localstorage = orm.String(max_length=255, allow_null=True)
-    tags = orm.String(max_length=255, allow_null=True)
     description = orm.String(max_length=200)
     date_created = orm.DateTime(default=datetime.datetime.now)
     date_triggered = orm.DateTime(default=datetime.datetime.now)
