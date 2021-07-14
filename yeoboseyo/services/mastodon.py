@@ -36,7 +36,6 @@ class Mastodon(Service):
         content = str("{title} {link}").format(title=entry.title, link=entry.link)
         # if not then use the content
         content = self.set_mastodon_content(content)
-        status = False
         try:
             toot_api = MastodonAPI(access_token='yeoboseyo_clientcred.secret',
                                    api_base_url=config('MASTODON_INSTANCE'))
@@ -46,7 +45,7 @@ class Mastodon(Service):
             status = False
 
         try:
-            toot_api.toot(content)
+            toot_api.status_post(content, visibility=config('MASTODON_VISIBILITY'))
             status = True
         except Exception:
             status = False

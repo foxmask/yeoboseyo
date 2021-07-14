@@ -40,6 +40,7 @@ LOG_LEVEL=logging.INFO
 MASTODON_USERNAME=your email
 MASTODON_PASSWORD=your pass
 MASTODON_INSTANCE=https://url instance of mastodon
+MASTODON_VISIBILITY=unlisted  # default is 'public', can be 'unlisted', 'private', 'direct'
 ```
 
 to create the app on mastodon :
