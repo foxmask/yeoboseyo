@@ -52,6 +52,7 @@ async def get_all(request):
             "description": result["description"],
             "localstorage": result["localstorage"],
             "mastodon": result["mastodon"],
+            "webhook": result["webhook"],
             "status": result["status"],
             "date_triggered": result['date_triggered']
         }
@@ -72,6 +73,7 @@ async def get(request):
                "description": result["description"],
                "localstorage": result["localstorage"],
                "mastodon": result["mastodon"],
+               "webhook": result["webhook"],
                "status": result["status"],
                "date_triggered": result['date_triggered']}
     console.print("get that trigger {} - {}".format(trigger_id, result['rss_url']), style="blue")
@@ -94,6 +96,7 @@ async def create(request):
                                      rss_url=trigger.rss_url,
                                      localstorage=trigger.localstorage,
                                      mastodon=trigger.mastodon,
+                                     webhook=trigger.webhook,
                                      status=trigger.status,
                                      )
         content = {"errors": ''}
@@ -121,6 +124,7 @@ async def update(request):
                                            rss_url=trigger.rss_url,
                                            localstorage=trigger.localstorage,
                                            mastodon=trigger.mastodon,
+                                           webhook=trigger.webhook,
                                            status=trigger.status,
                                            )
             content = {'errors': ''}

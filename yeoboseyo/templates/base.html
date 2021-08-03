@@ -47,6 +47,7 @@ var app = new Vue({
         rss_url: '',
         localstorage: '',
         mastodon: false,
+        webhook: '',
         status: true
       },
       // LIST
@@ -56,6 +57,7 @@ var app = new Vue({
         { key: 'rss_url', sortable: false },
         { key: 'localstorage', sortable: true },
         { key: 'mastodon', sortable: false },
+        { key: 'webhook', sortable: false },
         { key: 'date_triggered', sortable: true },
         { key: 'status', sortable: true },
         { key: 'actions', label: 'Actions' }
@@ -79,8 +81,8 @@ var app = new Vue({
       return this.show = !this.show
     },
     submitForm () {
-      if (this.formData.localstorage =='' && this.formData.mastodon != true  ) {
-        alert('One of them is mandatorry "Markdown Folder", "Mastodon" needs to be filled/selected"');
+      if (this.formData.localstorage =='' && this.formData.mastodon != true  && this.formData.webhook != '') {
+        alert('One of them is mandatory "Markdown Folder", "Mastodon" or "Webhook" needs to be filled/selected"');
       }
       else {
         const payload = {
@@ -88,6 +90,7 @@ var app = new Vue({
           rss_url: this.formData.rss_url,
           localstorage: this.formData.localstorage,
           mastodon: this.formData.mastodon,
+          webhook: this.formData.webhook,
           status: this.formData.status
         }
         console.log(payload)
@@ -137,6 +140,7 @@ var app = new Vue({
           this.formData.reddit =  response.data['reddit']
           this.formData.localstorage = response.data['localstorage']
           this.formData.mastodon = response.data['mastodon']
+          this.formData.webhook = response.data['webhook']
           this.formData.mail = response.data['mail']
           this.formData.status = response.data['status']
           if (!this.show) {
@@ -152,6 +156,7 @@ var app = new Vue({
       this.formData.rss_url = ''
       this.formData.localstorage = ''
       this.formData.mastodon = false
+      this.formData.webhook = ''
       this.status = true
     },
     getData() {
@@ -246,8 +251,7 @@ var app = new Vue({
           required
         ></b-form-input>
         <h2><i class="fa fa-dot-circle"></i> Origin of the data</h2>
-        <b-form-group
-            description="Put the URL from which you want to get the data to spread eg http://somethinglookslikethat.org/feeds.xml">
+        <b-form-group description="Put the URL from which you want to get the data to spread eg http://somethinglookslikethat.org/feeds.xml">
             <b-input-group size="sm" class="mb-2">
               <b-input-group-prepend is-text>
                 <b-icon icon="bookmark"></b-icon>
@@ -255,22 +259,28 @@ var app = new Vue({
               <b-form-input
                   v-model="formData.rss_url"
                   required
+                   placeholder="URL of the RSS Feeds to follow"
               ></b-form-input>
             </b-input-group>
         </b-form-group>
         <h2><i class="fa fa-arrow-alt-circle-down"></i> Destinations of the data</h2>
-        <b-form-group
-            description="Put the name of the folder (inside {{ MY_NOTES_FOLDER }}) that will store the generated Markdown files coming from the RSS Feeds">
-            <b-input-group size="sm" class="mb-2">
-              <b-input-group-prepend is-text>
-                <b-icon icon="folder"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input
-                  v-model="formData.localstorage"
-              ></b-form-input>
-            </b-input-group>
+        <b-form-group description="Put the name of the folder (inside {{ MY_NOTES_FOLDER }}) that will store the generated Markdown files coming from the RSS Feeds">
+          <b-input-group size="sm" class="mb-2">
+            <b-input-group-prepend is-text>
+              <b-icon icon="folder"></b-icon>
+            </b-input-group-prepend>
+            <b-form-input v-model="formData.localstorage" placeholder="/path/to/save/news/inf/files"></b-form-input>
+          </b-input-group>
         </b-form-group>
-        </fieldset>
+        <b-form-group description="Publish on slack/mattermost/discord by providing the url of the service eg https://url of the instance/hooks/xxxxxx">
+          <b-input-group size="sm" class="mb-2">
+            <b-input-group-prepend is-text>
+              <b-icon icon="globe"></b-icon>
+            </b-input-group-prepend>
+            <b-form-input v-model="formData.webhook" placeholder="URL used for publishing"></b-form-input>
+          </b-input-group>
+        </b-form-group>
+
         <b-form-checkbox v-model="formData.mastodon" name="mastodon">Publish on Mastodon ?</b-form-checkbox>
         <b-form-checkbox v-model="formData.status" name="status">Status</b-form-checkbox>
         <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>

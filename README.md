@@ -6,6 +6,16 @@
 
 The app allow you to generate markdown files from grabbed RSS Feeds
 
+
+## Services covered 
+
+* RSS
+* Mastodon
+* Mattermost
+* Slack
+* Discord
+* Local Markdown file
+
 ## :package: Installation
 
 ### pre requisistes
@@ -43,6 +53,8 @@ MASTODON_INSTANCE=https://url instance of mastodon
 MASTODON_VISIBILITY=unlisted  # default is 'public', can be 'unlisted', 'private', 'direct'
 ```
 
+### Mastodon
+
 to create the app on mastodon :
 
 on https://yourmasto instance/settings/applications/new
@@ -57,6 +69,11 @@ Azdfghy5678hefdsgghjuju09knb
 https://framapiaf.org
 ```
 this file will be read each time something will be posted on masto
+
+### Slack/Mattermost/Discord Webhook
+
+in the 'integrations' page set an "incoming webhooks" (eg from https://mattermost/teamname/integrations) and copy the URL into the field 'webhook' of the Yeoboseyo form
+
 
 ## :dvd: Database
 
