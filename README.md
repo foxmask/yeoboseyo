@@ -201,5 +201,8 @@ and check it again to see the status moving
 
 ```
 
+## Migrations
+
+run migrations/alter_table_trigger_add_webhook.sql
 
 (Image credits to [Emojipedia](https://emojipedia.org/))
