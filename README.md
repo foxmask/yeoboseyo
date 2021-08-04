@@ -4,7 +4,7 @@
 
 ## Description
 
-The app allow you to generate markdown files from grabbed RSS Feeds
+ From your favorite RSS feeds, spread/share those news to services of your choice
 
 
 ## Services covered 
