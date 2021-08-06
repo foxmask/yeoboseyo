@@ -1,10 +1,10 @@
 # 여보세요
 
-![Yeoboseyo home page](doc/Yeoboseyo_list.png)
+![Yeoboseyo home page](https://gitlab.com/annyong/yeoboseyo/-/raw/master/doc/Yeoboseyo_list.png)
 
 ## Description
 
- From your favorite RSS feeds, spread/share those news to services of your choice
+From your favorite RSS feeds, spread/share those news to services of your choice
 
 
 ## Services covered 
@@ -14,7 +14,21 @@
 * Mattermost
 * Slack
 * Discord
-* Local Markdown file
+* Local Markdown files
+
+### used cases:
+
+* With Yeoboseyo you set an RSS URL and the "local storage" (the folder where to store news in markdown) then you synchronize those files with [syncthing](https://syncthing.net/) on any of your devices and read them with [Espilon Notes](http://epsilonexpert.com/), [Notable](https://notable.app/), [markor](https://gsantner.net/project/markor.html). Any markdown editor/reader can open/import those files.
+This use case can be extended to any application that is able to import markdown file, use file manager or has import function.
+
+
+* You want to publish news from your favorite news websites to `Mastodon`, Yeoboseyo will do that without any problem
+
+ 
+* You need to spread news from your project on `Mattermost`/`Slack`/`Discord`, just set the URL of the `Webhook` of one of those services and the news will be published as expected on the `channel` of your choice
+
+Let see how to setup all of that below
+
 
 ## :package: Installation
 
@@ -36,9 +50,13 @@ pip install -r requirements.txt
 ```
 
 ##  :wrench: Settings
+
+copy or rename the config file
+
 ```bash
 mv env.sample .env
 ```
+
 set the correct values for your own environment
 ```ini
 DATABASE_URL=sqlite:///db.sqlite3
@@ -47,9 +65,9 @@ FORMAT_FROM=markdown_github
 FORMAT_TO=html
 BYPASS_BOZO=False   # if you don't want to get the malformed RSS Feeds set it to False
 LOG_LEVEL=logging.INFO
-MASTODON_USERNAME=your email
+MASTODON_USERNAME=your username@<domain instance of mastodon> 
 MASTODON_PASSWORD=your pass
-MASTODON_INSTANCE=https://url instance of mastodon
+MASTODON_INSTANCE=https://<domain instance of mastodon>
 MASTODON_VISIBILITY=unlisted  # default is 'public', can be 'unlisted', 'private', 'direct'
 ```
 
@@ -59,18 +77,18 @@ to create the app on mastodon :
 
 on https://yourmasto instance/settings/applications/new
 
-Application name : Yeoboseyo
-Scopes : check : read / write / push / follow
-then submit
+* Application name : `Yeoboseyo`
+* Scopes : check : `read` / `write` / `push` / `follow`
+* then `submit`
 
-then select Yeoboseyo again to retreive the access token, in a file name `yeoboseyo_clientcred.secret` put on the first line the value of "Your access token" and on the second line the https url of your masto instance eg
+then select Yeoboseyo again to retreive the access token, and fill the file `yeoboseyo_clientcred.secret` put on the first line the value of "Your access token" and on the second line the https url of your masto instance eg
 ```
 Azdfghy5678hefdsgghjuju09knb
 https://framapiaf.org
 ```
 this file will be read each time something will be posted on masto
 
-### Slack/Mattermost/Discord Webhook
+### Slack/Mattermost/Discord: Webhook
 
 in the 'integrations' page set an "incoming webhooks" (eg from https://mattermost/teamname/integrations) and copy the URL into the field 'webhook' of the Yeoboseyo form
 
@@ -97,10 +115,12 @@ INFO: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 
 ### :eyes: Adding some Feeds to track
 
-Go on http://0.0.0.0:8000 and fill the form to add new Feeds to track
+Go on `http://0.0.0.0:8000` and fill the form to add new Feeds to track
 
-* If you plan to publish RSS Feeds into a joplin note, fill the "Joplin folder" field, if not leave it empty.
-* If you plan to publish RSS Feeds on your Mastodon account, check the checkbox "Publish on Mastodon?", if not, leave it unchecked
+* If you plan to publish RSS Feeds 
+  * into a `local folder`, fill the `local storage` field with the complet path of that folder, if not leave it empty.
+  * on your Mastodon account, check the checkbox `Publish on Mastodon?`, if not, leave it unchecked
+  * on your `Mattermost`/`Slack`/`Discord` channel, just set the URL of the `Webhook` of one of those services, if not, leave it empty.
 
 ###  :dizzy: Running the engine
 
@@ -203,6 +223,8 @@ and check it again to see the status moving
 
 ## Migrations
 
-run migrations/alter_table_trigger_add_webhook.sql
+if you had the version 0.4.0:
+
+run `migrations/alter_table_trigger_add_webhook.sql`
 
 (Image credits to [Emojipedia](https://emojipedia.org/))
