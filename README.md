@@ -19,7 +19,7 @@ From your favorite RSS feeds, spread/share those news to services of your choice
 ### used cases:
 
 * With Yeoboseyo you set an RSS URL and the "local storage" (the folder where to store news in markdown) then you synchronize those files with [syncthing](https://syncthing.net/) on any of your devices and read them with [Espilon Notes](http://epsilonexpert.com/), [Notable](https://notable.app/), [markor](https://gsantner.net/project/markor.html). Any markdown editor/reader can open/import those files.
-This use case can be extended to any application that is able to import markdown file, use file manager or has import function.
+This use case can be extended to any application that is able to import markdown file, use file manager or has import function, like [TagSpaces](https://www.tagspaces.org/)
 
 
 * You want to publish news from your favorite news websites to `Mastodon`, Yeoboseyo will do that without any problem
