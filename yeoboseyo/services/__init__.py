@@ -21,6 +21,7 @@ class Service:
 
     format_from = 'markdown_github'
     format_to = 'html'
+    token = ''
 
     def __init__(self):
         """
@@ -28,6 +29,7 @@ class Service:
         """
         self.format_to = config('FORMAT_TO', default='html')
         self.format_from = config('FORMAT_FROM', default='markdown_github')
+        self.token = config('TOKEN', default='')
 
     def _get_content(self, data, which_content):
         """

@@ -31,18 +31,21 @@ async def report():
     table.add_column("Name")
     table.add_column("Md Folder")
     table.add_column("Mastodon")
+    table.add_column("Telegram")
     table.add_column("Status")
     table.add_column("Triggered", style="dim")
 
     for trigger in triggers:
         status = "[green]Ok[/]" if trigger.status else "[yellow]Disabled[/]"
         masto = "[green]Ok[/]" if trigger.mastodon else "[yellow]Disabled[/]"
+        telegram = "[green]Ok[/]" if trigger.telegram else "[yellow]Disabled[/]"
         date_triggered = trigger.date_triggered if trigger.date_triggered is not None else '***Not triggered yet**'
         localstorage = trigger.localstorage if trigger.localstorage is not None else '***Not used ***'
         table.add_row(str(trigger.id),
                       trigger.description,
                       localstorage,
                       masto,
+                      telegram,
                       status,
                       str(date_triggered))
     console.print(table)
@@ -148,6 +151,7 @@ async def go():
                     created_entries += await service('Mastodon', trigger, entry)
                     created_entries += await service('LocalStorage', trigger, entry)
                     created_entries += await service('Webhook', trigger, entry)
+                    created_entries += await service('Telegram', trigger, entry)
 
                     if created_entries > 0:
                         await _update_date(trigger.id)

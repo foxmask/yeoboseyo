@@ -47,6 +47,7 @@ var app = new Vue({
         rss_url: '',
         localstorage: '',
         mastodon: false,
+        telegram: false,
         webhook: '',
         status: true
       },
@@ -57,6 +58,7 @@ var app = new Vue({
         { key: 'rss_url', sortable: false },
         { key: 'localstorage', sortable: true },
         { key: 'mastodon', sortable: false },
+        { key: 'telegram', sortable: false },
         { key: 'webhook', sortable: false },
         { key: 'date_triggered', sortable: true },
         { key: 'status', sortable: true },
@@ -64,6 +66,9 @@ var app = new Vue({
       ],
       filter: null,
       selected: '',
+      masto_conf: '',
+      telegram_conf: '',
+      localstorage_conf: '',
       selectMode: 'single',
       errors: ''
     }
@@ -81,7 +86,7 @@ var app = new Vue({
       return this.show = !this.show
     },
     submitForm () {
-      if (this.formData.localstorage =='' && this.formData.mastodon != true  && this.formData.webhook != '') {
+      if (this.formData.localstorage =='' && this.formData.mastodon != true && this.formData.telegram != true && this.formData.webhook != '') {
         alert('One of them is mandatory "Markdown Folder", "Mastodon" or "Webhook" needs to be filled/selected"');
       }
       else {
@@ -90,10 +95,10 @@ var app = new Vue({
           rss_url: this.formData.rss_url,
           localstorage: this.formData.localstorage,
           mastodon: this.formData.mastodon,
+          telegram: this.formData.telegram,
           webhook: this.formData.webhook,
           status: this.formData.status
         }
-        console.log(payload)
         if (this.formData.triggerId == 0) {
           axios.post('/api/yeoboseyo/', payload)
           .then((res) => {
@@ -109,7 +114,6 @@ var app = new Vue({
           .catch(error => { error.statusText })
         }
         else {
-          console.log(payload)
           axios.patch('/api/yeoboseyo/' + this.formData.triggerId, payload)
           .then((res) => {
             if (res.status === 200) {
@@ -140,6 +144,7 @@ var app = new Vue({
           this.formData.reddit =  response.data['reddit']
           this.formData.localstorage = response.data['localstorage']
           this.formData.mastodon = response.data['mastodon']
+          this.formData.telegram = response.data['telegram']
           this.formData.webhook = response.data['webhook']
           this.formData.mail = response.data['mail']
           this.formData.status = response.data['status']
@@ -156,6 +161,7 @@ var app = new Vue({
       this.formData.rss_url = ''
       this.formData.localstorage = ''
       this.formData.mastodon = false
+      this.formData.telegram = false
       this.formData.webhook = ''
       this.status = true
     },
@@ -168,6 +174,18 @@ var app = new Vue({
     // SWITCHING DATA and STATUS FROM THE LIST
     switchMastodon (triggerId) {
       axios.patch('/api/yeoboseyo/switch/masto/' + triggerId)
+        .then((res) => {
+          if (res.status === 200) {
+            this.getData()
+          }
+          else {
+            this.errors = res.data['errors']
+          }
+        })
+        .catch(error => { error.statusText })
+    },
+    switchTelegram (triggerId) {
+      axios.patch('/api/yeoboseyo/switch/telegram/' + triggerId)
         .then((res) => {
           if (res.status === 200) {
             this.getData()
@@ -251,7 +269,7 @@ var app = new Vue({
           required
         ></b-form-input>
         <h2><i class="fa fa-dot-circle"></i> Origin of the data</h2>
-        <b-form-group description="Put the URL from which you want to get the data to spread eg http://somethinglookslikethat.org/feeds.xml">
+        <b-form-group class="mb-4"  description="Put the URL from which you want to get the data to spread eg http://somethinglookslikethat.org/feeds.xml">
             <b-input-group size="sm" class="mb-2">
               <b-input-group-prepend is-text>
                 <b-icon icon="bookmark"></b-icon>
@@ -264,7 +282,7 @@ var app = new Vue({
             </b-input-group>
         </b-form-group>
         <h2><i class="fa fa-arrow-alt-circle-down"></i> Destinations of the data</h2>
-        <b-form-group description="Put the name of the folder (inside {{ MY_NOTES_FOLDER }}) that will store the generated Markdown files coming from the RSS Feeds">
+        <b-form-group class="mb-4"  description="Put the name of the folder (inside {{ MY_NOTES_FOLDER }}) that will store the generated Markdown files coming from the RSS Feeds">
           <b-input-group size="sm" class="mb-2">
             <b-input-group-prepend is-text>
               <b-icon icon="folder"></b-icon>
@@ -272,7 +290,7 @@ var app = new Vue({
             <b-form-input v-model="formData.localstorage" placeholder="/path/to/save/news/inf/files"></b-form-input>
           </b-input-group>
         </b-form-group>
-        <b-form-group description="Publish on slack/mattermost/discord by providing the url of the service eg https://url of the instance/hooks/xxxxxx">
+        <b-form-group  class="mb-4" description="Publish on slack/mattermost/discord by providing the url of the service eg https://url of the instance/hooks/xxxxxx">
           <b-input-group size="sm" class="mb-2">
             <b-input-group-prepend is-text>
               <b-icon icon="globe"></b-icon>
@@ -281,8 +299,9 @@ var app = new Vue({
           </b-input-group>
         </b-form-group>
 
-        <b-form-checkbox v-model="formData.mastodon" name="mastodon">Publish on Mastodon ?</b-form-checkbox>
-        <b-form-checkbox v-model="formData.status" name="status">Status</b-form-checkbox>
+        <b-form-checkbox v-model="formData.mastodon" name="mastodon">&nbsp; Publish on Mastodon ? (to mastodon instance <a href="{{ MASTODON_INSTANCE }}">{{ MASTODON_INSTANCE }}</a>)</b-form-checkbox>
+        <b-form-checkbox v-model="formData.telegram" name="telegram">&nbsp; Publish on Telegram ? (to group / channel id {{ TELEGRAM_CHAT_ID }})</b-form-checkbox>
+        <b-form-checkbox v-model="formData.status" name="status">&nbsp;Status</b-form-checkbox>
         <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>
         <button type="cancel" class="btn btn-danger"><i class="fas fa-window-close"></i> Close</button>
     </form>
@@ -319,6 +338,16 @@ var app = new Vue({
               </b-button>
               <b-button v-else variant="outline-danger"
                         @click="switchMastodon(row.item.id)" title="Mastodon publishing is Off. Switch to on">
+                <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
+              </b-button>
+            </template>
+            <template v-slot:cell(telegram)="row">
+              <b-button v-if="row.item.telegram" variant="outline-info"
+                        @click="switchTelegram(row.item.id)" title="Telegram publishing is on. Switch to off">
+                <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
+              </b-button>
+              <b-button v-else variant="outline-danger"
+                        @click="switchTelegram(row.item.id)" title="Telegram publishing is Off. Switch to on">
                 <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
               </b-button>
             </template>

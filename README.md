@@ -14,6 +14,7 @@ From your favorite RSS feeds, spread/share those news to services of your choice
 * Mattermost
 * Slack
 * Discord
+* Telegram
 * Local Markdown files
 
 ### used cases:
@@ -69,6 +70,9 @@ MASTODON_USERNAME=your username@<domain instance of mastodon>
 MASTODON_PASSWORD=your pass
 MASTODON_INSTANCE=https://<domain instance of mastodon>
 MASTODON_VISIBILITY=unlisted  # default is 'public', can be 'unlisted', 'private', 'direct'
+TOKEN=''
+TELEGRAM_TOKEN=0123456789:AZERTYUIOPQSDFGHJKLMWXCVBN123456789
+TELEGRAM_CHAT_ID=-NNNNNNNNN
 ```
 
 ### Mastodon
@@ -91,6 +95,28 @@ this file will be read each time something will be posted on masto
 ### Slack/Mattermost/Discord: Webhook
 
 in the 'integrations' page set an "incoming webhooks" (eg from https://mattermost/teamname/integrations) and copy the URL into the field 'webhook' of the Yeoboseyo form
+
+
+### Telegram
+
+you will need to create a Telegram Bot by invoking [@BotFather](https://core.telegram.org/bots)
+once the bot is create, create a group or channel, invite your bot and give it admin rights
+
+Now you need to get the ID of the group or channel where the bot can "speak"
+for that :
+access to your got history url
+
+https://api.telegram.org/botXXXXX:YYYYY/getUpdates
+
+and spot this kind of data
+
+```json
+chat:
+  id: -NNNNNN
+  title: "my group name"  
+```
+
+pick up the `-NNNNNN` and put it as the `TELEGRAM_CHAT_ID`
 
 
 ## :dvd: Database

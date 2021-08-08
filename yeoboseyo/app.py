@@ -36,7 +36,13 @@ main_app.debug = config('', default=False)
 
 async def homepage(request):
     MY_NOTES_FOLDER = config.get('MY_NOTES_FOLDER')
-    context = {"request": request, 'MY_NOTES_FOLDER': MY_NOTES_FOLDER}
+    MASTODON_INSTANCE = config.get('MASTODON_INSTANCE')
+    TELEGRAM_CHAT_ID = config.get('TELEGRAM_CHAT_ID')
+    context = {"request": request,
+               'MY_NOTES_FOLDER': MY_NOTES_FOLDER,
+               'MASTODON_INSTANCE': MASTODON_INSTANCE,
+               'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
+               }
     return templates.TemplateResponse("base.html", context)
 
 
@@ -52,6 +58,7 @@ async def get_all(request):
             "description": result["description"],
             "localstorage": result["localstorage"],
             "mastodon": result["mastodon"],
+            "telegram": result["telegram"],
             "webhook": result["webhook"],
             "status": result["status"],
             "date_triggered": result['date_triggered']
@@ -73,6 +80,7 @@ async def get(request):
                "description": result["description"],
                "localstorage": result["localstorage"],
                "mastodon": result["mastodon"],
+               "telegram": result["telegram"],
                "webhook": result["webhook"],
                "status": result["status"],
                "date_triggered": result['date_triggered']}
@@ -96,6 +104,7 @@ async def create(request):
                                      rss_url=trigger.rss_url,
                                      localstorage=trigger.localstorage,
                                      mastodon=trigger.mastodon,
+                                     telegram=trigger.telegram,
                                      webhook=trigger.webhook,
                                      status=trigger.status,
                                      )
@@ -124,6 +133,7 @@ async def update(request):
                                            rss_url=trigger.rss_url,
                                            localstorage=trigger.localstorage,
                                            mastodon=trigger.mastodon,
+                                           telegram=trigger.telegram,
                                            webhook=trigger.webhook,
                                            status=trigger.status,
                                            )
@@ -172,6 +182,10 @@ async def switch(request):
                 request.path_params['switch_type'] == 'masto':
             await trigger.update(mastodon=not trigger.mastodon)
             trace = f"switch mastodon trigger {trigger_id}"
+        elif 'switch_type' in request.path_params and \
+                request.path_params['switch_type'] == 'telegram':
+            await trigger.update(telegram=not trigger.telegram)
+            trace = f"switch telegram trigger {trigger_id}"
 
         content = {'errors': ''}
         console.print(trace, style="blue")
