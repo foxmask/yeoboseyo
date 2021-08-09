@@ -221,4 +221,4 @@ main_app.mount('/', app=app)
 # Bootstrap
 if __name__ == '__main__':
     console.print('[green]여보세요 ![/]')
-    uvicorn.run(main_app, host='0.0.0.0', port=8000)
+    uvicorn.run(main_app, host=config('YEOBOSEYO_HOST'), port=int(config('YEOBOSEYO_PORT')))

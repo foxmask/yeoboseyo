@@ -63,7 +63,7 @@ class LocalStorage(Service):
         :return: boolean
         """
         env = Environment(
-            loader=PackageLoader('yeoboseyo', 'templates'),
+            loader=PackageLoader('yeoboseyo', 'templates'), autoescape=True
         )
         template = env.get_template('localstorage.md')
         output = template.render(data=data)
