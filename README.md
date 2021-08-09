@@ -27,6 +27,7 @@ This use case can be extended to any application that is able to import markdown
 
  
 * You need to spread news from your project on `Mattermost`/`Slack`/`Discord`, just set the URL of the `Webhook` of one of those services and the news will be published as expected on the `channel` of your choice
+* If you prefer to publish that on `Telegram`, set the `TELEGRAM_CHAT_ID` of the group or channel  
 
 Let see how to setup all of that below
 
@@ -79,7 +80,7 @@ TELEGRAM_CHAT_ID=-NNNNNNNNN
 
 to create the app on mastodon :
 
-on https://yourmasto instance/settings/applications/new
+on https://yourmastoinstance/settings/applications/new
 
 * Application name : `Yeoboseyo`
 * Scopes : check : `read` / `write` / `push` / `follow`
@@ -99,12 +100,12 @@ in the 'integrations' page set an "incoming webhooks" (eg from https://mattermos
 
 ### Telegram
 
-you will need to create a Telegram Bot by invoking [@BotFather](https://core.telegram.org/bots)
-once the bot is create, create a group or channel, invite your bot and give it admin rights
+you will need to create a `Telegram Bot` by invoking [@BotFather](https://core.telegram.org/bots).
+Once the bot is created, create a group / channel, and invite your bot on that group/channel and give it admin rights.
 
-Now you need to get the ID of the group or channel where the bot can "speak"
-for that :
-access to your got history url
+Now you need to get the ID of the group / channel where the bot can "speak"
+
+for that : access to your bot history url
 
 https://api.telegram.org/botXXXXX:YYYYY/getUpdates
 
@@ -116,7 +117,7 @@ chat:
   title: "my group name"  
 ```
 
-pick up the `-NNNNNN` and put it as the `TELEGRAM_CHAT_ID`
+pick up the `-NNNNNN` and put it as the `TELEGRAM_CHAT_ID` in the `.env` config file
 
 
 ## :dvd: Database
@@ -145,8 +146,9 @@ Go on `http://0.0.0.0:8000` and fill the form to add new Feeds to track
 
 * If you plan to publish RSS Feeds 
   * into a `local folder`, fill the `local storage` field with the complet path of that folder, if not leave it empty.
-  * on your Mastodon account, check the checkbox `Publish on Mastodon?`, if not, leave it unchecked
-  * on your `Mattermost`/`Slack`/`Discord` channel, just set the URL of the `Webhook` of one of those services, if not, leave it empty.
+  * on your `Mastodon` account, tick the checkbox `Publish on Mastodon?`, if not, leave it unchecked
+  * on your `Telegram` group/channel tick the checkbox `Publish on Telegram?`, if not, leave it unchecked
+  * on your `Mattermost`/`Slack`/`Discord` group/channel, just set the URL of the `Webhook` of one of those services, if not, leave it empty.
 
 ###  :dizzy: Running the engine
 
@@ -248,6 +250,10 @@ and check it again to see the status moving
 ```
 
 ## Migrations
+
+if you had the version 0.5.0:
+
+run `migrations/alter_table_trigger_add_telegram.sql`
 
 if you had the version 0.4.0:
 
