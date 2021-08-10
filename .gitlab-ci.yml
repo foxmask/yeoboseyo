@@ -35,9 +35,14 @@ before_script:
 
 test:
   script:
+    - pip install -r requirements-dev.txt
+    - bandit -r yeboseyo/*
+    - flake8
+    - cd yeboseyo
+    - pytest
     # - python setup.py test
-    - pip install tox  # you can also use tox
-    - tox -r  # tox.ini will install flake8 pytest bandit
+    #- pip install tox  # you can also use tox
+    #- tox -r  # tox.ini will install flake8 pytest bandit
 
 deploy:
   script:
