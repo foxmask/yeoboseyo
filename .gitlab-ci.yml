@@ -36,7 +36,7 @@ test:
   script:
     # - python setup.py test
     - pip install tox  # you can also use tox
-    - tox -e py38  # tox.ini will install flake8 pytest bandit
+    - tox -r  # tox.ini will install flake8 pytest bandit
 
 deploy:
   script:
