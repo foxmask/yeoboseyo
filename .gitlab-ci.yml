@@ -1,3 +1,6 @@
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+
 # This file is a template, and might need editing before it works on your project.
 # To contribute improvements to CI/CD templates, please follow the Development guide at:
 # https://docs.gitlab.com/ee/development/cicd/templates.html
@@ -35,32 +38,7 @@ test:
     - pip install tox flake8  # you can also use tox
     - tox -e py38,flake8
 
-#run:
-#  script:
-#    - python setup.py bdist_wheel
-#    # an alternative approach is to install and run:
-#    - pip install dist/*
-#    # run the command here
-#  artifacts:
-#    paths:
-#      - dist/*.whl
-
-#pages:
-#  script:
-#    - pip install sphinx sphinx-rtd-theme
-#    - cd doc ; make html
-#    - mv build/html/ ../public/
-#  artifacts:
-#    paths:
-#      - public
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-include:
-  - template: Jobs/SAST.gitlab-ci.yml
-
-release:
-  stage: release
+deploy:
   script:
     - cat $PYPIRC > /tmp/.pypirc
     - pip install twine
