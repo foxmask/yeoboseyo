@@ -36,8 +36,9 @@ before_script:
 test:
   script:
     - pip install -r requirements-dev.txt
+    - copy yeoboseyo/env.sample yeoboseyo/.env
     - cd yeoboseyo
-    - pytest
+    - python -m pytest -s
     #- pip install tox  # you can also use tox
     #- tox -r  # tox.ini will install flake8 pytest
 
