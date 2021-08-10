@@ -7,9 +7,7 @@ from feedparser_data import RssAsync as Rss
 import os
 from rich.console import Console
 from rich.table import Table
-
 import sys
-from starlette.config import Config
 import time
 
 console = Console()
@@ -17,11 +15,7 @@ console = Console()
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
-
-from yeoboseyo.models import Trigger
-
-
-config = Config('.env')
+from yeoboseyo import settings, Trigger
 
 
 async def report():
@@ -58,7 +52,7 @@ async def switch(trigger_id):
     :return:
     """
     trigger = await Trigger.objects.get(id=trigger_id)
-    date_triggered = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ')
+    date_triggered = arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DD HH:mm:ssZZ')
     await trigger.update(status=not trigger.status, date_triggered=date_triggered)
     msg = f"Successfully enabled Trigger '{trigger.description}'"
     if trigger.status is False:
@@ -73,7 +67,7 @@ async def _update_date(trigger_id) -> None:
     :param trigger_id: id to update
     :return: nothing
     """
-    now = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ')
+    now = arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DD HH:mm:ssZZ')
     trigger = await Trigger.objects.get(id=trigger_id)
     await trigger.update(date_triggered=now)
 
@@ -132,8 +126,8 @@ async def go():
     for trigger in triggers:
         if trigger.status:
             rss = Rss()
-            feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': config('BYPASS_BOZO')})
-            now = arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DDTHH:mm:ssZZ')
+            feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': settings.BYPASS_BOZO})
+            now = arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DDTHH:mm:ssZZ')
             date_triggered = arrow.get(trigger.date_triggered).format('YYYY-MM-DDTHH:mm:ssZZ')
 
             read_entries = 0
@@ -143,7 +137,7 @@ async def go():
                 # so will have the "now" date as default
                 published = get_published(entry)
                 if published:
-                    published = arrow.get(published).to(config('TIME_ZONE')).format('YYYY-MM-DDTHH:mm:ssZZ')
+                    published = arrow.get(published).to(settings.TIME_ZONE).format('YYYY-MM-DDTHH:mm:ssZZ')
                 # last triggered execution
                 if published is not None and now >= published >= date_triggered:
                     read_entries += 1

@@ -5,13 +5,11 @@
 import databases
 import datetime
 import orm
-from starlette.config import Config
 import sqlalchemy
+from yeoboseyo import settings
 
 metadata = sqlalchemy.MetaData()
-config = Config('.env')
-DATABASE_URL = config('DATABASE_URL')
-database = databases.Database(DATABASE_URL, force_rollback=True)
+database = databases.Database(settings.DATABASE_URL, force_rollback=True)
 
 
 class Trigger(orm.Model):
@@ -34,7 +32,7 @@ class Trigger(orm.Model):
 # Bootstrap
 if __name__ == '__main__':
     # Create the database
-    print(f"database creation {DATABASE_URL}")
-    engine = sqlalchemy.create_engine(DATABASE_URL)
+    print(f"database creation {settings.DATABASE_URL}")
+    engine = sqlalchemy.create_engine(settings.DATABASE_URL)
     metadata.create_all(engine)
     print("done!")

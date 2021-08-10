@@ -3,7 +3,7 @@ title: {{ data['title'] }}
 date: {{ data['date'] }}
 
 toc: Contents
-Style: {{ data['style'] }}
+Style: {{ data['TEMPLATE_STYLE'] }}
 ...
 
 # {{ data['title'] }}

@@ -9,7 +9,6 @@ import sys
 
 # starlette
 from starlette.applications import Starlette
-from starlette.config import Config
 from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route, Router
 from starlette.staticfiles import StaticFiles
@@ -21,27 +20,22 @@ import uvicorn
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
-from yeoboseyo.forms import TriggerSchema
-from yeoboseyo.models import Trigger
+from yeoboseyo import settings, TriggerSchema, Trigger
 
 console = Console()
 
 templates = Jinja2Templates(directory="templates")
 statics = StaticFiles(directory="static")
-config = Config('.env')
 
 main_app = Starlette()
-main_app.debug = config('', default=False)
+main_app.debug = settings.DEBUG
 
 
 async def homepage(request):
-    MY_NOTES_FOLDER = config.get('MY_NOTES_FOLDER')
-    MASTODON_INSTANCE = config.get('MASTODON_INSTANCE')
-    TELEGRAM_CHAT_ID = config.get('TELEGRAM_CHAT_ID')
     context = {"request": request,
-               'MY_NOTES_FOLDER': MY_NOTES_FOLDER,
-               'MASTODON_INSTANCE': MASTODON_INSTANCE,
-               'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
+               'MY_NOTES_FOLDER': settings.MY_NOTES_FOLDER,
+               'MASTODON_INSTANCE': settings.MASTODON_INSTANCE,
+               'TELEGRAM_CHAT_ID': settings.TELEGRAM_CHAT_ID,
                }
     return templates.TemplateResponse("base.html", context)
 
@@ -84,7 +78,8 @@ async def get(request):
                "webhook": result["webhook"],
                "status": result["status"],
                "date_triggered": result['date_triggered']}
-    console.print("get that trigger {} - {}".format(trigger_id, result['rss_url']), style="blue")
+    if settings.DEBUG:
+        console.print("get that trigger {} - {}".format(trigger_id, result['rss_url']), style="blue")
     return JSONResponse(content)
 
 
@@ -97,7 +92,8 @@ async def create(request):
 
     if errors:
         content = {"errors": errors}
-        console.print("error during creating a trigger", style="red")
+        if settings.DEBUG:
+            console.print("error during creating a trigger", style="red")
 
     else:
         await Trigger.objects.create(description=trigger.description,
@@ -109,7 +105,8 @@ async def create(request):
                                      status=trigger.status,
                                      )
         content = {"errors": ''}
-        console.print("trigger created", style="blue")
+        if settings.DEBUG:
+            console.print("trigger created", style="blue")
     return JSONResponse(content)
 
 
@@ -126,7 +123,8 @@ async def update(request):
             content = {"errors": errors,
                        "data": trigger,
                        "trigger_id": trigger_id}
-            console.print(f"error during updating trigger {trigger_id}", style="red")
+            if settings.DEBUG:
+                console.print(f"error during updating trigger {trigger_id}", style="red")
         else:
             trigger_to_update = await Trigger.objects.get(id=trigger_id)
             await trigger_to_update.update(description=trigger.description,
@@ -140,8 +138,8 @@ async def update(request):
             content = {'errors': ''}
     else:
         content = {'errors': {'message': 'Trigger id is missing'}}
-
-    console.print(f"update trigger {trigger_id}", style="blue")
+    if settings.DEBUG:
+        console.print(f"update trigger {trigger_id}", style="blue")
     return JSONResponse(content)
 
 
@@ -154,10 +152,12 @@ async def delete(request):
         trigger = await Trigger.objects.get(id=trigger_id)
         await trigger.delete()
         content = {'errors': ''}
-        console.print("trigger deleted", style="blue")
+        if settings.DEBUG:
+            console.print("trigger deleted", style="blue")
     else:
         content = {'errors': {'message': 'Trigger id is missing'}}
-        console.print("error during deleting trigger", style="blue")
+        if settings.DEBUG:
+            console.print("error during deleting trigger", style="blue")
     return JSONResponse(content)
 
 
@@ -170,8 +170,7 @@ async def switch(request):
         trigger = await Trigger.objects.get(id=trigger_id)
         date_triggered = trigger.date_triggered
         if trigger.status is False:
-            date_triggered = arrow.utcnow().to(
-                config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ')
+            date_triggered = arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DD HH:mm:ssZZ')
         trace = ''
         if 'switch_type' in request.path_params and \
                 request.path_params['switch_type'] == 'status':
@@ -188,10 +187,12 @@ async def switch(request):
             trace = f"switch telegram trigger {trigger_id}"
 
         content = {'errors': ''}
-        console.print(trace, style="blue")
+        if settings.DEBUG:
+            console.print(trace, style="blue")
     else:
         content = {'errors': {'message': 'Trigger id is missing'}}
-        console.print("error during switch status trigger", style="red")
+        if settings.DEBUG:
+            console.print("error during switch status trigger", style="red")
     return JSONResponse(content)
 
 
@@ -221,4 +222,4 @@ main_app.mount('/', app=app)
 # Bootstrap
 if __name__ == '__main__':
     console.print('[green]여보세요 ![/]')
-    uvicorn.run(main_app, host=config('YEOBOSEYO_HOST'), port=int(config('YEOBOSEYO_PORT')))
+    uvicorn.run(main_app, host=settings.YEOBOSEYO_HOST, port=settings.YEOBOSEYO_PORT)
