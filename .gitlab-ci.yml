@@ -35,11 +35,11 @@ before_script:
 
 test:
   script:
-    #- pip install -r requirements-dev.txt
-    #- cd yeboseyo
-    #- pytest
-    - pip install tox  # you can also use tox
-    - tox -r  # tox.ini will install flake8 pytest
+    - pip install -r requirements-dev.txt
+    - cd yeboseyo
+    - pytest
+    #- pip install tox  # you can also use tox
+    #- tox -r  # tox.ini will install flake8 pytest
 
 deploy:
   script:
