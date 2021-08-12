@@ -17,6 +17,8 @@ PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
 from yeoboseyo import settings, Trigger
 
+now = arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DDTHH:mm:ssZZ')
+
 
 async def report():
     triggers = await Trigger.objects.all()
@@ -67,7 +69,6 @@ async def _update_date(trigger_id) -> None:
     :param trigger_id: id to update
     :return: nothing
     """
-    now = arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DD HH:mm:ssZZ')
     trigger = await Trigger.objects.get(id=trigger_id)
     await trigger.update(date_triggered=now)
 
@@ -127,7 +128,6 @@ async def go():
         if trigger.status:
             rss = Rss()
             feeds = await rss.get_data(**{'url_to_parse': trigger.rss_url, 'bypass_bozo': settings.BYPASS_BOZO})
-            now = arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DDTHH:mm:ssZZ')
             date_triggered = arrow.get(trigger.date_triggered).format('YYYY-MM-DDTHH:mm:ssZZ')
 
             read_entries = 0

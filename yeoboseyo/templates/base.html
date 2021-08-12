@@ -22,13 +22,12 @@
     <b-container fluid>
     </b-container>
     <hr/>
-    <footer class="footer">
-        <div class="container">
-            <p>2019 <a href="https://gitlab.com/annyong/yeoboseyo">Yeoboseyo</a></p>
-        </div>
-    </footer>
   </div>
-
+  <footer class="footer">
+    <div class="container">
+        <p>since 2019 <i class="fas fa-igloo"></i> <a href="https://gitlab.com/annyong/yeoboseyo">Yeoboseyo</a></p>
+    </div>
+  </footer>
 
 <script>
 var app = new Vue({
@@ -242,13 +241,13 @@ var app = new Vue({
   <div>
     <!-- 'Yeoboseyo' NAVBAR -->
     <b-navbar toggleable="lg" type="dark" variant="info">
-      <b-navbar-brand href="#">Yeoboseyo</b-navbar-brand>
+      <b-navbar-brand href="#"><i class="fas fa-igloo"></i> Yeoboseyo</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-nav-form>
-            <b-button size="sm" class="ml-sm-2" v-on:click="newForm">New feed</b-button>
+            <b-button size="sm" class="ml-sm-2" v-on:click="newForm"><i class="fas fa-plus"></i> New trigger</b-button>
           </b-nav-form>
         </b-navbar-nav>
       </b-collapse>
@@ -261,14 +260,14 @@ var app = new Vue({
     <b-col cols="8">
     <div v-if="errors" class="alert alert-danger">{? errors ?}</div>
     <form v-if="show" ref="form" class="mt-4" @submit.stop.prevent="submitForm">
-        <label>Set a description for this 'Yeoboseyo'</label>
+        <h2><i class="far fa-comment-alt"></i> Description</h2>
         <b-form-input
           ref="desc"
           class="mb-4"
           v-model="formData.description"
           required
         ></b-form-input>
-        <h2><i class="fa fa-dot-circle"></i> Origin of the data</h2>
+        <h2><i class="fas fa-map-pin"></i> Origin of the data</h2>
         <b-form-group class="mb-4"  description="Put the URL from which you want to get the data to spread eg http://somethinglookslikethat.org/feeds.xml">
             <b-input-group size="sm" class="mb-2">
               <b-input-group-prepend is-text>
@@ -281,7 +280,7 @@ var app = new Vue({
               ></b-form-input>
             </b-input-group>
         </b-form-group>
-        <h2><i class="fa fa-arrow-alt-circle-down"></i> Destinations of the data</h2>
+        <h2><i class="fas fa-map-signs"></i> Destinations of the data</h2>
         <b-form-group class="mb-4"  description="Put the name of the folder (inside {{ MY_NOTES_FOLDER }}) that will store the generated Markdown files coming from the RSS Feeds">
           <b-input-group size="sm" class="mb-2">
             <b-input-group-prepend is-text>
@@ -290,20 +289,43 @@ var app = new Vue({
             <b-form-input v-model="formData.localstorage" placeholder="/path/to/save/news/inf/files"></b-form-input>
           </b-input-group>
         </b-form-group>
-        <b-form-group  class="mb-4" description="Publish on slack/mattermost/discord by providing the url of the service eg https://url of the instance/hooks/xxxxxx">
+        <b-form-group class="mb-4" description="Publish on slack/mattermost/discord by providing the url of the service eg https://url of the instance/hooks/xxxxxx">
           <b-input-group size="sm" class="mb-2">
             <b-input-group-prepend is-text>
               <b-icon icon="globe"></b-icon>
             </b-input-group-prepend>
             <b-form-input v-model="formData.webhook" placeholder="URL used for publishing"></b-form-input>
           </b-input-group>
+          <i class="fab fa-slack"></i> - <i class="fab fa-discord"></i> -
+        </b-form-group>
+        <b-form-group class="mb-4">
+          <b-input-group size="sm" class="mb-2">
+            <b-input-group-prepend is-text>
+              <i class="fab fa-mastodon"></i>
+            </b-input-group-prepend>
+            <b-form-checkbox v-model="formData.mastodon" name="mastodon">&nbsp; Publish on Mastodon? (to <a href="{{ MASTODON_INSTANCE }})">{{ MASTODON_INSTANCE }})</a></b-form-checkbox>
+          </b-input-group>
+        </b-form-group>
+        <b-form-group class="mb-4">
+          <b-input-group size="sm" class="mb-2">
+            <b-input-group-prepend is-text>
+              <i class="fab fa-telegram"></i>
+            </b-input-group-prepend>
+            <b-form-checkbox v-model="formData.telegram" name="telegram">&nbsp; Publish on Telegram? (to group / channel id {{ TELEGRAM_CHAT_ID }})</b-form-checkbox>
+          </b-input-group>
+        </b-form-group>
+        <b-form-group class="mb-4">
+          <b-input-group size="sm" class="mb-2">
+            <b-input-group-prepend is-text>
+              <i class="far fa-lightbulb"></i>
+            </b-input-group-prepend>
+            <b-form-checkbox v-model="formData.status" name="status">&nbsp; Status</b-form-checkbox>
+          </b-input-group>
         </b-form-group>
 
-        <b-form-checkbox v-model="formData.mastodon" name="mastodon">&nbsp; Publish on Mastodon ? (to mastodon instance <a href="{{ MASTODON_INSTANCE }}">{{ MASTODON_INSTANCE }}</a>)</b-form-checkbox>
-        <b-form-checkbox v-model="formData.telegram" name="telegram">&nbsp; Publish on Telegram ? (to group / channel id {{ TELEGRAM_CHAT_ID }})</b-form-checkbox>
-        <b-form-checkbox v-model="formData.status" name="status">&nbsp;Status</b-form-checkbox>
         <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit</button>
-        <button type="cancel" class="btn btn-danger"><i class="fas fa-window-close"></i> Close</button>
+        <button type="cancel" class="btn btn-danger" v-on:click="showForm"><i class="fas fa-window-close"></i> Close</button>
+
     </form>
   </b-col>
   <b-col cols="2"> </b-col>
@@ -333,42 +355,44 @@ var app = new Vue({
             >
             <template v-slot:cell(mastodon)="row">
               <b-button v-if="row.item.mastodon" variant="outline-info"
-                        @click="switchMastodon(row.item.id)" title="Mastodon publishing is on. Switch to off">
+                        @click="switchMastodon(row.item.id)" title="Mastodon publishing is on. Click to set it to off">
                 <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
               </b-button>
               <b-button v-else variant="outline-danger"
-                        @click="switchMastodon(row.item.id)" title="Mastodon publishing is Off. Switch to on">
+                        @click="switchMastodon(row.item.id)" title="Mastodon publishing is Off. Click to set it to on">
                 <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
               </b-button>
             </template>
             <template v-slot:cell(telegram)="row">
               <b-button v-if="row.item.telegram" variant="outline-info"
-                        @click="switchTelegram(row.item.id)" title="Telegram publishing is on. Switch to off">
+                        @click="switchTelegram(row.item.id)" title="Telegram publishing is on. Click to set it to off">
                 <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
               </b-button>
               <b-button v-else variant="outline-danger"
-                        @click="switchTelegram(row.item.id)" title="Telegram publishing is Off. Switch to on">
+                        @click="switchTelegram(row.item.id)" title="Telegram publishing is Off. Click to set it to on">
                 <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
               </b-button>
             </template>
             <template v-slot:cell(status)="row">
               <b-button v-if="row.item.status" variant="outline-info"
-                        @click="switchStatus(row.item.id)" title="Status is on. Switch to off">
+                        @click="switchStatus(row.item.id)" title="Trigger is enabled. Click to disable">
                 <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
               </b-button>
               <b-button v-else variant="outline-danger"
-                        @click="switchStatus(row.item.id)" title="Status is Off. Switch to on">
+                        @click="switchStatus(row.item.id)" title="Trigger is disabled. Click to enable">
                 <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
               </b-button>
             </template>
             <template v-slot:cell(actions)="row">
               <b-button-group>
                 <b-button variant="outline-info" class="ml-2 mr-2 mb-2"
-                          @click="editTrigger(row.item.id)">
+                          @click="editTrigger(row.item.id)"
+                          title="Edit this trigger">
                   <b-icon icon="pen" aria-hidden="true"></b-icon>
                 </b-button>
                 <b-button variant="outline-danger" class="ml-2 mr-2 mb-2"
-                          @click="deleteTrigger(row.item.id)">
+                          @click="deleteTrigger(row.item.id)"
+                          title="Delete this trigger">
                   <b-icon icon="trash" aria-hidden="true"></b-icon>
                 </b-button>
               </b-button-group>
