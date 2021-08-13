@@ -195,4 +195,3 @@ if __name__ == '__main__':
             console.print("You need to provide the ID you want to change.", style="red")
         else:
             asyncio.run(switch(args.trigger_id))
-

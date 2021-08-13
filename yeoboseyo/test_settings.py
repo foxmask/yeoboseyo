@@ -58,4 +58,3 @@ def test_config():
     assert type(settings.WALLABAG_PASSWORD) is Secret
     assert type(settings.WALLABAG_CLIENTID) is Secret
     assert type(settings.WALLABAG_CLIENTSECRET) is Secret
-
