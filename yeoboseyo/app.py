@@ -9,7 +9,7 @@ import sys
 
 # starlette
 from starlette.applications import Starlette
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, FileResponse
 from starlette.routing import Mount, Route, Router
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
@@ -30,15 +30,7 @@ statics = StaticFiles(directory="static")
 main_app = Starlette()
 main_app.debug = settings.DEBUG
 
-
-async def homepage(request):
-    context = {"request": request,
-               'MY_NOTES_FOLDER': settings.MY_NOTES_FOLDER,
-               'MASTODON_INSTANCE': settings.MASTODON_INSTANCE,
-               'TELEGRAM_CHAT_ID': settings.TELEGRAM_CHAT_ID,
-               'WALLABAG_URL': settings.WALLABAG_URL,
-               }
-    return templates.TemplateResponse("base.html", context)
+# The API Calls
 
 
 async def get_all(request):
@@ -216,10 +208,32 @@ api = Router(routes=[
     ]))
 ])
 
+# WEBPAGE
+
+
+async def homepage(request):
+    context = {"request": request,
+               'MY_NOTES_FOLDER': settings.MY_NOTES_FOLDER,
+               'MASTODON_INSTANCE': settings.MASTODON_INSTANCE,
+               'TELEGRAM_CHAT_ID': settings.TELEGRAM_CHAT_ID,
+               'WALLABAG_URL': settings.WALLABAG_URL,
+               }
+    return templates.TemplateResponse("base.html", context)
+
+
+async def favicon(request):
+    """
+    favicon
+    :param request:
+    :return:
+    """
+    return FileResponse('static/favicon.ico')
+
 app = Starlette(
     debug=True,
     routes=[
         Route('/', homepage, methods=['GET'], name='homepage'),
+        Route('/favicon.ico', favicon, methods=['GET']),
         Mount('/static', StaticFiles(directory="static")),
     ],
 )
