@@ -6,16 +6,12 @@
 from __future__ import unicode_literals
 import httpx
 from logging import getLogger
-# starlette
-from starlette.config import Config
 
 # yeoboseyo
-from yeoboseyo.services import Service
+from yeoboseyo import Service, settings
 
 # create logger
 logger = getLogger(__name__)
-
-config = Config('.env')
 
 __all__ = ['Telegram']
 
@@ -26,7 +22,7 @@ class Telegram(Service):
     """
 
     def __init__(self):
-        self.token = config('TELEGRAM_TOKEN')
+        self.token = settings.TELEGRAM_TOKEN
 
     async def save_data(self, trigger, entry) -> bool:
         """
@@ -38,7 +34,7 @@ class Telegram(Service):
         status = False
         content = str("[{title}]({link}) [{link}]({link})").format(title=entry.title, link=entry.link)
         url = f'https://api.telegram.org/bot{self.token}/sendMessage'
-        payload = {'chat_id': config('TELEGRAM_CHAT_ID'),
+        payload = {'chat_id': settings.TELEGRAM_CHAT_ID,
                    'text': content,
                    'parse_mode': 'markdown'}
         try:

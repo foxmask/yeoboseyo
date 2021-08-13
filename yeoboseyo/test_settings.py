@@ -32,6 +32,11 @@ def test_config():
     assert hasattr(settings, 'TELEGRAM_TOKEN')
     assert hasattr(settings, 'TELEGRAM_CHAT_ID')
     assert hasattr(settings, 'TOKEN')
+    assert hasattr(settings, 'WALLABAG_URL')
+    assert hasattr(settings, 'WALLABAG_USERNAME')
+    assert hasattr(settings, 'WALLABAG_PASSWORD')
+    assert hasattr(settings, 'WALLABAG_CLIENTID')
+    assert hasattr(settings, 'WALLABAG_CLIENTSECRET')
 
     assert type(settings.DEBUG) is bool
     assert type(settings.DATABASE_URL) is databases.DatabaseURL
@@ -48,3 +53,9 @@ def test_config():
     assert type(settings.TELEGRAM_TOKEN) is Secret
     assert type(settings.TELEGRAM_CHAT_ID) is Secret
     assert type(settings.TOKEN) is Secret
+    assert type(settings.WALLABAG_URL) is str
+    assert type(settings.WALLABAG_USERNAME) is Secret
+    assert type(settings.WALLABAG_PASSWORD) is Secret
+    assert type(settings.WALLABAG_CLIENTID) is Secret
+    assert type(settings.WALLABAG_CLIENTSECRET) is Secret
+

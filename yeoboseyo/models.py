@@ -22,6 +22,7 @@ class Trigger(orm.Model):
     mastodon = orm.Boolean(default=False)
     telegram = orm.Boolean(default=False)
     webhook = orm.String(max_length=255)
+    wallabag = orm.Boolean(default=False)
     localstorage = orm.String(max_length=255, allow_null=True)
     description = orm.String(max_length=200)
     date_created = orm.DateTime(default=datetime.datetime.now)

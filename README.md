@@ -15,6 +15,7 @@ From your favorite RSS feeds, spread/share those news to services of your choice
 * Slack
 * Discord
 * Telegram
+* Wallabag
 * Local Markdown files
 
 ### used cases:
@@ -74,6 +75,11 @@ MASTODON_VISIBILITY=unlisted  # default is 'public', can be 'unlisted', 'private
 TOKEN=''
 TELEGRAM_TOKEN=0123456789:AZERTYUIOPQSDFGHJKLMWXCVBN123456789
 TELEGRAM_CHAT_ID=-NNNNNNNNN
+WALLABAG_URL=http://wallabag/
+WALLABAG_CLIENTID=your id
+WALLABAG_CLIENTSECRET=your secret
+WALLABAG_PASSWORD=wallabag
+WALLABAG_USERNAME=wallabag
 ```
 
 ### Mastodon
@@ -253,7 +259,12 @@ and check it again to see the status moving
 
 if you had the version 0.5.0:
 
-run `migrations/alter_table_trigger_add_telegram.sql`
+run
+
+```sql 
+migrations/alter_table_trigger_add_telegram.sql
+migrations/alter_table_trigger_add_wallabag.sql
+``` 
 
 if you had the version 0.4.0:
 

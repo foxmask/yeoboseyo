@@ -7,15 +7,11 @@ from __future__ import unicode_literals
 from logging import getLogger
 # external lib
 from mastodon import Mastodon as MastodonAPI
-# starlette
-from starlette.config import Config
 # yeoboseyo
-from yeoboseyo.services import Service
+from yeoboseyo import Service, settings
 
 # create logger
 logger = getLogger(__name__)
-
-config = Config('.env')
 
 __all__ = ['Mastodon']
 
@@ -38,14 +34,14 @@ class Mastodon(Service):
         content = self.set_mastodon_content(content)
         try:
             toot_api = MastodonAPI(access_token='yeoboseyo_clientcred.secret',
-                                   api_base_url=config('MASTODON_INSTANCE'))
+                                   api_base_url=settings.MASTODON_INSTANCE)
             status = True
         except ValueError as e:
             logger.error(e)
             status = False
 
         try:
-            toot_api.status_post(content, visibility=config('MASTODON_VISIBILITY'))
+            toot_api.status_post(content, visibility=settings.MASTODON_VISIBILITY)
             status = True
         except Exception:
             status = False

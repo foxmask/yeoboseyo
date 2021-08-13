@@ -47,6 +47,7 @@ var app = new Vue({
         localstorage: '',
         mastodon: false,
         telegram: false,
+        wallabag: false,
         webhook: '',
         status: true
       },
@@ -58,6 +59,7 @@ var app = new Vue({
         { key: 'localstorage', sortable: true },
         { key: 'mastodon', sortable: false },
         { key: 'telegram', sortable: false },
+        { key: 'wallabag', sortable: false },
         { key: 'webhook', sortable: false },
         { key: 'date_triggered', sortable: true },
         { key: 'status', sortable: true },
@@ -65,9 +67,6 @@ var app = new Vue({
       ],
       filter: null,
       selected: '',
-      masto_conf: '',
-      telegram_conf: '',
-      localstorage_conf: '',
       selectMode: 'single',
       errors: ''
     }
@@ -85,7 +84,7 @@ var app = new Vue({
       return this.show = !this.show
     },
     submitForm () {
-      if (this.formData.localstorage =='' && this.formData.mastodon != true && this.formData.telegram != true && this.formData.webhook != '') {
+      if (this.formData.localstorage =='' && this.formData.mastodon != true && this.formData.telegram != true && this.formData.wallabag != true && this.formData.webhook != '') {
         alert('One of them is mandatory "Markdown Folder", "Mastodon" or "Webhook" needs to be filled/selected"');
       }
       else {
@@ -95,6 +94,7 @@ var app = new Vue({
           localstorage: this.formData.localstorage,
           mastodon: this.formData.mastodon,
           telegram: this.formData.telegram,
+          wallabag: this.formData.wallabag,
           webhook: this.formData.webhook,
           status: this.formData.status
         }
@@ -144,6 +144,7 @@ var app = new Vue({
           this.formData.localstorage = response.data['localstorage']
           this.formData.mastodon = response.data['mastodon']
           this.formData.telegram = response.data['telegram']
+          this.formData.wallabag = response.data['wallabag']
           this.formData.webhook = response.data['webhook']
           this.formData.mail = response.data['mail']
           this.formData.status = response.data['status']
@@ -161,6 +162,7 @@ var app = new Vue({
       this.formData.localstorage = ''
       this.formData.mastodon = false
       this.formData.telegram = false
+      this.formData.wallabag = false
       this.formData.webhook = ''
       this.status = true
     },
@@ -185,6 +187,18 @@ var app = new Vue({
     },
     switchTelegram (triggerId) {
       axios.patch('/api/yeoboseyo/switch/telegram/' + triggerId)
+        .then((res) => {
+          if (res.status === 200) {
+            this.getData()
+          }
+          else {
+            this.errors = res.data['errors']
+          }
+        })
+        .catch(error => { error.statusText })
+    },
+    switchWallabag (triggerId) {
+      axios.patch('/api/yeoboseyo/switch/wallabag/' + triggerId)
         .then((res) => {
           if (res.status === 200) {
             this.getData()
@@ -280,6 +294,7 @@ var app = new Vue({
               ></b-form-input>
             </b-input-group>
         </b-form-group>
+
         <h2><i class="fas fa-map-signs"></i> Destinations of the data</h2>
         <b-form-group class="mb-4"  description="Put the name of the folder (inside {{ MY_NOTES_FOLDER }}) that will store the generated Markdown files coming from the RSS Feeds">
           <b-input-group size="sm" class="mb-2">
@@ -289,6 +304,7 @@ var app = new Vue({
             <b-form-input v-model="formData.localstorage" placeholder="/path/to/save/news/inf/files"></b-form-input>
           </b-input-group>
         </b-form-group>
+
         <b-form-group class="mb-4" description="Publish on slack/mattermost/discord by providing the url of the service eg https://url of the instance/hooks/xxxxxx">
           <b-input-group size="sm" class="mb-2">
             <b-input-group-prepend is-text>
@@ -298,6 +314,7 @@ var app = new Vue({
           </b-input-group>
           <i class="fab fa-slack"></i> - <i class="fab fa-discord"></i> -
         </b-form-group>
+
         <b-form-group class="mb-4">
           <b-input-group size="sm" class="mb-2">
             <b-input-group-prepend is-text>
@@ -306,6 +323,7 @@ var app = new Vue({
             <b-form-checkbox v-model="formData.mastodon" name="mastodon">&nbsp; Publish on Mastodon? (to <a href="{{ MASTODON_INSTANCE }})">{{ MASTODON_INSTANCE }})</a></b-form-checkbox>
           </b-input-group>
         </b-form-group>
+
         <b-form-group class="mb-4">
           <b-input-group size="sm" class="mb-2">
             <b-input-group-prepend is-text>
@@ -314,6 +332,16 @@ var app = new Vue({
             <b-form-checkbox v-model="formData.telegram" name="telegram">&nbsp; Publish on Telegram? (to group / channel id {{ TELEGRAM_CHAT_ID }})</b-form-checkbox>
           </b-input-group>
         </b-form-group>
+
+        <b-form-group class="mb-4">
+          <b-input-group size="sm" class="mb-2">
+            <b-input-group-prepend is-text>
+              <i class="fas fa-bookmark"></i>
+            </b-input-group-prepend>
+            <b-form-checkbox v-model="formData.wallabag" name="wallabag">&nbsp; Add articles on Wallabag? (to <a href="{{ WALLABAG_URL }})">{{ WALLABAG_URL }})</a></b-form-checkbox>
+          </b-input-group>
+        </b-form-group>
+
         <b-form-group class="mb-4">
           <b-input-group size="sm" class="mb-2">
             <b-input-group-prepend is-text>
@@ -373,6 +401,18 @@ var app = new Vue({
                 <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
               </b-button>
             </template>
+
+            <template v-slot:cell(wallabag)="row">
+              <b-button v-if="row.item.wallabag" variant="outline-info"
+                        @click="switchWallabag(row.item.id)" title="Wallabag publishing is on. Click to set it to off">
+                <b-icon icon="toggle-on" aria-hidden="true"></b-icon>
+              </b-button>
+              <b-button v-else variant="outline-danger"
+                        @click="switchWallabag(row.item.id)" title="Wallabag publishing is Off. Click to set it to on">
+                <b-icon icon="toggle-off" aria-hidden="true"></b-icon>
+              </b-button>
+            </template>
+
             <template v-slot:cell(status)="row">
               <b-button v-if="row.item.status" variant="outline-info"
                         @click="switchStatus(row.item.id)" title="Trigger is enabled. Click to disable">

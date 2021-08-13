@@ -15,4 +15,5 @@ class TriggerSchema(typesystem.Schema):
     webhook = typesystem.String(title="Publish on slack/mattermost/discord?", max_length=255, allow_blank=True)
     mastodon = typesystem.Boolean(title="Publish on Mastodon?", default=True)
     telegram = typesystem.Boolean(title="Publish on Telegram?", default=True)
+    wallabag = typesystem.Boolean(title="Add articles on Wallabag?", default=False)
     status = typesystem.Boolean(title="Status", default=True)

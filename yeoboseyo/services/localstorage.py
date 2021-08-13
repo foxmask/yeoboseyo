@@ -10,14 +10,11 @@ from pathlib import Path
 # external lib
 from jinja2 import Environment, PackageLoader
 from slugify import slugify
-from starlette.config import Config
 # yeoboseyo
-from yeoboseyo.services import Service
+from yeoboseyo import Service, settings
 
 # create logger
 logger = getLogger(__name__)
-
-config = Config('.env')
 
 __all__ = ['LocalStorage']
 
@@ -31,11 +28,11 @@ class LocalStorage(Service):
         super().__init__()
         self.format_to = "markdown_github"
         self.format_from = "html"
-        self.local_storage = config('MY_NOTES_FOLDER')
+        self.local_storage = settings.MY_NOTES_FOLDER
 
     async def save_data(self, trigger, entry) -> bool:
         """
-        Create a new note to the config('MY_NOTES_FOLDER')
+        Create a new note to the settings.MY_NOTES_FOLDER
         :param trigger: current trigger
         :param entry: data from Feeds
         :return: boolean
@@ -48,8 +45,8 @@ class LocalStorage(Service):
                     'body': content,
                     'author': entry.author,
                     'source_url': entry.link,
-                    'date': arrow.utcnow().to(config('TIME_ZONE')).format('YYYY-MM-DD HH:mm:ssZZ'),
-                    'style': config('STYLE'),
+                    'date': arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DD HH:mm:ssZZ'),
+                    'style': settings.TEMPLATE_STYLE,
                     'localstorage': trigger.localstorage}
             logger.debug(data)
             yesno = await self.save_file(**data)

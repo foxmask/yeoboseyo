@@ -6,15 +6,12 @@
 from __future__ import unicode_literals
 import httpx
 from logging import getLogger
-# starlette
-from starlette.config import Config
 # yeoboseyo
 from yeoboseyo.services import Service
 
 # create logger
 logger = getLogger(__name__)
 
-config = Config('.env')
 
 __all__ = ['Webhook']
 

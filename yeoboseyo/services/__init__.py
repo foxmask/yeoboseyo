@@ -7,9 +7,7 @@ from logging import getLogger
 # external lib
 import feedparser
 import pypandoc
-from starlette.config import Config
-
-config = Config('.env')
+from yeoboseyo import settings
 
 # create logger
 logger = getLogger(__name__)
@@ -27,9 +25,9 @@ class Service:
         """
         init parms
         """
-        self.format_to = config('FORMAT_TO', default='html')
-        self.format_from = config('FORMAT_FROM', default='markdown_github')
-        self.token = config('TOKEN', default='')
+        self.format_to = settings.FORMAT_TO
+        self.format_from = settings.FORMAT_FROM
+        self.token = settings.TOKEN
 
     def _get_content(self, data, which_content):
         """

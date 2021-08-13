@@ -36,6 +36,7 @@ async def homepage(request):
                'MY_NOTES_FOLDER': settings.MY_NOTES_FOLDER,
                'MASTODON_INSTANCE': settings.MASTODON_INSTANCE,
                'TELEGRAM_CHAT_ID': settings.TELEGRAM_CHAT_ID,
+               'WALLABAG_URL': settings.WALLABAG_URL,
                }
     return templates.TemplateResponse("base.html", context)
 
@@ -53,6 +54,7 @@ async def get_all(request):
             "localstorage": result["localstorage"],
             "mastodon": result["mastodon"],
             "telegram": result["telegram"],
+            "wallabag": result["wallabag"],
             "webhook": result["webhook"],
             "status": result["status"],
             "date_triggered": result['date_triggered']
@@ -75,6 +77,7 @@ async def get(request):
                "localstorage": result["localstorage"],
                "mastodon": result["mastodon"],
                "telegram": result["telegram"],
+               "wallabag": result["wallabag"],
                "webhook": result["webhook"],
                "status": result["status"],
                "date_triggered": result['date_triggered']}
@@ -101,6 +104,7 @@ async def create(request):
                                      localstorage=trigger.localstorage,
                                      mastodon=trigger.mastodon,
                                      telegram=trigger.telegram,
+                                     wallabag=trigger.wallabag,
                                      webhook=trigger.webhook,
                                      status=trigger.status,
                                      )
@@ -132,6 +136,7 @@ async def update(request):
                                            localstorage=trigger.localstorage,
                                            mastodon=trigger.mastodon,
                                            telegram=trigger.telegram,
+                                           wallabag=trigger.wallabag,
                                            webhook=trigger.webhook,
                                            status=trigger.status,
                                            )
@@ -185,7 +190,10 @@ async def switch(request):
                 request.path_params['switch_type'] == 'telegram':
             await trigger.update(telegram=not trigger.telegram)
             trace = f"switch telegram trigger {trigger_id}"
-
+        elif 'switch_type' in request.path_params and \
+                request.path_params['switch_type'] == 'wallabag':
+            await trigger.update(wallabag=not trigger.wallabag)
+            trace = f"switch wallabag trigger {trigger_id}"
         content = {'errors': ''}
         if settings.DEBUG:
             console.print(trace, style="blue")
