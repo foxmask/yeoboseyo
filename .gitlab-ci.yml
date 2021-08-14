@@ -29,10 +29,11 @@ test:
 deploy:
   script:
   - cat $PYPIRC > /tmp/.pypirc
+  - cat $PYPIRC_PYPI > /tmp/.pypirc_pypi
   - pip install twine
   - python setup.py  bdist_wheel
-  - python -m twine upload --repository gitlab dist/yeoboseyo-${CI_COMMIT_TAG}-py3-none-any.whl
-    --config-file /tmp/.pypirc
+  - python -m twine upload --repository gitlab dist/* --config-file /tmp/.pypirc
+  - python -m twine dist/* --config-file /tmp/.pypirc_pypi 
   only:
   - tags
 stages:
