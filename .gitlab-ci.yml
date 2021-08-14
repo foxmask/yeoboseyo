@@ -33,7 +33,7 @@ deploy:
   - pip install twine
   - python setup.py  bdist_wheel
   - python -m twine upload --repository gitlab dist/* --config-file /tmp/.pypirc
-  - python -m twine dist/* --config-file /tmp/.pypirc_pypi 
+  - python -m twine upload dist/* --config-file /tmp/.pypirc_pypi
   only:
   - tags
 stages:
