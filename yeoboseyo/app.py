@@ -1,7 +1,8 @@
 # coding: utf-8
 """
-   여보세요 App
+   여보세요 - App
 """
+
 import arrow
 import os
 from rich.console import Console

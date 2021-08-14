@@ -1,7 +1,8 @@
 # coding: utf-8
 """
-   여보세요 Service Telegram
+   여보세요 - Service Telegram
 """
+
 # std lib
 from __future__ import unicode_literals
 import httpx

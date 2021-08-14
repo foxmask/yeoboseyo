@@ -1,3 +1,8 @@
+# coding: utf-8
+"""
+   여보세요 - Tests
+"""
+
 import databases
 import os
 from starlette.datastructures import Secret
