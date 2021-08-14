@@ -2,9 +2,12 @@
 """
    여보세요
 """
+import importlib_metadata
+
+__version__ = importlib_metadata.version('yeoboseyo')
+
 
 from yeoboseyo.services import Service
 from yeoboseyo.forms import TriggerSchema
 from yeoboseyo.models import Trigger
 
-__version__ = '0.6.0'
