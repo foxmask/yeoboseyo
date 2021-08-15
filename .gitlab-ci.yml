@@ -12,6 +12,7 @@ include:
 image: python:3.8.11
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  DS_EXCLUDED_ANALYZERS: bundler-audit, retire.js, gemnasium, gemnasium-maven
 cache:
   paths:
   - ".cache/pip"
@@ -41,6 +42,8 @@ stages:
 - test
 sast:
   variables:
-    SAST_EXCLUDED_ANALYZERS: brakeman, eslint, flawfinder, gosec, kubesec, nodejs-scan,
-      phpcs-security-audit, pmd-apex, security-code-scan, semgrep, sobelow, spotbugs
+    SAST_EXCLUDED_ANALYZERS: bandit, brakeman, eslint, flawfinder, gosec, kubesec,
+      nodejs-scan, phpcs-security-audit, pmd-apex, security-code-scan, sobelow, spotbugs
+    SAST_EXCLUDED_PATHS: "venv"
+    SAST_SEMGREP_METRICS: "false"
   stage: test
