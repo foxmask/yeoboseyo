@@ -38,9 +38,10 @@ Let see how to setup all of that below
 ### pre requisistes
 
 - python 3.8+
-- starlette (the web application)
-- feedparser (for RSS support)
-- pypandoc (to convert html to markdown)
+- [starlette](https://www.starlette.io/) (the web application)
+- [feedparser](https://feedparser.readthedocs.io/en/latest/) (for RSS support)
+- [pypandoc](https://pypi.org/project/pypandoc/) (to convert html to markdown)
+- [wallabag API](https://gitlab.com/foxmask/wallabag_api) for [Wallabag](https://wallabag.org/en) readit later applications
 
 ### Installation
 create a virtualenv
@@ -49,7 +50,14 @@ create a virtualenv
 python3 -m venv yeoboseyo
 cd yeoboseyo
 source bin/activate
+```
+then 
+```bash
 pip install -r requirements.txt
+```
+or 
+```bash
+pip install yeoboseyo
 ```
 
 ##  :wrench: Settings
@@ -124,6 +132,24 @@ chat:
 ```
 
 pick up the `-NNNNNN` and put it as the `TELEGRAM_CHAT_ID` in the `.env` config file
+
+### Wallabag
+
+Create a client API like explain here https://doc.wallabag.org/fr/developer/api/oauth.html
+
+this will give you something like this
+
+![Wallabag](https://gitlab.com/foxmask/wallabag_api/-/raw/master/wallabag_api_key.png)
+
+Then replace the client_id / client_secret / login / pass in the .env file
+
+```ini
+WALLABAG_URL=http://wallabag/
+WALLABAG_CLIENTID=your id
+WALLABAG_CLIENTSECRET=your secret
+WALLABAG_PASSWORD=wallabag
+WALLABAG_USERNAME=wallabag
+```
 
 
 ## :dvd: Database
@@ -268,6 +294,10 @@ migrations/alter_table_trigger_add_wallabag.sql
 
 if you had the version 0.4.0:
 
-run `migrations/alter_table_trigger_add_webhook.sql`
+run 
+
+```sql 
+migrations/alter_table_trigger_add_webhook.sql
+```
 
 (Image credits to [Emojipedia](https://emojipedia.org/))
