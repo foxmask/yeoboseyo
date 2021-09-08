@@ -42,6 +42,11 @@ MASTODON_INSTANCE = config('MASTODON_INSTANCE')
 MASTODON_VISIBILITY = config('MASTODON_VISIBILITY')
 # LOCAL STORAGE
 MY_NOTES_FOLDER = config('MY_NOTES_FOLDER')
+
+SUPPORTED_SERVICES = config('SUPPORTED_SERVICES',
+                            default=('Mastodon', 'LocalStorage', 'Webhook', 'Telegram', 'Wallabag'),
+                            cast=tuple)
+
 TEMPLATE_STYLE = config('TEMPLATE_STYLE')
 # TELEGRAM
 TELEGRAM_TOKEN = config('TELEGRAM_TOKEN', cast=Secret)
@@ -54,3 +59,4 @@ WALLABAG_CLIENTID = config('WALLABAG_CLIENTID', default='', cast=Secret)
 WALLABAG_CLIENTSECRET = config('WALLABAG_CLIENTSECRET', default='', cast=Secret)
 WALLABAG_USERNAME = config('WALLABAG_USERNAME', default='', cast=Secret)
 WALLABAG_PASSWORD = config('WALLABAG_PASSWORD', default='', cast=Secret)
+

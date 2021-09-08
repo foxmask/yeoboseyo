@@ -1,6 +1,7 @@
 # coding: utf-8
 """
    여보세요 - Service Webhook
+   used to post data to a Mattermost/Slack/Discord endpoint
 """
 
 # std lib
