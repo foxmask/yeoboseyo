@@ -21,7 +21,7 @@ import uvicorn
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
-from yeoboseyo import settings, TriggerSchema, Trigger
+from yeoboseyo import settings, trigger_schema, Trigger
 
 console = Console()
 
@@ -41,16 +41,16 @@ async def get_all(request):
     data = await Trigger.objects.all()
     content = [
         {
-            "id": result["id"],
-            "rss_url": result["rss_url"],
-            "description": result["description"],
-            "localstorage": result["localstorage"],
-            "mastodon": result["mastodon"],
-            "telegram": result["telegram"],
-            "wallabag": result["wallabag"],
-            "webhook": result["webhook"],
-            "status": result["status"],
-            "date_triggered": result['date_triggered']
+            "id": result.id,
+            "rss_url": result.rss_url,
+            "description": result.description,
+            "localstorage": result.localstorage,
+            "mastodon": result.mastodon,
+            "telegram": result.telegram,
+            "wallabag": result.wallabag,
+            "webhook": result.webhook,
+            "status": result.status,
+            "date_triggered": str(result.date_triggered)
         }
         for result in data
     ]
@@ -65,17 +65,17 @@ async def get(request):
     trigger_id = request.path_params['trigger_id']
     result = await Trigger.objects.get(id=trigger_id)
     content = {"id": trigger_id,
-               "rss_url": result["rss_url"],
-               "description": result["description"],
-               "localstorage": result["localstorage"],
-               "mastodon": result["mastodon"],
-               "telegram": result["telegram"],
-               "wallabag": result["wallabag"],
-               "webhook": result["webhook"],
-               "status": result["status"],
-               "date_triggered": result['date_triggered']}
+               "rss_url": result.rss_url,
+               "description": result.description,
+               "localstorage": result.localstorage,
+               "mastodon": result.mastodon,
+               "telegram": result.telegram,
+               "wallabag": result.wallabag,
+               "webhook": result.webhook,
+               "status": result.status,
+               "date_triggered": str(result.date_triggered)}
     if settings.DEBUG:
-        console.print("get that trigger {} - {}".format(trigger_id, result['rss_url']), style="blue")
+        console.print("get that trigger {} - {}".format(trigger_id, result.rss_url), style="blue")
     return JSONResponse(content)
 
 
@@ -84,22 +84,23 @@ async def create(request):
     create a data
     """
     payload = await request.json()
-    trigger, errors = TriggerSchema.validate_or_error(payload)
-
+    trigger, errors = trigger_schema.validate_or_error(payload)
+    print(type(trigger))
+    print(trigger)
     if errors:
-        content = {"errors": errors}
         if settings.DEBUG:
             console.print("error during creating a trigger", style="red")
+        return JSONResponse(dict(errors), status_code=400)
 
     else:
-        await Trigger.objects.create(description=trigger.description,
-                                     rss_url=trigger.rss_url,
-                                     localstorage=trigger.localstorage,
-                                     mastodon=trigger.mastodon,
-                                     telegram=trigger.telegram,
-                                     wallabag=trigger.wallabag,
-                                     webhook=trigger.webhook,
-                                     status=trigger.status,
+        await Trigger.objects.create(description=trigger['description'],
+                                     rss_url=trigger['rss_url'],
+                                     localstorage=trigger['localstorage'],
+                                     mastodon=trigger['mastodon'],
+                                     telegram=trigger['telegram'],
+                                     wallabag=trigger['wallabag'],
+                                     webhook=trigger['webhook'],
+                                     status=trigger['status'],
                                      )
         content = {"errors": ''}
         if settings.DEBUG:
@@ -115,7 +116,7 @@ async def update(request):
         trigger_id = int(request.path_params['trigger_id'])
 
         data = await request.json()
-        trigger, errors = TriggerSchema.validate_or_error(data)
+        trigger, errors = trigger_schema.validate_or_error(data)
         if errors:
             content = {"errors": errors,
                        "data": trigger,
@@ -124,14 +125,14 @@ async def update(request):
                 console.print(f"error during updating trigger {trigger_id}", style="red")
         else:
             trigger_to_update = await Trigger.objects.get(id=trigger_id)
-            await trigger_to_update.update(description=trigger.description,
-                                           rss_url=trigger.rss_url,
-                                           localstorage=trigger.localstorage,
-                                           mastodon=trigger.mastodon,
-                                           telegram=trigger.telegram,
-                                           wallabag=trigger.wallabag,
-                                           webhook=trigger.webhook,
-                                           status=trigger.status,
+            await trigger_to_update.update(description=trigger['description'],
+                                           rss_url=trigger['rss_url'],
+                                           localstorage=trigger['localstorage'],
+                                           mastodon=trigger['mastodon'],
+                                           telegram=trigger['telegram'],
+                                           wallabag=trigger['wallabag'],
+                                           webhook=trigger['webhook'],
+                                           status=trigger['status'],
                                            )
             content = {'errors': ''}
     else:

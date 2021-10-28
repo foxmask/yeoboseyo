@@ -7,7 +7,7 @@ import argparse
 import arrow
 import asyncio
 import datetime
-from feedparser_data import RssAsync as Rss
+from feedsparser_data import RssAsync as Rss
 import os
 from rich.console import Console
 from rich.table import Table
@@ -167,7 +167,7 @@ async def go():
             if published is not None and now >= published >= date_triggered:
                 read_entries += 1
 
-                for service in settings.SUPPORTED_SERVICES:
+                for service in list(settings.SUPPORTED_SERVICES):
                     # hasattr(trigger, service.lower()) => retrieve trigger.mastodon / trigger.localstorage and so on
                     # attr = value of the trigger.<service>
                     attr = hasattr(trigger, service.lower())

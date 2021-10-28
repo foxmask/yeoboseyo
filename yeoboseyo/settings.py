@@ -6,7 +6,7 @@
 import logging
 from starlette.config import Config
 import databases
-from starlette.datastructures import Secret
+from starlette.datastructures import Secret, CommaSeparatedStrings
 
 config = Config(".env")
 
@@ -44,8 +44,8 @@ MASTODON_VISIBILITY = config('MASTODON_VISIBILITY')
 MY_NOTES_FOLDER = config('MY_NOTES_FOLDER')
 
 SUPPORTED_SERVICES = config('SUPPORTED_SERVICES',
-                            default=('Mastodon', 'LocalStorage', 'Webhook', 'Telegram', 'Wallabag'),
-                            cast=tuple)
+                            default='Mastodon, LocalStorage, Webhook, Telegram, Wallabag',
+                            cast=CommaSeparatedStrings)
 
 TEMPLATE_STYLE = config('TEMPLATE_STYLE')
 # TELEGRAM
@@ -59,4 +59,3 @@ WALLABAG_CLIENTID = config('WALLABAG_CLIENTID', default='', cast=Secret)
 WALLABAG_CLIENTSECRET = config('WALLABAG_CLIENTSECRET', default='', cast=Secret)
 WALLABAG_USERNAME = config('WALLABAG_USERNAME', default='', cast=Secret)
 WALLABAG_PASSWORD = config('WALLABAG_PASSWORD', default='', cast=Secret)
-
