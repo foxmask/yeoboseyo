@@ -2,7 +2,7 @@
 """
    여보세요 - Models
 """
-
+import asyncio
 import databases
 import datetime
 import orm
@@ -41,5 +41,5 @@ if __name__ == '__main__':
     # Create the database
     print(f"database creation {settings.DATABASE_URL}")
     # Create the tables
-    models.create_all()
+    asyncio.run(models.create_all())
     print("done!")
