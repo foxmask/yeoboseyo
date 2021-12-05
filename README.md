@@ -301,3 +301,16 @@ migrations/alter_table_trigger_add_webhook.sql
 ```
 
 (Image credits to [Emojipedia](https://emojipedia.org/))
+
+## Test
+
+```commandline
+pytest
+```
+
+or
+
+```commandline
+coverage run --source='.' -m pytest
+coverage report -m
+```
