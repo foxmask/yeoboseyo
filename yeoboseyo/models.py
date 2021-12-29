@@ -6,12 +6,13 @@ import asyncio
 import databases
 import datetime
 import orm
+
 import os
 import sys
-
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
 sys.path.append(PARENT_FOLDER)
+
 from yeoboseyo import settings
 
 database = databases.Database(settings.DATABASE_URL, force_rollback=True)

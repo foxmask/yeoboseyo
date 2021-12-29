@@ -8,18 +8,14 @@ import arrow
 import asyncio
 import datetime
 from feedsparser_data import RssAsync as Rss
-import os
 from rich.console import Console
 from rich.table import Table
-import sys
 import time
 
-console = Console()
+import settings
+from models import Trigger
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
-sys.path.append(PARENT_FOLDER)
-from yeoboseyo import settings, Trigger
+console = Console()
 
 now = arrow.utcnow().to(settings.TIME_ZONE).format('YYYY-MM-DDTHH:mm:ssZZ')
 
@@ -70,8 +66,9 @@ async def _service(the_service, status, trigger, entry) -> int:
         attr = the_service.lower()
         # check if the attributes mastodon, localstorage are set
         # to trigger the associated service
+        class_to_import = 'yeoboseyo.services.' + the_service.lower()
         if getattr(trigger, attr):
-            klass = getattr(__import__('yeoboseyo.services.' + the_service.lower(), fromlist=[the_service]), the_service)
+            klass = getattr(__import__(class_to_import, fromlist=[the_service]), the_service)
             # save the data
             if await klass().save_data(trigger, entry):
                 return 1

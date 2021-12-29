@@ -2,13 +2,14 @@
 """
    여보세요 - Settings
 """
-
-import logging
-from starlette.config import Config
 import databases
+import logging
+import os
+from starlette.config import Config
 from starlette.datastructures import Secret, CommaSeparatedStrings
 
-config = Config(".env")
+dir_path = os.path.dirname(os.path.abspath(__file__))
+config = Config(f"{dir_path}/.env")
 
 ###################################################
 # Do not change anything below
@@ -19,11 +20,8 @@ config = Config(".env")
 LOG_LEVEL = logging.INFO
 
 DEBUG = config('DEBUG', cast=bool, default=False)
-TESTING = config('TESTING', cast=bool, default=False)
 
 DATABASE_URL = config('DATABASE_URL', cast=databases.DatabaseURL)
-if TESTING:
-    DATABASE_URL = DATABASE_URL.replace(database='test_' + DATABASE_URL.database)
 
 # server host and port
 YEOBOSEYO_HOST = config('YEOBOSEYO_HOST', default='127.0.0.1')

@@ -17,6 +17,7 @@ From your favorite RSS feeds, spread/share those news to services of your choice
 * Telegram
 * Wallabag
 * Local Markdown files
+* Any services using a Webhook to push data
 
 ### used cases:
 
@@ -44,6 +45,7 @@ Let see how to setup all of that below
 - [wallabag API](https://gitlab.com/foxmask/wallabag_api) for [Wallabag](https://wallabag.org/en) readit later applications
 
 ### Installation
+
 create a virtualenv
 
 ```bash
@@ -51,11 +53,15 @@ python3 -m venv yeoboseyo
 cd yeoboseyo
 source bin/activate
 ```
-then 
+
+then
+
 ```bash
 pip install -r requirements.txt
 ```
+
 or 
+
 ```bash
 pip install yeoboseyo
 ```
@@ -69,6 +75,7 @@ mv env.sample .env
 ```
 
 set the correct values for your own environment
+
 ```ini
 DATABASE_URL=sqlite:///db.sqlite3
 TIME_ZONE=Europe/Paris
@@ -101,10 +108,12 @@ on https://yourmastoinstance/settings/applications/new
 * then `submit`
 
 then select Yeoboseyo again to retreive the access token, and fill the file `yeoboseyo_clientcred.secret` put on the first line the value of "Your access token" and on the second line the https url of your masto instance eg
-```
+
+```bash
 Azdfghy5678hefdsgghjuju09knb
 https://framapiaf.org
 ```
+
 this file will be read each time something will be posted on masto
 
 ### Slack/Mattermost/Discord: Webhook
@@ -155,6 +164,7 @@ WALLABAG_USERNAME=wallabag
 ## :dvd: Database
 
 create the database (to execute only once)
+
 ```bash
 python models.py
 ```
@@ -162,6 +172,7 @@ python models.py
 ## :mega: Running the Web application
 
 start the application
+
 ```bash
 cd yeoboseyo
 python app.py &
@@ -170,7 +181,6 @@ INFO: Started server process [13588]
 INFO: Waiting for application startup.
 INFO: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
-
 
 ### :eyes: Adding some Feeds to track
 
@@ -185,6 +195,7 @@ Go on `http://0.0.0.0:8000` and fill the form to add new Feeds to track
 ###  :dizzy: Running the engine
 
 now that you fill settings, and form, launch the command and see how many feeds are comming
+
 ```bash
 여보세요 !
 usage: python run.py [-h] -a {report,go,switch} [-trigger_id TRIGGER_ID]
@@ -206,8 +217,11 @@ Trigger FoxMasK blog
  Entries created 1 / Read 1
 
 ```
+
 ### get the list
+
 get the list of your feeds to check which one provided articles or not
+
 ```bash
 $ python run.py -a report
 여보세요 !
@@ -241,14 +255,18 @@ $ python run.py -a report
 ```
 
 ### switch the status of a trigger
+
 switch the status of trigger to on/off
+
 ```bash
 python run.py -a switch -trigger_id 1
 
 여보세요 ! Switch
 Successfully disabled Trigger 'Mon Blog'
 ```
+
 and check it again to see the status moving
+
 ```bash 
 09:00 $ python run.py -a report
 여보세요 !
@@ -304,13 +322,13 @@ migrations/alter_table_trigger_add_webhook.sql
 
 ## Test
 
-```commandline
+```bash
 pytest
 ```
 
 or
 
-```commandline
+```bash
 coverage run --source='.' -m pytest
 coverage report -m
 ```

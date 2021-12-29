@@ -2,11 +2,8 @@
 """
    여보세요 - App
 """
-
 import arrow
-import os
 from rich.console import Console
-import sys
 
 # starlette
 from starlette.applications import Starlette
@@ -18,10 +15,9 @@ from starlette.templating import Jinja2Templates
 # uvicorn
 import uvicorn
 # yeoboseyo
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
-sys.path.append(PARENT_FOLDER)
-from yeoboseyo import settings, trigger_schema, Trigger
+import settings
+from forms import trigger_schema
+from models import Trigger
 
 console = Console()
 

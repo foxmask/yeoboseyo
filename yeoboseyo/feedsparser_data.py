@@ -8,6 +8,7 @@ from logging import getLogger
 import typing
 # external lib
 import feedparser
+from feedparser.util import FeedParserDict
 import httpx
 
 # create logger
@@ -19,7 +20,7 @@ __all__ = ['RssAsync']
 
 class RssAsync:
 
-    USER_AGENT = f'FeedParserData/0.1.3 +https://framagit.org/annyong/yeoboseyo'
+    USER_AGENT = 'FeedParserData/0.1.3 +https://framagit.org/annyong/yeoboseyo'
 
     async def get_data(self, url_to_parse, bypass_bozo=False, **kwargs) -> typing.Any:
         """
@@ -28,16 +29,18 @@ class RssAsync:
         :boolean bypass_bozo : for not well formed URL, do we ignore or not that URL
         :return: Feeds if Feeds are well formed
         """
-        data = {'bozo': 0, 'entries': []}
-        async with httpx.AsyncClient(timeout=30) as client:
-            feed = await client.get(url_to_parse)
-            logger.debug(url_to_parse)
-            if feed.status_code == 200:
-                data = feedparser.parse(feed.text, agent=self.USER_AGENT)
-                # if the feeds is not well formed, return no data at all
-            if bypass_bozo is False and data.bozo == 1:
-                data.entries = ''
-                log = f"{url_to_parse}: is not valid. Make a try by providing 'True' to 'Bypass Bozo' parameter"
-                logger.info(log)
-
+        data = FeedParserDict()
+        try:
+            async with httpx.Client(timeout=30) as client:
+                feed = await client.get(url_to_parse)
+                if feed.status_code == 200:
+                    logger.debug(url_to_parse)
+                    data = feedparser.parse(feed.text, agent=self.USER_AGENT)
+                    # if the feeds is not well formed, return no data at all
+                    if bypass_bozo is False and data.bozo == 1:
+                        data.entries = ''
+                        log = f"{url_to_parse}: is not valid. Make a try by providing 'True' to 'Bypass Bozo' parameter"
+                        logger.info(log)
+        except httpx.ConnectError as e:
+            logger.error(e)
         return data

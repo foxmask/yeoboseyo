@@ -4,14 +4,7 @@
 """
 
 import databases
-import os
 from starlette.datastructures import Secret
-import sys
-
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
-sys.path.append(PARENT_FOLDER)
-
 from yeoboseyo import settings
 
 

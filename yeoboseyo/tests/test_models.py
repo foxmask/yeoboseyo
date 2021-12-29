@@ -4,21 +4,16 @@
 """
 import databases
 import datetime
+import pytest
 import orm
 import os
-import sys
 
-import pytest
+pytestmark = pytest.mark.anyio
 
-pytest_plugins = ('pytest_asyncio',)
+assert "TEST_DATABASE_URL" in os.environ, "TEST_DATABASE_URL is not set."
+DATABASE_URL = os.environ["TEST_DATABASE_URL"]
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_FOLDER = os.path.dirname(PROJECT_DIR)
-sys.path.append(PARENT_FOLDER)
-
-from yeoboseyo.models import Trigger
-
-database = databases.Database("sqlite:///db_test.sqlite3")
+database = databases.Database(DATABASE_URL)
 models = orm.ModelRegistry(database=database)
 
 
@@ -40,23 +35,35 @@ class Trigger(orm.Model):
     }
 
 
-@pytest.mark.asyncio
-async def test_create():
+@pytest.fixture(autouse=True, scope="function")
+async def create_test_database():
     await models.create_all()
-    return await Trigger.objects.create(
+    yield
+    await models.drop_all()
+
+
+async def test_create():
+    trigger = await Trigger.objects.create(
+        description="My Blog",
         rss_url="https://foxmask.org/feeds/atom.rss",
         mastodon=False,
         telegram=False,
         wallabag=False,
         webhook="",
         localstorage="/home/foxmask/Notes/",
-        description="My Blog",
         status=True
     )
+    assert trigger.description == 'My Blog'
+    assert type(trigger.rss_url) is str
+    assert type(trigger.localstorage) is str
+    assert type(trigger.mastodon) is bool
+    assert type(trigger.telegram) is bool
+    assert type(trigger.wallabag) is bool
+    assert trigger.webhook is None
+    assert type(trigger.status) is bool
+    return trigger
 
 
-@pytest.mark.asyncio
 async def test_get():
     trigger = await test_create()
     assert trigger.rss_url == "https://foxmask.org/feeds/atom.rss"
-    print(trigger)

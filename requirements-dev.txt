@@ -1,4 +1,7 @@
 -r requirements.txt
+coverage
 flake8
 pytest-asyncio
 semgrep
+pipdeptree
+tox
