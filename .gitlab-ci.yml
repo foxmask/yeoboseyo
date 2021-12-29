@@ -13,6 +13,7 @@ image: python:3.8.11
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   DS_EXCLUDED_ANALYZERS: bundler-audit, retire.js, gemnasium, gemnasium-maven
+  TEST_DATABASE_URL: sqlite:///db_test.sqlite3
 cache:
   paths:
   - ".cache/pip"
