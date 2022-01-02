@@ -1,6 +1,6 @@
 # 여보세요
 
-![Yeoboseyo home page](https://gitlab.com/annyong/yeoboseyo/-/raw/master/doc/Yeoboseyo_list.png)
+![Yeoboseyo home page](https://framagit.org/annyong/yeoboseyo/-/raw/master/doc/Yeoboseyo_list.png)
 
 ## Description
 
