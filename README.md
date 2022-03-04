@@ -42,7 +42,7 @@ Let see how to setup all of that below
 - [starlette](https://www.starlette.io/) (the web application)
 - [feedparser](https://feedparser.readthedocs.io/en/latest/) (for RSS support)
 - [pypandoc](https://pypi.org/project/pypandoc/) (to convert html to markdown)
-- [wallabag API](https://gitlab.com/foxmask/wallabag_api) for [Wallabag](https://wallabag.org/en) readit later applications
+- [wallabag API](https://framagit.org/foxmask/wallabagapi) for [Wallabag](https://wallabag.org/en) readit later applications
 
 ### Installation
 
@@ -148,7 +148,7 @@ Create a client API like explain here https://doc.wallabag.org/fr/developer/api/
 
 this will give you something like this
 
-![Wallabag](https://gitlab.com/foxmask/wallabag_api/-/raw/master/wallabag_api_key.png)
+![Wallabag](https://framagit.org/foxmask/wallabagapi/-/raw/master/wallabag_api_key.png)
 
 Then replace the client_id / client_secret / login / pass in the .env file
 
