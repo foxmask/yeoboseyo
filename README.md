@@ -1,6 +1,6 @@
 # 여보세요
 
-![Yeoboseyo home page](https://git.afpy.org/foxmask/yeoboseyo/-/raw/master/doc/Yeoboseyo_list.png)
+![Yeoboseyo home page](https://git.afpy.org/foxmask/yeoboseyo/raw/branch/master/doc/Yeoboseyo_list.png)
 
 ## Description
 
