@@ -323,7 +323,13 @@ migrations/alter_table_trigger_add_webhook.sql
 ## Test
 
 ```bash
+export TEST_DATABASE_URL=sqlite:///db_test.sqlite3
 pytest
+[...]
+yeoboseyo/tests/test_models.py ..                                                                                                                      [ 66%]
+yeoboseyo/tests/test_settings.py .                                                                                                                     [100%]
+
+===================================================================== 3 passed in 0.52s ======================================================================
 ```
 
 or
