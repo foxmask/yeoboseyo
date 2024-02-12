@@ -1,6 +1,6 @@
 # 여보세요
 
-![Yeoboseyo home page](https://git.afpy.org/foxmask/yeoboseyo/raw/branch/master/doc/Yeoboseyo_list.png)
+![Yeoboseyo home page](https://github.com/foxmask/yeoboseyo/master/doc/Yeoboseyo_list.png)
 
 ## Description
 
@@ -42,7 +42,7 @@ Let see how to setup all of that below
 - [starlette](https://www.starlette.io/) (the web application)
 - [feedparser](https://feedparser.readthedocs.io/en/latest/) (for RSS support)
 - [pypandoc](https://pypi.org/project/pypandoc/) (to convert html to markdown)
-- [wallabag API](https://git.afpy.org/foxmask/wallabagapi) for [Wallabag](https://wallabag.org/en) readit later applications
+- [wallabag API](https://guthub.com/foxmask/wallabagapi) for [Wallabag](https://wallabag.org/en) readit later applications
 
 ### Installation
 
@@ -148,7 +148,7 @@ Create a client API like explain here https://doc.wallabag.org/fr/developer/api/
 
 this will give you something like this
 
-![Wallabag](https://git.afpy.org/foxmask/wallabagapi/-/raw/master/wallabag_api_key.png)
+![Wallabag](https://github.com/foxmask/wallabagapi/blob/master/wallabag_api_key.png)
 
 Then replace the client_id / client_secret / login / pass in the .env file
 
